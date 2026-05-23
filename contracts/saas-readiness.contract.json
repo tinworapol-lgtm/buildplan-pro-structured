@@ -1,0 +1,37 @@
+{
+  "name": "BuildPlan Pro SaaS Readiness Contract",
+  "version": "2026-05-20.phase-18",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/system/readiness",
+      "purpose": "Return non-secret environment readiness flags for operator checks.",
+      "response": {
+        "configured": false,
+        "mode": "scaffold-env-missing",
+        "supabase": {
+          "url": true,
+          "anonKey": true,
+          "serviceRoleKey": false
+        },
+        "stripe": {
+          "secretKey": false,
+          "webhookSecret": false,
+          "monthlyPrice": false,
+          "yearlyPrice": false
+        },
+        "app": {
+          "baseUrl": true
+        },
+        "missing": [
+          "SUPABASE_SERVICE_ROLE_KEY",
+          "STRIPE_SECRET_KEY"
+        ]
+      }
+    }
+  ],
+  "security": {
+    "exposesSecretValues": false,
+    "exposesOnlyBooleanPresence": true
+  }
+}

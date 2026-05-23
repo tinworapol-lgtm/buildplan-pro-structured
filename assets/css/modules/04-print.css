@@ -1,0 +1,150 @@
+/* Print formatting */
+        @media print {
+            @page { size: A3 landscape; margin: 10mm; }
+            body, html { 
+                display: block !important;
+                background: white !important; 
+                overflow: visible !important; 
+                height: auto !important; 
+                width: max-content !important; 
+                min-width: 100% !important;
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .no-print { display: none !important; }
+            #project-info-header, #gantt-page, #dashboard-page, #actual-page, #cost-page, #duration-page, #signature-section, .sig-toggle-wrapper {
+                margin-left: 0 !important;
+            }
+            
+            /* ล็อกโครงสร้างหลักให้แสดงผลพอดีเป๊ะ ห้ามขยายหรือย่อเอง */
+            #main-container { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                box-shadow: none !important; 
+                height: auto !important; 
+                overflow: hidden !important; 
+                padding: 0 !important; 
+                border: 2px solid #000 !important; 
+                border-radius: 0 !important;
+                margin-bottom: 20px !important;
+                min-height: 0 !important;
+            }
+            
+            #data-pane { 
+                flex: none !important; 
+                box-shadow: none !important; 
+                border-right: 1px solid #000 !important; /* เส้นคั่นกลางสีดำเข้ม */
+                overflow: visible !important; 
+                height: auto !important; 
+            }
+            
+            #gantt-pane { 
+                flex: none !important; 
+                overflow: hidden !important; 
+                height: auto !important; 
+                background: white !important;
+                border: 1px solid #000 !important;
+                border-left: 0 !important;
+                box-shadow: inset -2px 0 0 #000 !important;
+                box-sizing: border-box !important;
+            }
+            #gantt-content, #timeline-header-wrapper {
+                border-right: 1px solid #000 !important;
+                box-sizing: border-box !important;
+            }
+            
+            #data-header, #timeline-header-wrapper {
+                border-bottom: 1px solid #cbd5e1 !important; 
+                background: white !important;
+                position: relative !important;
+            }
+
+            #data-body, #gantt-body { 
+                overflow: visible !important; /* ลบล้างคุณสมบัติ Scroll ที่ทำให้เกิดแท่งสีขาว */
+                height: auto !important; 
+                position: relative !important; 
+                max-height: none !important; 
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* ทำลาย Scrollbar ทิ้งทั้งหมดเวลาสั่งปริ้นท์ ป้องกันการเกิดพื้นที่ว่างปิดทับตาราง */
+            .custom-scrollbar { overflow: visible !important; }
+            ::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+            
+            .cell, .header-cell { 
+                border-color: #e2e8f0 !important; 
+                border-bottom-width: 1px !important;
+                border-right-width: 1px !important;
+                color: #000 !important;
+            }
+            #gantt-bg-rows > div { border-bottom: 1px solid #f1f5f9 !important; width: 100% !important; }
+            .gantt-grid-line { border-left: 1px solid #f8fafc !important; }
+            #header-top, #header-bottom { border-color: #e2e8f0 !important; background: white !important; }
+            #header-top > div, #header-bottom > div { border-right: 1px solid #e2e8f0 !important; color: #000 !important; }
+
+            #critical-svg { overflow: hidden !important; }
+            .shadow-sm, .shadow-md, .shadow-modern, .shadow-inner { box-shadow: none !important; }
+
+            #signature-section { 
+                display: flex !important;
+                margin-top: 6px !important; 
+                padding-top: 0 !important; 
+                background-color: white !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                border: none !important;
+                min-height: 0 !important;
+            }
+            #signature-container {
+                display: flex !important;
+                justify-content: flex-end !important;
+                gap: 2.2rem !important;
+                padding: 8px 20px 4px !important;
+            }
+            #signature-section [id^="sig-"] {
+                gap: 2px !important;
+            }
+            #signature-section .w-48 {
+                width: 140px !important;
+                height: 16px !important;
+            }
+            #signature-section .w-44 {
+                width: 132px !important;
+            }
+            #signature-section input {
+                color: #000 !important;
+                font-size: 10px !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                line-height: 1.1 !important;
+            }
+            #signature-section span {
+                font-size: 10px !important;
+                line-height: 1.1 !important;
+            }
+
+            #project-info-header {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                padding: 10px 0 !important;
+                border-bottom: none !important; 
+                margin-bottom: 10px !important;
+            }
+            #project-info-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                column-gap: 60px !important;
+                width: 100% !important;
+            }
+            #project-info-grid > div { gap: 4px !important; }
+            .modern-input, #header-duration-input, #project-value {
+                border-bottom: 1px dotted #9ca3af !important;
+                background-color: white !important;
+                color: #000 !important;
+            }
+            .sig-toggle-wrapper { display: none !important; }
+        }

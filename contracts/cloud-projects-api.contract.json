@@ -1,0 +1,54 @@
+{
+  "name": "BuildPlan Pro Cloud Projects API Contract",
+  "version": "2026-05-20.phase-17",
+  "basePath": "/api",
+  "auth": {
+    "bearer": "Supabase access token",
+    "rowLevelSecurity": true
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "purpose": "List projects owned by the logged-in user.",
+      "response": {
+        "projects": [
+          {
+            "id": "uuid",
+            "name": "Project name",
+            "updatedAt": "2026-05-20T00:00:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects",
+      "purpose": "Create or update a cloud project snapshot.",
+      "request": {
+        "id": "optional-uuid",
+        "name": "Project name",
+        "projectData": {}
+      },
+      "response": {
+        "project": {
+          "id": "uuid",
+          "name": "Project name",
+          "updatedAt": "2026-05-20T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/:id",
+      "purpose": "Load one project owned by the logged-in user.",
+      "response": {
+        "project": {
+          "id": "uuid",
+          "name": "Project name",
+          "payload": {}
+        }
+      }
+    }
+  ]
+}

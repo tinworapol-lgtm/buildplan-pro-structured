@@ -1,0 +1,40 @@
+{
+  "name": "BuildPlan Pro Auth OTP API Contract",
+  "version": "2026-05-20.phase-19",
+  "provider": "supabase-auth",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/auth/start",
+      "purpose": "Send email one-time login code.",
+      "request": {
+        "email": "customer@example.com"
+      },
+      "response": {
+        "sent": true,
+        "email": "customer@example.com"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/verify",
+      "purpose": "Verify email one-time login code and return browser access token.",
+      "request": {
+        "email": "customer@example.com",
+        "token": "123456"
+      },
+      "response": {
+        "authenticated": true,
+        "accessToken": "jwt",
+        "user": {
+          "id": "uuid",
+          "email": "customer@example.com"
+        }
+      }
+    }
+  ],
+  "notes": [
+    "Email OTP requires Supabase email templates to expose the token code.",
+    "The browser stores only the Supabase access token in localStorage."
+  ]
+}

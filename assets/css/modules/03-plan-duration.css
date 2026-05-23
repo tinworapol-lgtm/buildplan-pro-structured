@@ -1,0 +1,37 @@
+.plan-toolbar { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06); max-width: 100%; }
+        .plan-date-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #dbeafe; background: #f8fbff; color: #0f3b75; border-radius: 8px; padding: 4px 9px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .plan-control-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; min-width: 0; }
+        .plan-select { height: 28px; border: 1px solid #cbd5e1; border-radius: 7px; padding: 0 28px 0 9px; background-color: #fff; color: #334155; font-size: 12px; font-weight: 700; outline: none; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); cursor: pointer; }
+        .plan-select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+        .plan-mode-btn { height: 28px; border: 1px solid #cbd5e1; border-radius: 7px; padding: 0 10px; background: #fff; color: #334155; font-size: 12px; font-weight: 900; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); transition: background 0.16s, border-color 0.16s, color 0.16s; white-space: nowrap; }
+        .plan-mode-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        .plan-mode-btn-active, .plan-mode-btn-active:hover { background: #0f172a; border-color: #0f172a; color: #fff; }
+        .plan-toggle-row { display: flex; align-items: center; gap: 6px; overflow-x: auto; overflow-y: hidden; padding-bottom: 1px; }
+        .plan-chip { height: 26px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid #d9e1ec; background: #fff; color: #475569; border-radius: 7px; padding: 0 8px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; user-select: none; transition: background 0.16s, border-color 0.16s, color 0.16s, box-shadow 0.16s; }
+        .plan-chip:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .plan-chip input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+        .plan-chip i { font-size: 10px; color: #64748b; }
+        .plan-chip:has(input:checked) { background: #f8fafc; border-color: #94a3b8; color: #0f172a; box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35); }
+        .plan-chip-critical:has(input:checked) i { color: #d97706; }
+        .plan-chip-today:has(input:checked) i { color: #2563eb; }
+        .plan-chip-curve:has(input:checked) i { color: #e11d48; }
+        .plan-chip-label:has(input:checked) i { color: #059669; }
+        .plan-chip-installments:has(input:checked) i { color: #f97316; }
+        .installment-line-label { background: #f97316; color: #fff; border: 1px solid #fdba74; box-shadow: 0 6px 14px rgba(249, 115, 22, 0.22); }
+        .installment-line-bar { position: absolute; top: 0; left: -1px; width: 2px; height: 100%; background: #f97316; box-shadow: 0 0 6px rgba(249, 115, 22, 0.7); }
+        .installment-line-date { background: rgba(255, 255, 255, 0.96); color: #b45309; border: 1px solid #fed7aa; }
+        .work-duration-input { width: 54px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; text-align: right; font-size: 11px; font-weight: 800; outline: none; background: #fff; }
+        .work-duration-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+        .work-duration-percent { width: 48px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 5px; text-align: right; font-size: 11px; font-weight: 800; outline: none; background: #fff; }
+        .work-duration-percent:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14); }
+        .work-duration-select { width: 100%; min-width: 0; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 6px; font-size: 11px; font-weight: 700; color: #334155; outline: none; background: #fff; }
+        .work-duration-select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+        .work-duration-input, .work-duration-percent { appearance: textfield; -moz-appearance: textfield; }
+        .work-duration-input::-webkit-outer-spin-button,
+        .work-duration-input::-webkit-inner-spin-button,
+        .work-duration-percent::-webkit-outer-spin-button,
+        .work-duration-percent::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .duration-name-resizer { position: absolute; top: 0; right: -3px; width: 8px; height: 100%; cursor: col-resize; z-index: 20; }
+        .duration-name-resizer::after { content: ""; position: absolute; top: 8px; bottom: 8px; left: 3px; width: 2px; border-radius: 999px; background: #cbd5e1; }
+        .duration-name-resizer:hover::after, body.resizing-duration-name .duration-name-resizer::after { background: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14); }
+        body.resizing-duration-name { cursor: col-resize; user-select: none; }

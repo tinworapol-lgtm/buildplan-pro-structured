@@ -1,0 +1,11 @@
+.vercel
+.env
+.env.local
+.env.*.local
+.env.production
+node_modules/
+reports/
+docs/superpowers/
+*.log
+dist/
+coverage/

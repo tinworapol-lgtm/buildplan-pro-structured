@@ -1,0 +1,5 @@
+/* Local Sarabun fallback.
+   Replace this with self-hosted Sarabun font files during final brand packaging if exact font parity is required. */
+body {
+  font-family: Sarabun, "Segoe UI", Tahoma, Arial, sans-serif;
+}

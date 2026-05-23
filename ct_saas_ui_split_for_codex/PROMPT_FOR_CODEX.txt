@@ -1,0 +1,40 @@
+You are Codex working on a Construction Tech SaaS UI prototype.
+
+Build a responsive Thai-language SaaS web app based on the attached reference images and the design brief file `CODEX_DESIGN_BRIEF_TH.md`.
+
+Goal:
+Create a polished frontend prototype with these screens:
+1. Landing + Login
+2. Program Selection by subscription package
+3. User Workspace Dashboard
+4. Admin Dashboard
+5. Floating Help Chatbot
+
+Use mock data only. Do not connect to a real backend yet.
+
+Important requirements:
+- Follow the visual style of the reference images: navy/teal/orange, rounded cards, modern SaaS dashboard, construction theme.
+- Thai UI labels must be natural and readable.
+- After mock login, route to Program Selector.
+- Program Selector must show modules enabled/locked by current package.
+- User dashboard must include back-to-program-selector and logout buttons.
+- Admin dashboard must be separate by role.
+- Floating chatbot must appear at bottom-right and open a small help panel.
+- Make the layout responsive for desktop/tablet/mobile.
+- Keep code clean and componentized.
+
+Please inspect:
+- `00_full_flow_reference.png`
+- `01_landing_login.png`
+- `02_program_selector.png`
+- `03_user_dashboard.png`
+- `04_admin_dashboard.png`
+- `CODEX_DESIGN_BRIEF_TH.md`
+
+Then implement the prototype in the current project using the existing stack. If there is no framework, use React + TypeScript + Tailwind if available; otherwise use HTML/CSS/JS.
+
+Deliver:
+- Working UI
+- Clear component/file structure
+- Mock state for login, package, role, and module permissions
+- No backend required in this iteration

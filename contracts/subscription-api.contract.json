@@ -1,0 +1,80 @@
+{
+  "name": "BuildPlan Pro Subscription API Contract",
+  "version": "2026-05-20.phase-17",
+  "basePath": "/api",
+  "auth": {
+    "cookieSession": true,
+    "csrf": "recommended-for-post-requests",
+    "bearer": "Supabase access token for API requests"
+  },
+  "plans": [
+    "monthly",
+    "yearly"
+  ],
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/session",
+      "purpose": "Return current login session.",
+      "response": {
+        "authenticated": true,
+        "user": {
+          "id": "usr_123",
+          "email": "customer@example.com",
+          "name": "Customer Name"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/license/status",
+      "purpose": "Return subscription/license status for the logged-in user.",
+      "response": {
+        "status": "active",
+        "plan": "monthly",
+        "expiresAt": "2026-06-19T00:00:00.000Z",
+        "message": ""
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/checkout",
+      "purpose": "Start a monthly or yearly checkout flow.",
+      "request": {
+        "plan": "monthly"
+      },
+      "response": {
+        "checkoutUrl": "https://payments.example.com/checkout/session_123"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/payment",
+      "purpose": "Receive payment provider webhook and update subscription state.",
+      "request": {
+        "provider": "stripe-or-other",
+        "eventType": "subscription.updated"
+      },
+      "response": {
+        "received": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "purpose": "Receive Stripe signed webhook and update subscription state.",
+      "response": {
+        "received": true
+      }
+    }
+  ],
+  "statusValues": [
+    "active",
+    "trialing",
+    "past_due",
+    "expired",
+    "cancelled",
+    "inactive",
+    "unavailable"
+  ]
+}

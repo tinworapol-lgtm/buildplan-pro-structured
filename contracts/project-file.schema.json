@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://buildplan.local/contracts/project-file.schema.json",
+  "title": "BuildPlan Pro Project File",
+  "type": "object",
+  "required": [
+    "version",
+    "savedAt",
+    "app",
+    "tasks"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "string"
+    },
+    "savedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "app": {
+      "type": "string"
+    },
+    "appVersion": {
+      "type": "string"
+    },
+    "info": {
+      "type": "object"
+    },
+    "prefs": {
+      "type": "object"
+    },
+    "installmentSettings": {
+      "type": "object"
+    },
+    "durationPlanSettings": {
+      "type": "object"
+    },
+    "actualSettings": {
+      "type": "object"
+    },
+    "actualEntries": {
+      "type": "object"
+    },
+    "costSettings": {
+      "type": "object"
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {},
+          "name": {
+            "type": "string"
+          },
+          "duration": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "start": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "predecessors": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cost": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "progress": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "isGroup": {
+            "type": "boolean"
+          },
+          "isMilestone": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

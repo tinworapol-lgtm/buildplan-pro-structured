@@ -1,0 +1,287 @@
+{
+  "productName": "BuildPlan Pro",
+  "packageName": "buildplan-pro-structured",
+  "version": "structured-phase-24",
+  "releaseDate": "2026-05-19",
+  "locale": "th-TH",
+  "appType": "browser-plus-serverless-app-shell-ct-saas-mock-prototype",
+  "entrypoint": "index.html",
+  "config": "assets/js/config/app-config.js",
+  "verification": "tools/verify-structured.js",
+  "modules": {
+    "js": [
+      "assets/js/config/app-config.js",
+      "assets/js/modules/00-buildplan-namespace.js",
+      "assets/js/services/license-adapter.js",
+      "assets/js/services/project-schema.js",
+      "assets/js/services/auth-adapter.js",
+      "assets/js/services/cloud-save-adapter.js",
+      "assets/js/services/saas-readiness-adapter.js",
+      "assets/js/services/account-cloud-ui.js",
+      "assets/js/services/app-shell.js",
+      "assets/js/services/ct-saas-mock-app.js",
+      "assets/js/modules/01-core-state.js",
+      "assets/js/modules/02-storage.js",
+      "assets/js/modules/03-ui-controls-print.js",
+      "assets/js/modules/04-duration-installments.js",
+      "assets/js/modules/05-gantt-rendering.js",
+      "assets/js/modules/06-actual-dashboard.js",
+      "assets/js/modules/07-cost-scurve.js",
+      "assets/js/modules/08-task-editing-bootstrap.js",
+      "assets/js/modules/09-public-api.js"
+    ],
+    "css": [
+      "assets/css/buildplan.css",
+      "assets/css/modules/00-foundation.css",
+      "assets/css/modules/01-gantt.css",
+      "assets/css/modules/02-navigation-cost-dashboard.css",
+      "assets/css/modules/03-plan-duration.css",
+      "assets/css/modules/04-print.css",
+      "assets/css/modules/05-app-shell.css"
+    ],
+    "services": [
+      "assets/js/services/license-adapter.js",
+      "assets/js/services/project-schema.js",
+      "assets/js/services/auth-adapter.js",
+      "assets/js/services/cloud-save-adapter.js",
+      "assets/js/services/saas-readiness-adapter.js",
+      "assets/js/services/account-cloud-ui.js",
+      "assets/js/services/app-shell.js",
+      "assets/js/services/ct-saas-mock-app.js"
+    ],
+    "contracts": [
+      "contracts/subscription-api.contract.json",
+      "contracts/project-file.schema.json",
+      "contracts/cloud-projects-api.contract.json",
+      "contracts/saas-readiness.contract.json",
+      "contracts/auth-otp-api.contract.json"
+    ]
+  },
+  "capabilities": [
+    "construction-gantt-schedule",
+    "s-curve-plan-and-actual",
+    "work-value-cost-summary",
+    "installment-lines",
+    "duration-allocation",
+    "project-import-export",
+    "local-autosave",
+    "print-report",
+    "login-session-adapter",
+    "subscription-checkout-adapter",
+    "cloud-project-save-adapter",
+    "saas-readiness-check",
+    "email-otp-login-ui",
+    "cloud-save-ui",
+    "account-cloud-smoke-test",
+    "production-url-smoke-test",
+    "local-vendor-assets",
+    "production-saas-readiness-smoke",
+    "home-login-workspace-routing",
+    "demo-production-mode-status-ui",
+    "polished-home-login-shell",
+    "cache-busted-app-shell-assets",
+    "image-background-home-shell",
+    "grouped-saas-readiness-guidance",
+    "home-saas-setup-panel",
+    "structured-api-env-guard-responses",
+    "saas-launch-doctor",
+    "vercel-env-plan-helper",
+    "windows-vercel-env-push-helper",
+    "windows-saas-activation-wizard",
+    "pricing-checkout-ui",
+    "ct-saas-landing-login-prototype",
+    "program-selector-package-permissions",
+    "user-workspace-dashboard-prototype",
+    "admin-dashboard-prototype",
+    "floating-help-chatbot",
+    "ct-saas-production-smoke-test",
+    "mock-subscription-status-guard",
+    "mock-expiry-lock-flow",
+    "mock-plan-switcher",
+    "mock-billing-upgrade-modal",
+    "mock-monthly-yearly-plan-selection",
+    "mock-renewal-flow",
+    "billing-deep-link-route",
+    "app-shell-hash-param-routing",
+    "reference-matched-landing-login",
+    "workspace-back-to-home-button",
+    "reference-matched-user-dashboard",
+    "plan-only-home-entry",
+    "free-199-599-pricing",
+    "plan-only-entry",
+    "free-199-599-packages",
+    "no-enterprise-tier",
+    "buildplan-pro-branding",
+    "english-professional-landing-copy",
+    "compact-login-card"
+  ],
+  "subscriptionReadiness": {
+    "mode": "serverless-scaffold-local-demo-default",
+    "plannedPlans": [
+      "monthly",
+      "yearly"
+    ],
+    "backendContract": "contracts/subscription-api.contract.json",
+    "licenseAdapter": "assets/js/services/license-adapter.js",
+    "apiRoutes": [
+      "api/session.js",
+      "api/license/status.js",
+      "api/checkout.js",
+      "api/webhooks/stripe.js"
+    ],
+    "pricingUi": "index.html",
+    "checkoutClient": "assets/js/services/license-adapter.js"
+  },
+  "dataReadiness": {
+    "projectFileSchema": "contracts/project-file.schema.json",
+    "schemaAdapter": "assets/js/services/project-schema.js",
+    "storageAdapter": "assets/js/modules/02-storage.js"
+  },
+  "qa": {
+    "verify": "tools/verify-structured.js",
+    "preflight": "tools/qa-preflight.js",
+    "latestReport": "reports/qa-preflight-phase-11.json",
+    "browserSmoke": "docs/BROWSER_SMOKE_PHASE_12.md",
+    "latestBrowserSmoke": "reports/browser-smoke-phase-12.json"
+  },
+  "localPreview": {
+    "command": "node tools/serve-local.js --port 4177",
+    "url": "http://127.0.0.1:4177/",
+    "tool": "tools/serve-local.js"
+  },
+  "productionReadiness": {
+    "audit": "tools/audit-production-readiness.js",
+    "latestReport": "reports/production-readiness-phase-13.json",
+    "status": "external-cdn-removed-env-pending",
+    "knownExternalDependencies": []
+  },
+  "qualityGate": {
+    "command": "node tools/quality-gate.js",
+    "npmScript": "npm run quality",
+    "latestReport": "reports/quality-gate-phase-14.json"
+  },
+  "launchers": {
+    "windowsCmd": "Start-BuildPlan-Pro.cmd",
+    "powershell": "Start-BuildPlan-Pro.ps1",
+    "quickStartThai": "docs/USER_QUICK_START_TH.md"
+  },
+  "webDeploy": {
+    "status": "deployed-production-phase-40-mock-billing-upgrade-modal-clean",
+    "recommended": "vercel",
+    "vercelConfig": "vercel.json",
+    "netlifyConfig": "netlify.toml",
+    "previewCommand": "vercel",
+    "productionCommand": "vercel --prod",
+    "limitation": "Backend scaffold is present, but production login/payment/cloud save needs Supabase and Stripe environment variables.",
+    "provider": "vercel",
+    "productionUrl": "https://buildplan-pro-structured.vercel.app/",
+    "deploymentUrl": "https://buildplan-pro-structured-am6e83rx1-tinworapol-1514s-projects.vercel.app",
+    "inspectorUrl": "https://vercel.com/tinworapol-1514s-projects/buildplan-pro-structured/HGPYF83aug8Wr4JsA2YRjHxDf5rR",
+    "latestReport": "reports/web-deploy-phase-40-mock-billing-upgrade-modal.json",
+    "latestProductionSmoke": "reports/production-url-smoke-phase-38.json"
+  },
+  "cloudReadiness": {
+    "mode": "supabase-scaffold",
+    "contract": "contracts/cloud-projects-api.contract.json",
+    "schema": "supabase/schema.sql",
+    "adapter": "assets/js/services/cloud-save-adapter.js",
+    "apiRoute": "api/projects/index.js"
+  },
+  "backendReadiness": {
+    "status": "scaffold-ready-env-required",
+    "preflight": "tools/backend-readiness-preflight.js",
+    "latestReport": "reports/backend-readiness-phase-17.json",
+    "envExample": ".env.example",
+    "envGuardHelper": "api/_shared.js"
+  },
+  "saasActivation": {
+    "status": "activation-scaffold-ready-env-required",
+    "preflight": "tools/saas-activation-preflight.js",
+    "readinessCheck": "tools/saas-readiness-check.js",
+    "readinessApi": "api/system/readiness.js",
+    "contract": "contracts/saas-readiness.contract.json",
+    "runbookThai": "docs/SAAS_ACTIVATION_RUNBOOK_TH.md",
+    "latestReport": "reports/saas-activation-phase-18.json",
+    "launchChecklistThai": "docs/SAAS_LAUNCH_CHECKLIST_TH.md",
+    "readinessGuidance": "api/system/readiness.js",
+    "launchDoctor": "tools/saas-launch-doctor.js",
+    "launchDoctorReport": "reports/saas-launch-doctor-phase-32.json",
+    "vercelEnvPlan": "tools/vercel-env-plan.js",
+    "productionEnvExample": ".env.production.example",
+    "vercelEnvPush": "tools/vercel-env-push.ps1",
+    "activationWizard": "tools/saas-activate.ps1"
+  },
+  "accountCloud": {
+    "status": "ui-scaffold-ready-env-required",
+    "preflight": "tools/account-cloud-preflight.js",
+    "authContract": "contracts/auth-otp-api.contract.json",
+    "uiAdapter": "assets/js/services/account-cloud-ui.js",
+    "authRoutes": [
+      "api/auth/start.js",
+      "api/auth/verify.js"
+    ],
+    "latestReport": "reports/account-cloud-phase-19.json"
+  },
+  "accountCloudSmoke": {
+    "status": "vm-dom-smoke-ready",
+    "preflight": "tools/account-cloud-smoke-preflight.js",
+    "smoke": "tools/browser-account-cloud-smoke.js",
+    "doc": "docs/ACCOUNT_CLOUD_SMOKE_PHASE_20.md",
+    "latestReport": "reports/account-cloud-smoke-phase-20.json"
+  },
+  "productionUrlSmoke": {
+    "status": "passed-after-production-deploy",
+    "preflight": "tools/production-url-smoke-preflight.js",
+    "smoke": "tools/production-url-smoke.js",
+    "doc": "docs/PRODUCTION_URL_SMOKE_PHASE_21.md",
+    "latestReport": "reports/production-url-smoke-phase-38.json"
+  },
+  "vendorDependencies": {
+    "status": "localized",
+    "preflight": "tools/vendor-dependency-preflight.js",
+    "doc": "docs/VENDOR_LOCALIZATION_PHASE_22.md",
+    "latestReport": "reports/vendor-dependencies-phase-22.json",
+    "assets": [
+      "assets/vendor/tailwind/tailwindcss-cdn.js",
+      "assets/vendor/fontawesome/css/all.min.css",
+      "assets/vendor/sweetalert2/sweetalert2.all.min.js",
+      "assets/vendor/fonts/sarabun.css"
+    ]
+  },
+  "productionSaaSReadiness": {
+    "status": "passed-after-production-deploy-env-missing",
+    "preflight": "tools/production-saas-readiness-preflight.js",
+    "smoke": "tools/production-saas-readiness-smoke.js",
+    "doc": "docs/PRODUCTION_SAAS_READINESS_PHASE_23.md",
+    "latestReport": "reports/production-saas-readiness-phase-23.json"
+  },
+  "appShell": {
+    "status": "deployed-production-phase-40-mock-billing-upgrade-modal-clean",
+    "preflight": "tools/app-shell-preflight.js",
+    "smoke": "tools/app-shell-smoke.js",
+    "service": "assets/js/services/app-shell.js",
+    "css": "assets/css/modules/05-app-shell.css",
+    "doc": "docs/CT_SAAS_PROTOTYPE_PHASE_38_TH.md",
+    "latestReport": "reports/app-shell-phase-24.json",
+    "routes": [
+      "home",
+      "login",
+      "programs",
+      "billing",
+      "user-dashboard",
+      "admin-dashboard",
+      "workspace"
+    ],
+    "latestSmokeReport": "reports/app-shell-smoke-phase-37.json",
+    "enhancementStatus": "phase-40-mock-billing-upgrade-modal-clean",
+    "homeBackground": "assets/images/home-construction-bg.png"
+  },
+  "phase": "phase-45-buildplan-pro-landing",
+  "updatedAt": "2026-05-23T01:32:07.310Z",
+  "qualityGates": [
+    "phase41-reference-landing-ui",
+    "phase42-workspace-back-home-button",
+    "phase43-reference-user-dashboard",
+    "phase44-plan-only-entry-pricing"
+  ]
+}
