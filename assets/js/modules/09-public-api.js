@@ -94,7 +94,12 @@
     restoreAutoSavedProject,
     clearAutoSavedProject,
     updateAutoSaveStatus,
-    initializeAutoSave
+    initializeAutoSave,
+
+
+
+
+    loadDefaultSampleProjectIfNeeded
   });
 
   BuildPlan.register('duration', {
