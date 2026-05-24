@@ -90,6 +90,12 @@ const steps = [
     command: process.execPath,
     args: ['tools/app-shell-smoke.js'],
     required: true,
+  },
+  {
+    id: 'phase-regression',
+    command: process.execPath,
+    args: ['tools/phase-regression-preflight.js'],
+    required: true,
   },
 ];
 
