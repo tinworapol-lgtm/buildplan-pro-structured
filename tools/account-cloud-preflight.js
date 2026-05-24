@@ -39,7 +39,7 @@ for (const marker of [
   "startOtp: '/api/auth/start'",
   "verifyOtp: '/api/auth/verify'",
 ]) {
-  if (!config.includes(marker)) fail('Config missing account/cloud marker', marker);
+  if (!config.includes(marker.replace(/'\/api\/auth\/[a-z]+?'/, "''"))) fail('Static demo config missing disabled account/cloud marker', marker);
 }
 
 const authAdapter = readText('assets/js/services/auth-adapter.js');

@@ -3,8 +3,10 @@
 (function bootstrapBuildPlanCloud(global) {
   const config = global.BuildPlanConfig || {};
   const cloudConfig = config.cloud || {};
+  const staticDemoMode = config.licensing?.mode === 'static-demo' || cloudConfig.provider === 'static-demo';
 
   function getEndpoint() {
+    if (staticDemoMode) return '';
     return cloudConfig.endpoints?.projects || '';
   }
 

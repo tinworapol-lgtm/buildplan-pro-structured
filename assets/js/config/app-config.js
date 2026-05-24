@@ -18,33 +18,33 @@
       actualProgressDashboard: true,
     },
     auth: {
-      provider: 'supabase',
+      provider: 'static-demo',
       tokenStorageKey: 'buildplan_auth_token',
       endpoints: {
-        session: '/api/session',
-        startOtp: '/api/auth/start',
-        verifyOtp: '/api/auth/verify',
+        session: '',
+        startOtp: '',
+        verifyOtp: '',
       },
     },
     licensing: {
-      mode: 'serverless-saas-demo-access',
+      mode: 'static-demo',
       loginRequired: false,
       plans: ['monthly', 'yearly'],
       endpoints: {
-        session: '/api/session',
-        licenseStatus: '/api/license/status',
-        checkout: '/api/checkout',
+        session: '',
+        licenseStatus: '',
+        checkout: '',
       },
     },
     cloud: {
-      provider: 'supabase',
+      provider: 'static-demo',
       endpoints: {
-        projects: '/api/projects',
+        projects: '',
       },
     },
     system: {
       endpoints: {
-        readiness: '/api/system/readiness',
+        readiness: '',
       },
     },
   };

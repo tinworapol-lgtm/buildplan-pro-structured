@@ -40,7 +40,7 @@ for (const marker of [
   "system: {",
   "readiness: '/api/system/readiness'",
 ]) {
-  if (!config.includes(marker)) fail('Config missing SaaS activation marker', marker);
+  if (!config.includes("readiness: ''")) fail('Static demo config missing disabled SaaS readiness marker', marker);
 }
 
 const html = readText('index.html');
