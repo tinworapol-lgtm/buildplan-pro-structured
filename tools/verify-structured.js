@@ -106,11 +106,11 @@ if (indexHtml.includes('assets/js/app.js')) throw new Error('index.html still lo
 
 const config = requireFile('assets/js/config/app-config.js');
 if (!config.includes("version: 'structured-phase-24'")) throw new Error('Config version must be structured-phase-24');
-if (!config.includes("session: '/api/session'")) throw new Error('Config missing session endpoint');
-if (!config.includes("projects: '/api/projects'")) throw new Error('Config missing cloud projects endpoint');
-if (!config.includes("readiness: '/api/system/readiness'")) throw new Error('Config missing SaaS readiness endpoint');
-if (!config.includes("startOtp: '/api/auth/start'")) throw new Error('Config missing auth start endpoint');
-if (!config.includes("verifyOtp: '/api/auth/verify'")) throw new Error('Config missing auth verify endpoint');
+if (!config.includes("session: ''")) throw new Error('Config must disable session endpoint in static-demo mode');
+if (!config.includes("projects: ''")) throw new Error('Config must disable cloud projects endpoint in static-demo mode');
+if (!config.includes("readiness: ''")) throw new Error('Config must disable readiness endpoint in static-demo mode');
+if (!config.includes("startOtp: ''")) throw new Error('Config must disable auth start endpoint in static-demo mode');
+if (!config.includes("verifyOtp: ''")) throw new Error('Config must disable auth verify endpoint in static-demo mode');
 
 const combined = [
   config,

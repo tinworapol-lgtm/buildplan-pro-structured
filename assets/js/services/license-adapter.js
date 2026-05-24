@@ -11,7 +11,7 @@
     expiresAt: null,
     checkedAt: null,
     loginRequired: !!licensing.loginRequired,
-    message: 'Local demo mode',
+    message: licenseConfig.mode === 'static-demo' ? 'Static demo mode' : 'Local demo mode',
   };
 
   function publishLicenseState() {
@@ -74,7 +74,7 @@
 
   async function getSessionStatus() {
     const licenseConfig = getLicenseConfig();
-    if (licenseConfig.mode === 'local-demo' || !licenseConfig.endpoints.session) {
+    if (licenseConfig.mode === 'local-demo' || licenseConfig.mode === 'static-demo' || !licenseConfig.endpoints.session) {
       return {
         authenticated: true,
         user: null,
@@ -91,7 +91,7 @@
     if (!licenseConfig.plans.includes(plan)) {
       throw new Error('Unsupported subscription plan');
     }
-    if (licenseConfig.mode === 'local-demo' || !licenseConfig.endpoints.checkout) {
+    if (licenseConfig.mode === 'local-demo' || licenseConfig.mode === 'static-demo' || !licenseConfig.endpoints.checkout) {
       return {
         mode: 'local-demo',
         plan,
@@ -109,7 +109,7 @@
 
   async function refreshLicenseStatus() {
     const licenseConfig = getLicenseConfig();
-    if (licenseConfig.mode === 'local-demo' || !licenseConfig.endpoints.licenseStatus) {
+    if (licenseConfig.mode === 'local-demo' || licenseConfig.mode === 'static-demo' || !licenseConfig.endpoints.licenseStatus) {
       return setLicenseState({
         mode: 'local-demo',
         status: 'active',

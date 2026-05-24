@@ -3,6 +3,7 @@
 (function bootstrapBuildPlanAuth(global) {
   const config = global.BuildPlanConfig || {};
   const authConfig = config.auth || {};
+  const staticDemoMode = config.licensing?.mode === 'static-demo' || authConfig.provider === 'static-demo';
   const tokenStorageKey = authConfig.tokenStorageKey || 'buildplan_auth_token';
   const refreshStorageKey = authConfig.refreshStorageKey || 'buildplan_refresh_token';
 
@@ -102,13 +103,13 @@
 
   async function refreshSession() {
     const endpoint = authConfig.endpoints?.session || config.licensing?.endpoints?.session || '';
-    if (!endpoint) {
+    if (staticDemoMode || !endpoint) {
       sessionState = {
         authenticated: config.licensing?.loginRequired !== true,
-        configured: false,
+        configured: !staticDemoMode,
         user: null,
         checkedAt: new Date().toISOString(),
-        message: 'Auth endpoint is not configured',
+        message: staticDemoMode ? 'Static demo mode' : 'Auth endpoint is not configured',
       };
       publishSessionState();
       return getSessionState();

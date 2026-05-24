@@ -61,3 +61,10 @@
 - หลังกรอก `.env.production.local` แล้ว ให้รัน `npm run saas:activate:dry` เพื่อตรวจทุกขั้นแบบปลอดภัย
 - เมื่อพร้อมเปิดใช้จริง ให้รัน `npm run saas:activate`
 - คำสั่งจริงจะ push env เข้า Vercel production, deploy production, แล้วรัน SaaS Doctor
+
+
+## Phase 55 static demo mode
+
+- Default production frontend runs in static-demo mode to avoid unnecessary Vercel Function Invocation usage.
+- Auth, license, readiness, checkout, and cloud-save endpoints remain scaffolded but are not called until backend activation changes app-config endpoints/mode.
+- Use local autosave and bundled sample project for pilot/demo usage.

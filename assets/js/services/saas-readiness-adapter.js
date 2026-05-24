@@ -3,6 +3,7 @@
 (function bootstrapBuildPlanSaaS(global) {
   const config = global.BuildPlanConfig || {};
   const endpoint = config.system?.endpoints?.readiness || '';
+  const staticDemoMode = config.licensing?.mode === 'static-demo';
 
   let readinessState = {
     configured: false,
@@ -25,11 +26,12 @@
   }
 
   async function refreshReadiness() {
-    if (!endpoint) {
+    if (staticDemoMode || !endpoint) {
       readinessState = {
         configured: false,
-        mode: 'readiness-endpoint-missing',
-        missing: ['system.endpoints.readiness'],
+        mode: staticDemoMode ? 'static-demo' : 'readiness-endpoint-missing',
+        missing: staticDemoMode ? [] : ['system.endpoints.readiness'],
+        message: staticDemoMode ? 'Static demo mode: backend checks are disabled until cloud/subscription is activated.' : '',
         checkedAt: new Date().toISOString(),
       };
       publishReadinessState();

@@ -52,16 +52,22 @@ const requiredFiles = [
 for (const file of requiredFiles) requireFile(file);
 
 const config = requireFile('assets/js/config/app-config.js');
-for (const marker of [
-  "version: 'structured-phase-24'",
-  "auth: {",
-  "cloud: {",
-  "session: '/api/session'",
-  "licenseStatus: '/api/license/status'",
-  "checkout: '/api/checkout'",
-  "projects: '/api/projects'",
-]) {
-  if (!config.includes(marker)) fail('Config missing backend marker', marker);
+for (const marker of [
+  "version: 'structured-phase-24'",
+  "auth: {",
+  "cloud: {",
+  "mode: 'static-demo'",
+]) {
+  if (!config.includes(marker)) fail('Config missing backend marker', marker);
+}
+
+for (const marker of [
+  "session: ''",
+  "licenseStatus: ''",
+  "checkout: ''",
+  "projects: ''",
+]) {
+  if (!config.includes(marker)) fail('Static demo config missing disabled backend marker', marker);
 }
 
 const html = requireFile('index.html');
