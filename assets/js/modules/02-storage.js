@@ -199,10 +199,26 @@
             }
         }
 
+        function hasUsableCurrentProjectData() {
+            return Array.isArray(tasks) && tasks.some(task => task && (task.name || task.wbs || task.cost));
+        }
+
+        function loadDefaultSampleProjectIfNeeded() {
+            const saved = getAutoSavedProject();
+            if (saved) return false;
+            const sample = window.BuildPlanDefaultProjectData;
+            if (!sample || !Array.isArray(sample.tasks) || !sample.tasks.length) return false;
+            applyProjectData(sample);
+            updateAutoSaveStatus();
+            return true;
+        }
+
         function initializeAutoSave() {
+            const loadedDefaultSample = loadDefaultSampleProjectIfNeeded();
             updateAutoSaveStatus();
             document.querySelectorAll('#project-info-header input, #signature-section input, #print-paper-size, #sig-count').forEach(el => {
                 el.addEventListener('input', scheduleAutoSave);
                 el.addEventListener('change', scheduleAutoSave);
             });
+            if (loadedDefaultSample) scheduleAutoSave();
         }
