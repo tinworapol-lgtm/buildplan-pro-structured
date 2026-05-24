@@ -96,8 +96,14 @@ const steps = [
     command: process.execPath,
     args: ['tools/phase-regression-preflight.js'],
     required: true,
-  },
-];
+  },
+  {
+    id: 'package-permission',
+    command: process.execPath,
+    args: ['tools/package-permission-preflight.js'],
+    required: true,
+  },
+];
 
 function runStep(step) {
   const startedAt = new Date().toISOString();
