@@ -18,6 +18,15 @@
     'ai-assistant': ['599'],
   };
 
+  const workspaceFeatureRules = {
+    dashboard: { minPlan: '599', label: 'Executive Dashboard' },
+    'actual-progress': { minPlan: '599', label: 'Actual Progress Tracking' },
+    'cost-scurve': { minPlan: '199', label: 'มูลค่าโครงการ / S-Curve' },
+    'duration-planning': { minPlan: '599', label: 'การคำนวณระยะเวลางาน' },
+    gantt: { minPlan: 'Free', label: 'แผนงาน Gantt' },
+    'new-plan': { minPlan: 'Free', label: 'สร้างแผนงานใหม่' },
+  };
+
   const modules = [
     {
       id: 'construction-control',
@@ -123,6 +132,26 @@
 
   function canUse(module) {
     return isSubscriptionActive() && (modulePermissions[module.id] || []).includes(state.plan);
+  }
+
+  function planRank(plan) {
+    const index = planOrder.indexOf(plan);
+    return index < 0 ? 0 : index;
+  }
+
+  function isFeatureAllowedForPlan(feature, plan = state.plan) {
+    const rule = workspaceFeatureRules[feature];
+    if (!rule) return isSubscriptionActive();
+    return isSubscriptionActive() && planRank(plan) >= planRank(rule.minPlan);
+  }
+
+  function showPackageUpgradeAlert(feature) {
+    const rule = workspaceFeatureRules[feature] || { minPlan: '599', label: feature };
+    const message = isSubscriptionActive()
+      ? `${rule.label} ต้องใช้แพ็กเกจ ${rule.minPlan} ขึ้นไป`
+      : 'สมาชิกหมดอายุ กรุณาต่ออายุก่อนใช้งาน';
+    showBlocked(message, isSubscriptionActive() ? 'ต้องอัปเกรดแพ็กเกจ' : 'สมาชิกหมดอายุ');
+    if (!isFeatureAllowedForPlan(feature)) openBilling();
   }
 
   function formatThaiDate(isoDate) {
@@ -245,12 +274,26 @@
     }).join('');
   }
 
+  function applyWorkspaceFeatureLocks() {
+    qsa('[data-plan-feature]').forEach((item) => {
+      const feature = item.dataset.planFeature;
+      const rule = workspaceFeatureRules[feature];
+      const allowed = isFeatureAllowedForPlan(feature);
+      item.dataset.planLocked = allowed ? 'false' : 'true';
+      item.setAttribute('aria-disabled', allowed ? 'false' : 'true');
+      if (rule) {
+        item.title = allowed ? rule.label : `${rule.label} - ต้องใช้แพ็กเกจ ${rule.minPlan} ขึ้นไป`;
+      }
+    });
+  }
+
   function renderAll() {
     renderPlanLabels();
     renderSubscription();
     renderModules();
     renderAdminPermissions();
     renderBilling();
+    applyWorkspaceFeatureLocks();
   }
 
   function signIn(role) {
@@ -360,6 +403,15 @@
   }
 
   function bind() {
+    global.document?.addEventListener('click', (event) => {
+      const target = event.target?.closest?.('[data-plan-feature]');
+      if (!target) return;
+      const feature = target.dataset.planFeature;
+      if (isFeatureAllowedForPlan(feature)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      showPackageUpgradeAlert(feature);
+    }, true);
     qsa('[data-ct-login-user]').forEach((button) => button.addEventListener('click', () => signIn('user')));
     qsa('[data-ct-login-admin]').forEach((button) => button.addEventListener('click', () => signIn('admin')));
     qsa('[data-ct-logout]').forEach((button) => button.addEventListener('click', signOut));
@@ -419,6 +471,7 @@
     plans,
     modules,
     modulePermissions,
+    workspaceFeatureRules,
     signIn,
     signOut,
     openModule,
@@ -431,6 +484,9 @@
     closeBilling,
     choosePlan,
     isSubscriptionActive,
+    isFeatureAllowedForPlan,
+    applyWorkspaceFeatureLocks,
+    showPackageUpgradeAlert,
     toggleChat,
   };
 

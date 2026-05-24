@@ -621,6 +621,21 @@ textarea,
   box-shadow: 0 8px 18px rgba(234, 88, 12, .22), inset 0 1px 0 rgba(255,255,255,.18) !important;
 }
 .dashboard-nav-orange:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+/* Phase 59A: visible workspace locks for package-based feature access */
+[data-plan-locked="true"] {
+  opacity: 0.48;
+  filter: grayscale(0.25);
+  cursor: not-allowed !important;
+}
+
+[data-plan-locked="true"]:hover {
+  transform: none !important;
+}
+
+[data-plan-locked="true"] i {
+  opacity: 0.86;
+}
 .dashboard-date-control {
   display: inline-flex;
   align-items: center;
