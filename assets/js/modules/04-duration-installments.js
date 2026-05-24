@@ -6,7 +6,32 @@
             const durationDays = Math.min(3650, Math.max(1, parseInt(raw?.durationDays, 10) || 30));
             const rawDurations = Array.isArray(raw?.durations) ? raw.durations : [];
             const durations = Array.from({ length: count }, (_, index) => Math.min(3650, Math.max(1, parseInt(rawDurations[index], 10) || durationDays)));
-            return { count, durationDays, durations };
+            const defaultPercent = count ? parseFloat((100 / count).toFixed(2)) : 0;
+            const rawPercents = Array.isArray(raw?.percents) ? raw.percents : [];
+            const percents = Array.from({ length: count }, (_, index) => {
+                const fallback = index === count - 1 ? parseFloat((100 - (defaultPercent * (count - 1))).toFixed(2)) : defaultPercent;
+                return clampNumber(rawPercents[index] ?? fallback, 0, 100);
+            });
+            const payments = {};
+            Object.entries(raw?.payments || {}).forEach(([key, value]) => {
+                const no = parseInt(key, 10);
+                if (no >= 1 && no <= count && /^\d{4}-\d{2}-\d{2}$/.test(String(value))) {
+                    payments[String(no)] = String(value);
+                }
+            });
+            return { count, durationDays, durations, percents, payments };
+        }
+
+        function getInstallmentProjectTotal() {
+            const summaryTotal = parseFloat(computeCostSummaryData?.().projectTotal) || 0;
+            const headerValue = parseFloat(String(document.getElementById('project-value')?.value || '').replace(/,/g, '')) || 0;
+            return summaryTotal || headerValue || 0;
+        }
+
+        function getBalancedInstallmentPercents(count) {
+            if (!count) return [];
+            const base = parseFloat((100 / count).toFixed(2));
+            return Array.from({ length: count }, (_, index) => index === count - 1 ? parseFloat((100 - (base * (count - 1))).toFixed(2)) : base);
         }
 
         function getTaskDateObject(task) {
@@ -42,18 +67,37 @@
             const settings = normalizeInstallmentSettings(installmentSettings);
             if (!settings.count || !settings.durationDays) return [];
             const start = getActualProjectStartDate();
+            const projectTotal = getInstallmentProjectTotal();
             let offsetDays = 0;
+            let cumulativePercent = 0;
+            let cumulativeValue = 0;
+            let cumulativePaidValue = 0;
             return Array.from({ length: settings.count }, (_, idx) => {
+                const no = idx + 1;
                 const durationDays = settings.durations?.[idx] || settings.durationDays;
+                const percent = clampNumber(settings.percents?.[idx] ?? 0, 0, 100);
                 offsetDays += durationDays;
+                cumulativePercent += percent;
                 const dueDate = new Date(start);
                 dueDate.setDate(dueDate.getDate() + offsetDays - 1);
                 dueDate.setHours(0, 0, 0, 0);
+                const installmentValue = projectTotal * (percent / 100);
+                cumulativeValue += installmentValue;
+                const paymentDateKey = settings.payments?.[String(no)] || '';
+                const paidValue = paymentDateKey ? installmentValue : 0;
+                cumulativePaidValue += paidValue;
                 return {
-                    no: idx + 1,
-                    label: `งวด ${idx + 1}`,
+                    no,
+                    label: `งวดที่ ${no}`,
                     offsetDays,
                     durationDays,
+                    percent,
+                    cumulativePercent,
+                    installmentValue,
+                    cumulativeValue,
+                    paymentDateKey,
+                    paidValue,
+                    cumulativePaidValue,
                     dateObj: dueDate,
                     date: safeFormatDate(dueDate)
                 };
@@ -81,29 +125,63 @@
             }
 
             const totalInstallmentDays = schedule.reduce((sum, item) => sum + item.durationDays, 0);
+            const totalInstallmentPercent = schedule.reduce((sum, item) => sum + item.percent, 0);
             const planDays = parseInt(document.getElementById('header-duration-input')?.value, 10) || 0;
-            const warning = planDays && totalInstallmentDays !== planDays
+            const dayWarning = planDays && totalInstallmentDays !== planDays
                 ? `<div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">คำเตือน: ผลรวมวันงวดงาน ${totalInstallmentDays} วัน ไม่เท่ากับระยะเวลาแผนงาน ${planDays} วัน</div>`
                 : `<div class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">ผลรวมวันงวดงาน ${totalInstallmentDays} วัน</div>`;
+            const percentWarning = Math.abs(totalInstallmentPercent - 100) > 0.01
+                ? `<div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">คำเตือน: ผลรวม % งวดงาน ${totalInstallmentPercent.toFixed(2)}% ต้องเท่ากับ 100%</div>`
+                : `<div class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">ผลรวม % งวดงาน 100%</div>`;
+
             preview.innerHTML = `
                 <div class="flex flex-col gap-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2">
                         <div class="text-sm font-bold text-slate-700">วันเริ่มต้นโครงการ: <span class="text-narit-blue">${formatDateDisplay(getActualProjectStartDate())}</span></div>
-                        ${warning}
+                        <div class="flex flex-col sm:flex-row gap-2">${dayWarning}${percentWarning}</div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
-                        ${schedule.map(item => `
-                            <div class="border border-amber-200 bg-amber-50 rounded-lg px-3 py-2">
-                                <div class="flex items-center justify-between gap-2">
-                                    <div class="text-[11px] font-black text-amber-700">${item.label}</div>
-                                    <label class="flex items-center gap-1 text-[11px] font-bold text-slate-600">
-                                        <input type="number" min="1" max="3650" step="1" value="${item.durationDays}" onchange="updateInstallmentDuration(${item.no}, this.value)" class="w-16 border border-amber-200 rounded px-2 py-1 text-right font-black text-amber-700 bg-white"> วัน
-                                    </label>
-                                </div>
-                                <div class="text-sm font-bold text-slate-800 mt-1">${formatDateDisplay(item.dateObj)}</div>
-                                <div class="text-[11px] text-slate-500 mt-0.5">เริ่ม + ${item.offsetDays} วัน</div>
-                            </div>
-                        `).join('')}
+                    <div class="overflow-auto custom-scrollbar border border-slate-200 rounded-xl bg-white">
+                        <table class="w-full min-w-[1280px] text-[12px]">
+                            <thead class="bg-slate-50 text-slate-800">
+                                <tr>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">งวดงานที่</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">จำนวนวัน</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">จำนวนวันสะสม</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">วันที่ครบกำหนด</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">% งวดงาน</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">%งวดงานสะสม</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-right">มูลค่างวดงาน (บาท)</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-right">มูลค่างวดงานสะสม (บาท)</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">เบิกจ่ายแล้ว</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-right">เบิกจ่ายสะสม</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${schedule.map(item => `
+                                    <tr class="hover:bg-blue-50/40">
+                                        <td class="border border-slate-200 px-2 py-2 text-center font-black text-amber-700">${item.no}</td>
+                                        <td class="border border-slate-200 px-2 py-2 text-center">
+                                            <input type="number" min="1" max="3650" step="1" value="${item.durationDays}" onchange="updateInstallmentDuration(${item.no}, this.value)" class="w-20 rounded-lg border border-slate-300 px-2 py-1 text-right font-black text-slate-800">
+                                        </td>
+                                        <td class="border border-slate-200 px-2 py-2 text-center font-bold text-slate-700">${item.offsetDays}</td>
+                                        <td class="border border-slate-200 px-2 py-2 text-center font-bold text-narit-blue">${formatDateDisplay(item.dateObj)}</td>
+                                        <td class="border border-slate-200 px-2 py-2 text-center">
+                                            <input type="number" min="0" max="100" step="0.01" value="${item.percent}" onchange="updateInstallmentPercent(${item.no}, this.value)" class="w-20 rounded-lg border border-slate-300 px-2 py-1 text-right font-black text-amber-700">
+                                        </td>
+                                        <td class="border border-slate-200 px-2 py-2 text-center font-black ${Math.abs(item.cumulativePercent - 100) <= 0.01 ? 'text-emerald-700' : item.cumulativePercent > 100 ? 'text-red-700' : 'text-slate-700'}">${item.cumulativePercent.toFixed(2)}%</td>
+                                        <td class="border border-slate-200 px-2 py-2 text-right font-bold text-slate-800">${formatMoneyDisplay(item.installmentValue)}</td>
+                                        <td class="border border-slate-200 px-2 py-2 text-right font-black text-narit-blue">${formatMoneyDisplay(item.cumulativeValue)}</td>
+                                        <td class="border border-slate-200 px-2 py-2">
+                                            <div class="flex flex-col gap-1">
+                                                <input type="date" value="${item.paymentDateKey}" onchange="updateInstallmentPaymentDate(${item.no}, this.value)" class="rounded-lg border border-slate-300 px-2 py-1 text-center font-bold">
+                                                ${item.paymentDateKey ? `<div class="rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-center text-[11px] font-black text-emerald-700">เบิกจ่ายแล้ว ${formatMoneyDisplay(item.paidValue)} บาท</div>` : '<div class="text-center text-[11px] font-bold text-slate-400">ยังไม่เบิกจ่าย</div>'}
+                                            </div>
+                                        </td>
+                                        <td class="border border-slate-200 px-2 py-2 text-right font-black text-emerald-700">${formatMoneyDisplay(item.cumulativePaidValue)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 </div>`;
         }
@@ -117,7 +195,13 @@
             }
             showProcessingAlert('กำลังสร้างงวดงาน', 'ระบบกำลังคำนวณวันส่งงวดงาน');
             setTimeout(() => {
-                installmentSettings = normalizeInstallmentSettings({ count, durationDays, durations: Array.from({ length: count }, () => durationDays) });
+                installmentSettings = normalizeInstallmentSettings({
+                    count,
+                    durationDays,
+                    durations: Array.from({ length: count }, () => durationDays),
+                    percents: getBalancedInstallmentPercents(count),
+                    payments: {}
+                });
                 calculateDates(false);
                 renderInstallmentPanel();
                 scheduleAutoSave();
@@ -137,6 +221,38 @@
             renderDurationPlanTable();
             renderUI();
             scheduleAutoSave();
+        }
+
+        function updateInstallmentPercent(no, value) {
+            const settings = normalizeInstallmentSettings(installmentSettings);
+            if (!settings.count) return;
+            const index = Math.max(0, parseInt(no, 10) - 1);
+            if (index >= settings.count) return;
+            settings.percents[index] = clampNumber(value, 0, 100);
+            installmentSettings = normalizeInstallmentSettings(settings);
+            renderInstallmentPanel();
+            renderDurationPlanTable();
+            renderDashboard();
+            scheduleAutoSave();
+        }
+
+        function updateInstallmentPaymentDate(no, value) {
+            const settings = normalizeInstallmentSettings(installmentSettings);
+            if (!settings.count) return;
+            const key = String(parseInt(no, 10));
+            if (!settings.payments) settings.payments = {};
+            if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) settings.payments[key] = String(value);
+            else delete settings.payments[key];
+            installmentSettings = normalizeInstallmentSettings(settings);
+            renderInstallmentPanel();
+            renderDashboard();
+            scheduleAutoSave();
+        }
+
+        function getLatestCumulativePaidValue() {
+            const schedule = getInstallmentSchedule();
+            const paidRows = schedule.filter(item => item.paymentDateKey).sort((a, b) => String(a.paymentDateKey).localeCompare(String(b.paymentDateKey)) || a.no - b.no);
+            return paidRows.length ? paidRows[paidRows.length - 1].cumulativePaidValue : 0;
         }
 
         function clearInstallmentSchedule() {
@@ -503,7 +619,9 @@
                 </div>`).join('');
 
             const rows = tasks.filter(task => !task.isMilestone).map(task => renderDurationPlanRow(task, periods, compact)).join('');
+            const minTableWidth = compact.no + compact.name + compact.days + compact.total + compact.start + compact.range + (compact.period * periods.length);
             table.innerHTML = `
+                <div class="duration-plan-inner" style="min-width:${minTableWidth}px">
                 <div class="flex w-full bg-slate-50 border-b border-slate-300 sticky top-0 z-10 items-center" style="height:50px;">
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center" style="width:${compact.no}px">ที่</div>
                     <div class="header-cell shrink-0 px-2 h-full text-black font-bold flex items-center justify-center text-[12px] relative" style="width:${compact.name}px">
@@ -516,7 +634,8 @@
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.start}px">แนะนำวันเริ่ม</div>
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.range}px">ช่วงวันที่คำนวณ</div>
                 </div>
-                <div>${rows || '<div class="px-6 py-8 text-center text-slate-400 text-sm">ยังไม่มีรายการปฏิบัติงาน</div>'}</div>`;
+                <div>${rows || '<div class="px-6 py-8 text-center text-slate-400 text-sm">ยังไม่มีรายการปฏิบัติงาน</div>'}</div>
+                </div>`;
             setupDurationNameColumnResizer();
         }
 

@@ -107,7 +107,10 @@
     getInstallmentSchedule,
     renderInstallmentPanel,
     createInstallmentSchedule,
-    updateInstallmentDuration,
+    updateInstallmentDuration,
+    updateInstallmentPercent,
+    updateInstallmentPaymentDate,
+    getLatestCumulativePaidValue,
     clearInstallmentSchedule,
     toggleInstallmentLines,
     normalizeDurationPlanSettings,
