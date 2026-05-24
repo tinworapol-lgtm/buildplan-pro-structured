@@ -83,6 +83,12 @@
             return { groups, projectTotal };
         }
 
+        function syncProjectHeaderValue(projectTotal) {
+            const valueInput = document.getElementById('project-value');
+            if (!valueInput) return;
+            valueInput.value = formatMoneyDisplay(projectTotal);
+        }
+
         function renderCostSummary(summaryData) {
             const summaryBody = document.getElementById('cost-summary-body');
             const summaryTotal = document.getElementById('cost-summary-total');
@@ -112,6 +118,7 @@
 
             summaryTotal.textContent = formatMoneyDisplay(summaryData.projectTotal);
             summaryThai.textContent = `(${numberToThaiText(summaryData.projectTotal)})`;
+            syncProjectHeaderValue(summaryData.projectTotal);
         }
         function updateSCurveFillToggleButton() {
             const btn = document.getElementById('s-curve-fill-toggle');

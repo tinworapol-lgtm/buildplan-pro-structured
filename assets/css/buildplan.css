@@ -606,3 +606,8 @@ textarea,
 .today-line-display-zone { z-index: 170 !important; pointer-events: none; }
 .today-line-display-zone .today-progress-popover { pointer-events: auto; }
 .today-line-display-zone .today-progress-popover { cursor: ns-resize; }
+
+
+/* Phase 54: project value summary sync */
+.project-value-display { justify-content: flex-start; }
+.project-value-input { flex: 0 0 auto; min-width: 0; }

@@ -159,7 +159,12 @@
     formatFactorDisplay,
     numberToThaiText,
     computeCostSummaryData,
-    renderCostSummary,
+    renderCostSummary,
+
+
+
+
+    syncProjectHeaderValue,
     renderCostTable,
     renderSCurveChart,
     getSCurveData,
