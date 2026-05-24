@@ -466,13 +466,15 @@
             </button>
             <button id="btn-navbar-new-plan" type="button" class="navbar-new-plan-btn" onclick="resetBuildPlanWorkspace()" title="สร้างแผนงานใหม่" aria-label="สร้างแผนงานใหม่">
                 <i class="fa-solid fa-file-circle-plus"></i><span>แผนใหม่</span>
+            </button>
+
+            <button id="btn-page-dashboard" onclick="switchPage('dashboard')" class="top-page-btn dashboard-nav-orange" title="แดชบอร์ด" aria-label="แดชบอร์ด">
+                <i class="fa-solid fa-gauge-high"></i>
             </button>
             <button id="btn-page-gantt" onclick="switchPage('gantt')" class="top-page-btn page-tab-active" title="แผนงาน" aria-label="แผนงาน">
                 <i class="fa-solid fa-chart-gantt"></i>
-            </button>
-            <button id="btn-page-dashboard" onclick="switchPage('dashboard')" class="top-page-btn" title="แดชบอร์ด" aria-label="แดชบอร์ด">
-                <i class="fa-solid fa-gauge-high"></i>
-            </button>
+            </button>
+
             <button id="btn-page-actual" onclick="switchPage('actual')" class="top-page-btn" title="Actual Progress" aria-label="Actual Progress">
                 <i class="fa-solid fa-chart-line"></i>
             </button>
@@ -703,7 +705,13 @@
                         <h2 class="text-xl font-black text-slate-900">Executive Dashboard</h2>
                         <p class="text-sm text-slate-500 mt-1">ภาพรวมสถานะแผนงาน ความเสี่ยง สายงานวิกฤต และความก้าวหน้าจริงสำหรับใช้บริหารโครงการ</p>
                     </div>
-                    <div id="dashboard-health-chip" class="health-chip health-watch">กำลังประเมิน</div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <label class="dashboard-date-control">
+                            <span>วันที่รายงาน</span>
+                            <input id="dashboard-date-input" type="date" onchange="renderDashboard()">
+                        </label>
+                        <div id="dashboard-health-chip" class="health-chip health-watch">กำลังประเมิน</div>
+                    </div>
                 </div>
                 <div class="p-5">
                     <div id="dashboard-kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>

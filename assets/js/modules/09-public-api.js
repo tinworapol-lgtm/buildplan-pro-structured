@@ -110,7 +110,8 @@
     updateInstallmentDuration,
     updateInstallmentPercent,
     updateInstallmentPaymentDate,
-    getLatestCumulativePaidValue,
+    getLatestCumulativePaidValue,
+    getCumulativePaidValueAtDate,
     clearInstallmentSchedule,
     toggleInstallmentLines,
     normalizeDurationPlanSettings,

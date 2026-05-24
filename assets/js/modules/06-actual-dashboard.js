@@ -144,8 +144,9 @@
                     const plannedPct = getTaskPlannedPercentAtDate(task, selectedDate);
                     const value = getEffectiveActualPercentForTask(task.id, dateKey);
                     const completeRecord = getTaskCompletionRecord(task.id, dateKey);
+                    const isCompleteBeforeSelectedDate = !!completeRecord && completeRecord.dateKey < dateKey;
                     const complete = !!completeRecord;
-                    const actualControl = complete ? `
+                    const actualControl = isCompleteBeforeSelectedDate ? `
                                 <div class="actual-complete-badge">Complete วันที่ ${formatDateDisplay(completeRecord.date)}</div>` : `
                                 <input type="number" min="0" max="100" step="0.01" value="${value || ''}" onchange="updateActualTaskProgress(${task.id}, this.value)" class="actual-input">`;
                     return `
@@ -354,32 +355,44 @@ ${actualControl}
             return current ? Math.min(100, Math.max(0, (current.cumulative / totalValue) * 100)) : 0;
         }
 
-        function computeProjectMetrics() {
+        function getDashboardSelectedDateKey() {
+            const input = document.getElementById('dashboard-date-input');
+            if (input?.value) return input.value;
+            const todayKey = safeFormatDate(new Date());
+            if (input) input.value = todayKey;
+            return todayKey;
+        }
+
+        function metricsStatusText(dayDelta, overdueCount = 0) {
+            const absDays = Math.abs(parseInt(dayDelta, 10) || 0);
+            if (dayDelta > 0 && !overdueCount) return absDays ? `เร็วกว่าแผน ${absDays} วัน` : 'ตามแผน';
+            if (dayDelta < 0 || overdueCount) return absDays ? `ช้ากว่าแผน ${absDays} วัน` : 'ช้ากว่าแผน';
+            return 'ตามแผน';
+        }
+
+        function computeProjectMetrics(dateKey = getDashboardSelectedDateKey()) {
             const workTasks = tasks.filter(task => !task.isGroup && !task.isMilestone);
             const milestones = tasks.filter(task => task.isMilestone);
             const costMap = getTaskFinalValueMap();
             const projectTotal = Array.from(costMap.values()).reduce((sum, value) => sum + value, 0);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const actualValue = workTasks.reduce((sum, task) => sum + ((costMap.get(task.id) || 0) * clampNumber(task.progress, 0, 100) / 100), 0);
-            const averageProgress = workTasks.length ? workTasks.reduce((sum, task) => sum + clampNumber(task.progress, 0, 100), 0) / workTasks.length : 0;
+            const targetDate = new Date(dateKey + 'T00:00:00');
+            targetDate.setHours(0, 0, 0, 0);
+            const actualValue = workTasks.reduce((sum, task) => sum + ((costMap.get(task.id) || 0) * getTaskActualPercentAtDate(task.id, dateKey) / 100), 0);
+            const averageProgress = workTasks.length ? workTasks.reduce((sum, task) => sum + getTaskActualPercentAtDate(task.id, dateKey), 0) / workTasks.length : 0;
             const actualProgress = projectTotal > 0 ? (actualValue / projectTotal) * 100 : averageProgress;
-            const plannedProgress = getPlannedProgressAtDate(today, projectTotal || getSCurveData().totalValue);
-            const overdue = workTasks.filter(task => task.endDateObj && task.endDateObj < today && clampNumber(task.progress, 0, 100) < 100);
-            const inProgress = workTasks.filter(task => task.startDateObj && task.endDateObj && task.startDateObj <= today && task.endDateObj >= today && clampNumber(task.progress, 0, 100) < 100);
-            const complete = workTasks.filter(task => clampNumber(task.progress, 0, 100) >= 100);
-            const upcoming = workTasks.filter(task => task.startDateObj && task.startDateObj >= today && clampNumber(task.progress, 0, 100) < 100).sort((a, b) => a.startDateObj - b.startDateObj).slice(0, 6);
+            const plannedProgress = getPlannedProgressAtDate(targetDate, projectTotal || getSCurveData().totalValue);
+            const overdue = workTasks.filter(task => task.endDateObj && task.endDateObj < targetDate && getTaskActualPercentAtDate(task.id, dateKey) < 100);
+            const inProgress = workTasks.filter(task => task.startDateObj && task.endDateObj && task.startDateObj <= targetDate && task.endDateObj >= targetDate && getTaskActualPercentAtDate(task.id, dateKey) < 100);
+            const complete = workTasks.filter(task => getTaskActualPercentAtDate(task.id, dateKey) >= 100);
+            const upcoming = workTasks.filter(task => task.startDateObj && task.startDateObj >= targetDate && getTaskActualPercentAtDate(task.id, dateKey) < 100).sort((a, b) => a.startDateObj - b.startDateObj).slice(0, 6);
             const critical = workTasks.filter(task => task.isCritical).sort((a, b) => a.startDateObj - b.startDateObj);
             const variance = actualProgress - plannedProgress;
-            const paidValue = typeof getLatestCumulativePaidValue === 'function' ? getLatestCumulativePaidValue() : 0;
-            const status = metricsStatusText(variance, overdue.length);
-            return { workTasks, milestones, projectTotal, actualValue, paidValue, actualProgress, plannedProgress, variance, status, overdue, inProgress, complete, upcoming, critical };
-        }
-
-        function metricsStatusText(variance, overdueCount = 0) {
-            if (overdueCount || variance < -3) return 'ช้ากว่าแผน';
-            if (variance > 3) return 'เร็วกว่าแผน';
-            return 'ตามแผน';
+            const actualVariance = computeActualVariance(dateKey);
+            const dayDelta = actualVariance.dayDelta || 0;
+            const paidValue = typeof getCumulativePaidValueAtDate === 'function' ? getCumulativePaidValueAtDate(dateKey) : (typeof getLatestCumulativePaidValue === 'function' ? getLatestCumulativePaidValue() : 0);
+            const valueDelta = actualValue - paidValue;
+            const status = metricsStatusText(dayDelta, overdue.length);
+            return { dateKey, workTasks, milestones, projectTotal, actualValue, paidValue, valueDelta, actualProgress, plannedProgress, variance, dayDelta, status, overdue, inProgress, complete, upcoming, critical };
         }
 
         function renderDashboardBar(label, value, colorClass) {
@@ -424,13 +437,11 @@ ${actualControl}
             const healthChip = document.getElementById('dashboard-health-chip');
             const varianceText = metrics.variance.toFixed(2) + '%';
             let healthClass = 'health-good';
-            let healthText = 'On Track';
-            if (metrics.overdue.length || metrics.variance < -10) {
+            let healthText = metrics.status;
+            if (metrics.overdue.length || metrics.dayDelta < -3) {
                 healthClass = 'health-risk';
-                healthText = 'Risk';
-            } else if (metrics.variance < -3) {
+            } else if (metrics.dayDelta < 0) {
                 healthClass = 'health-watch';
-                healthText = 'Watch';
             }
             if (healthChip) {
                 healthChip.className = 'health-chip ' + healthClass;
@@ -440,9 +451,10 @@ ${actualControl}
                 <div class="kpi-card"><div class="kpi-label">Plan Progress</div><div class="kpi-value text-blue-700">${metrics.plannedProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ความคืบหน้าตามแผนสะสม</div></div>
                 <div class="kpi-card"><div class="kpi-label">Actual Progress</div><div class="kpi-value text-emerald-700">${metrics.actualProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ผลงานจริงจาก Actual Tracking</div></div>
                 <div class="kpi-card"><div class="kpi-label">Variance</div><div class="kpi-value ${metrics.variance >= 0 ? 'text-emerald-700' : 'text-red-700'}">${metrics.variance >= 0 ? '+' : ''}${metrics.variance.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">Actual - Plan</div></div>
-                <div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value ${metrics.status === 'ช้ากว่าแผน' ? 'text-red-700' : metrics.status === 'เร็วกว่าแผน' ? 'text-emerald-700' : 'text-narit-blue'}">${metrics.status}</div><div class="text-xs text-slate-500 mt-2">ประเมินจาก Variance และงานล่าช้า</div></div>
+                <div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value ${metrics.dayDelta < 0 || metrics.overdue.length ? 'text-red-700' : metrics.dayDelta > 0 ? 'text-emerald-700' : 'text-narit-blue'}">${metrics.status}</div><div class="text-xs text-slate-500 mt-2">สถานะ ณ ${formatDateDisplay(new Date(metrics.dateKey + 'T00:00:00'))}</div></div>
                 <div class="kpi-card"><div class="kpi-label">มูลค่างานที่ทำได้</div><div class="kpi-value text-narit-blue">${formatMoneyDisplay(metrics.actualValue)}</div><div class="text-xs text-slate-500 mt-2">มูลค่าโครงการ x %Actual</div></div>
-                <div class="kpi-card"><div class="kpi-label">มูลค่างานที่เบิก</div><div class="kpi-value text-emerald-700">${formatMoneyDisplay(metrics.paidValue)}</div><div class="text-xs text-slate-500 mt-2">จากเบิกจ่ายสะสมล่าสุด</div></div>
+                <div class="kpi-card"><div class="kpi-label">มูลค่างานที่เบิก</div><div class="kpi-value text-emerald-700">${formatMoneyDisplay(metrics.paidValue)}</div><div class="text-xs text-slate-500 mt-2">จากเบิกจ่ายสะสมตามวันที่รายงาน</div></div>
+                <div class="kpi-card"><div class="kpi-label">มูลค่าส่วนต่าง</div><div class="kpi-value ${metrics.valueDelta >= 0 ? 'text-blue-700' : 'text-red-700'}">${formatMoneyDisplay(metrics.valueDelta)}</div><div class="text-xs text-slate-500 mt-2">มูลค่างานที่ทำได้ - มูลค่างานที่เบิก</div></div>
             `;
             const varianceEl = document.getElementById('dashboard-variance');
             if (varianceEl) varianceEl.textContent = 'Variance ' + varianceText;

@@ -611,3 +611,33 @@ textarea,
 /* Phase 54: project value summary sync */
 .project-value-display { justify-content: flex-start; }
 .project-value-input { flex: 0 0 auto; min-width: 0; }
+
+
+/* Phase 51: dashboard date view and orange navbar shortcut */
+.dashboard-nav-orange {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.28) !important;
+  box-shadow: 0 8px 18px rgba(234, 88, 12, .22), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.dashboard-nav-orange:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.dashboard-date-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+}
+.dashboard-date-control input {
+  border: 0;
+  outline: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: #0f2344;
+}
