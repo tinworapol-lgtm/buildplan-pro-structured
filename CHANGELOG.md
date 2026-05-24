@@ -1,5 +1,19 @@
 # Changelog
 
+## phase-60A-real-subscription-packages - 2026-05-25
+
+### Added
+
+- Added package-based subscription scaffold for BuildPlan Pro packages `Free`, `199`, and `599`.
+- Added package-specific Stripe price environment variables for `199` and `599` monthly/yearly billing.
+- Added `subscription-packages` quality gate coverage for checkout, readiness, webhook, schema, and config.
+
+### Updated
+
+- Updated checkout API to accept `packageCode` and `billingCycle`.
+- Updated Stripe webhook and Supabase schema scaffold to store package code and billing cycle.
+- Updated subscription contract and launch docs for package-based billing.
+
 ## phase-58-release-metadata-refresh - 2026-05-25
 
 ### Updated

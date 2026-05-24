@@ -103,6 +103,12 @@ const steps = [
     args: ['tools/package-permission-preflight.js'],
     required: true,
   },
+  {
+    id: 'subscription-packages',
+    command: process.execPath,
+    args: ['tools/subscription-packages-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

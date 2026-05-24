@@ -13,8 +13,10 @@
 
 ## 2. Stripe
 - สร้าง Product สำหรับ BuildPlan Pro
-- สร้าง Price รายเดือน แล้วคัดลอกเป็น `STRIPE_PRICE_MONTHLY`
-- สร้าง Price รายปี แล้วคัดลอกเป็น `STRIPE_PRICE_YEARLY`
+- สร้าง Price สำหรับแพ็กเกจ 199 รายเดือน แล้วคัดลอกเป็น `STRIPE_PRICE_199_MONTHLY`
+- สร้าง Price สำหรับแพ็กเกจ 199 รายปี แล้วคัดลอกเป็น `STRIPE_PRICE_199_YEARLY`
+- สร้าง Price สำหรับแพ็กเกจ 599 รายเดือน แล้วคัดลอกเป็น `STRIPE_PRICE_599_MONTHLY`
+- สร้าง Price สำหรับแพ็กเกจ 599 รายปี แล้วคัดลอกเป็น `STRIPE_PRICE_599_YEARLY`
 - ตั้ง Webhook URL เป็น `https://buildplan-pro-structured.vercel.app/api/webhooks/stripe`
 - เลือก event อย่างน้อย:
   - `checkout.session.completed`

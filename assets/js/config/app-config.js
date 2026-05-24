@@ -26,11 +26,13 @@
         verifyOtp: '',
       },
     },
-    licensing: {
-      mode: 'static-demo',
-      loginRequired: false,
-      plans: ['monthly', 'yearly'],
-      endpoints: {
+    licensing: {
+      mode: 'static-demo',
+      loginRequired: false,
+      plans: ['Free', '199', '599'],
+      packages: ['Free', '199', '599'],
+      billingCycles: ['monthly', 'yearly'],
+      endpoints: {
         session: '',
         licenseStatus: '',
         checkout: '',
