@@ -249,6 +249,14 @@
             scheduleAutoSave();
         }
 
+        function getCumulativePaidValueAtDate(dateKey = safeFormatDate(new Date())) {
+            const targetKey = /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey)) ? String(dateKey) : safeFormatDate(new Date());
+            const schedule = getInstallmentSchedule();
+            return schedule
+                .filter(item => item.paymentDateKey && item.paymentDateKey <= targetKey)
+                .reduce((sum, item) => sum + (parseFloat(item.paidValue) || 0), 0);
+        }
+
         function getLatestCumulativePaidValue() {
             const schedule = getInstallmentSchedule();
             const paidRows = schedule.filter(item => item.paymentDateKey).sort((a, b) => String(a.paymentDateKey).localeCompare(String(b.paymentDateKey)) || a.no - b.no);
