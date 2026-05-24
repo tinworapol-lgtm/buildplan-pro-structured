@@ -7,7 +7,7 @@ function hasValue(name) {
 const envGroups = {
   app: ['APP_BASE_URL'],
   supabase: ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
-  stripe: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_MONTHLY', 'STRIPE_PRICE_YEARLY'],
+  stripe: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_199_MONTHLY', 'STRIPE_PRICE_199_YEARLY', 'STRIPE_PRICE_599_MONTHLY', 'STRIPE_PRICE_599_YEARLY'],
 };
 
 function getGroupStatus(values) {
@@ -32,8 +32,10 @@ function getReadiness() {
   const stripe = {
     secretKey: hasValue('STRIPE_SECRET_KEY'),
     webhookSecret: hasValue('STRIPE_WEBHOOK_SECRET'),
-    monthlyPrice: hasValue('STRIPE_PRICE_MONTHLY'),
-    yearlyPrice: hasValue('STRIPE_PRICE_YEARLY'),
+    price199Monthly: hasValue('STRIPE_PRICE_199_MONTHLY'),
+    price199Yearly: hasValue('STRIPE_PRICE_199_YEARLY'),
+    price599Monthly: hasValue('STRIPE_PRICE_599_MONTHLY'),
+    price599Yearly: hasValue('STRIPE_PRICE_599_YEARLY'),
   };
   const app = {
     baseUrl: hasValue('APP_BASE_URL'),
@@ -50,8 +52,10 @@ function getReadiness() {
     stripe: getGroupStatus({
       STRIPE_SECRET_KEY: stripe.secretKey,
       STRIPE_WEBHOOK_SECRET: stripe.webhookSecret,
-      STRIPE_PRICE_MONTHLY: stripe.monthlyPrice,
-      STRIPE_PRICE_YEARLY: stripe.yearlyPrice,
+      STRIPE_PRICE_199_MONTHLY: stripe.price199Monthly,
+      STRIPE_PRICE_199_YEARLY: stripe.price199Yearly,
+      STRIPE_PRICE_599_MONTHLY: stripe.price599Monthly,
+      STRIPE_PRICE_599_YEARLY: stripe.price599Yearly,
     }),
   };
   const missing = [

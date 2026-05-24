@@ -18,6 +18,8 @@ create table if not exists public.subscriptions (
   stripe_subscription_id text unique,
   status text not null default 'inactive',
   plan text,
+  package_code text,
+  billing_cycle text,
   current_period_end timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

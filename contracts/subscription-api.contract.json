@@ -1,13 +1,18 @@
 {
   "name": "BuildPlan Pro Subscription API Contract",
-  "version": "2026-05-20.phase-17",
+  "version": "2026-05-25.phase-60A",
   "basePath": "/api",
   "auth": {
     "cookieSession": true,
     "csrf": "recommended-for-post-requests",
     "bearer": "Supabase access token for API requests"
   },
-  "plans": [
+  "packages": [
+    "Free",
+    "199",
+    "599"
+  ],
+  "billingCycles": [
     "monthly",
     "yearly"
   ],
@@ -31,7 +36,9 @@
       "purpose": "Return subscription/license status for the logged-in user.",
       "response": {
         "status": "active",
-        "plan": "monthly",
+        "plan": "599",
+        "packageCode": "599",
+        "billingCycle": "monthly",
         "expiresAt": "2026-06-19T00:00:00.000Z",
         "message": ""
       }
@@ -39,11 +46,14 @@
     {
       "method": "POST",
       "path": "/checkout",
-      "purpose": "Start a monthly or yearly checkout flow.",
+      "purpose": "Start a checkout flow for package 199 or 599. Free does not require Stripe checkout.",
       "request": {
-        "plan": "monthly"
+        "packageCode": "199",
+        "billingCycle": "monthly"
       },
       "response": {
+        "packageCode": "199",
+        "billingCycle": "monthly",
         "checkoutUrl": "https://payments.example.com/checkout/session_123"
       }
     },
