@@ -236,6 +236,17 @@
     global.document?.body?.classList?.remove('project-start-open');
   }
 
+  function showWorkspaceWelcomeAlert() {
+    const payload = { icon: 'success', title: 'ยินดีต้อนรับเข้าสู่ BuildPlan Pro', text: '', timer: 1500 };
+    if (typeof global.showAppAlert === 'function') {
+      global.showAppAlert(payload);
+      return;
+    }
+    if (global.Swal?.fire) {
+      global.Swal.fire({ ...payload, showConfirmButton: false, timerProgressBar: true });
+    }
+  }
+
   function applyProjectStartForm() {
     setFieldValue('proj-name', getFieldValue('project-popup-name'));
     setFieldValue('proj-contract-no', getFieldValue('project-popup-contract-no'));
@@ -249,6 +260,7 @@
     const route = navigateTo('workspace');
     global.renderUI?.();
     global.scheduleAutoSave?.();
+    showWorkspaceWelcomeAlert();
     setMessage('');
     return route;
   }

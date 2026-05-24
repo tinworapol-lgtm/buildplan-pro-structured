@@ -371,7 +371,15 @@ ${actualControl}
             const upcoming = workTasks.filter(task => task.startDateObj && task.startDateObj >= today && clampNumber(task.progress, 0, 100) < 100).sort((a, b) => a.startDateObj - b.startDateObj).slice(0, 6);
             const critical = workTasks.filter(task => task.isCritical).sort((a, b) => a.startDateObj - b.startDateObj);
             const variance = actualProgress - plannedProgress;
-            return { workTasks, milestones, projectTotal, actualValue, actualProgress, plannedProgress, variance, overdue, inProgress, complete, upcoming, critical };
+            const paidValue = typeof getLatestCumulativePaidValue === 'function' ? getLatestCumulativePaidValue() : 0;
+            const status = metricsStatusText(variance, overdue.length);
+            return { workTasks, milestones, projectTotal, actualValue, paidValue, actualProgress, plannedProgress, variance, status, overdue, inProgress, complete, upcoming, critical };
+        }
+
+        function metricsStatusText(variance, overdueCount = 0) {
+            if (overdueCount || variance < -3) return 'ช้ากว่าแผน';
+            if (variance > 3) return 'เร็วกว่าแผน';
+            return 'ตามแผน';
         }
 
         function renderDashboardBar(label, value, colorClass) {
@@ -429,10 +437,12 @@ ${actualControl}
                 healthChip.innerHTML = `<i class="fa-solid fa-circle-check"></i>${healthText}`;
             }
             kpis.innerHTML = `
-                <div class="kpi-card"><div class="kpi-label">งานทั้งหมด</div><div class="kpi-value">${metrics.workTasks.length}</div><div class="text-xs text-slate-500 mt-2">Milestone ${metrics.milestones.length} รายการ</div></div>
-                <div class="kpi-card"><div class="kpi-label">เสร็จแล้ว</div><div class="kpi-value text-emerald-700">${metrics.complete.length}</div><div class="text-xs text-slate-500 mt-2">${metrics.actualProgress.toFixed(2)}% actual progress</div></div>
-                <div class="kpi-card"><div class="kpi-label">งานล่าช้า</div><div class="kpi-value text-red-700">${metrics.overdue.length}</div><div class="text-xs text-slate-500 mt-2">ยังไม่ครบ 100% หลังวันสิ้นสุด</div></div>
-                <div class="kpi-card"><div class="kpi-label">มูลค่าโครงการ</div><div class="kpi-value text-narit-blue">${formatMoneyDisplay(metrics.projectTotal)}</div><div class="text-xs text-slate-500 mt-2">บาท หลัง Factor F / Vat</div></div>
+                <div class="kpi-card"><div class="kpi-label">Plan Progress</div><div class="kpi-value text-blue-700">${metrics.plannedProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ความคืบหน้าตามแผนสะสม</div></div>
+                <div class="kpi-card"><div class="kpi-label">Actual Progress</div><div class="kpi-value text-emerald-700">${metrics.actualProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ผลงานจริงจาก Actual Tracking</div></div>
+                <div class="kpi-card"><div class="kpi-label">Variance</div><div class="kpi-value ${metrics.variance >= 0 ? 'text-emerald-700' : 'text-red-700'}">${metrics.variance >= 0 ? '+' : ''}${metrics.variance.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">Actual - Plan</div></div>
+                <div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value ${metrics.status === 'ช้ากว่าแผน' ? 'text-red-700' : metrics.status === 'เร็วกว่าแผน' ? 'text-emerald-700' : 'text-narit-blue'}">${metrics.status}</div><div class="text-xs text-slate-500 mt-2">ประเมินจาก Variance และงานล่าช้า</div></div>
+                <div class="kpi-card"><div class="kpi-label">มูลค่างานที่ทำได้</div><div class="kpi-value text-narit-blue">${formatMoneyDisplay(metrics.actualValue)}</div><div class="text-xs text-slate-500 mt-2">มูลค่าโครงการ x %Actual</div></div>
+                <div class="kpi-card"><div class="kpi-label">มูลค่างานที่เบิก</div><div class="kpi-value text-emerald-700">${formatMoneyDisplay(metrics.paidValue)}</div><div class="text-xs text-slate-500 mt-2">จากเบิกจ่ายสะสมล่าสุด</div></div>
             `;
             const varianceEl = document.getElementById('dashboard-variance');
             if (varianceEl) varianceEl.textContent = 'Variance ' + varianceText;

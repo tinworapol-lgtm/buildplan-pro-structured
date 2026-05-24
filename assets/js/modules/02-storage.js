@@ -52,7 +52,7 @@
                     if (parsedData && parsedData.tasks) {
                         applyProjectData(parsedData);
                         event.target.value = '';
-                        alert("เปิดไฟล์โครงการสำเร็จ!");
+                        showAppAlert({ icon: 'success', title: 'เปิดไฟล์โครงการแล้ว', text: 'โหลดข้อมูลโครงการเรียบร้อย', timer: 1000 });
                     } else {
                         alert("รูปแบบไฟล์ไม่ถูกต้อง ไม่มีข้อมูลแผนงาน");
                     }
