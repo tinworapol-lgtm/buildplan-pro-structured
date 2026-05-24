@@ -1,29 +1,33 @@
 # คู่มือเปิดใช้งาน BuildPlan Pro แบบจับมือทำ
 
-## วิธีง่ายที่สุด
+## ใช้งานผ่านเว็บ
 
-1. เปิดโฟลเดอร์นี้:
+เปิดลิงก์นี้:
+
+```text
+https://buildplan-pro-structured.vercel.app/
+```
+
+สถานะปัจจุบันเป็น static-demo สำหรับทดลองใช้งานและรีวิวสินค้า ยังไม่ใช่ระบบชำระเงินจริงเต็มรูปแบบ
+
+## ใช้งานบนเครื่อง
+
+1. เปิดโฟลเดอร์:
 
 ```text
 D:\AI\01-แผนงานก่อสร้าง\NEW\BuildPlan-Pro-Structured
 ```
 
-2. ดับเบิลคลิกไฟล์:
+2. ดับเบิลคลิก:
 
 ```text
 Start-BuildPlan-Pro.cmd
 ```
 
-3. รอสักครู่ โปรแกรมจะเปิด browser ไปที่:
+3. โปรแกรมจะเปิด:
 
 ```text
 http://127.0.0.1:4177/
-```
-
-4. ถ้าต้องการปิดโปรแกรม ให้กลับไปที่หน้าต่างดำ แล้วกด:
-
-```text
-Ctrl + C
 ```
 
 ## ตรวจคุณภาพก่อนส่งให้คนอื่นลอง
@@ -34,23 +38,14 @@ Ctrl + C
 node .\tools\quality-gate.js
 ```
 
-ถ้าเห็น:
+ควรเห็นบรรทัดสำคัญ:
 
 ```text
-PASS production-audit
-PASS structured-verify
-PASS qa-preflight
+PASS phase-regression
 pilot ready: true
+paid production ready: true
 ```
-
-แปลว่าส่งให้ทดลองใช้งานแบบ pilot/demo ได้
 
 ## สถานะขายจริง
 
-ถ้ายังเห็น:
-
-```text
-paid production ready: false
-```
-
-แปลว่ายังต้องจัดการ dependency จาก CDN ก่อนนำไปขาย production จริง
+ระบบหน้าเว็บและ workflow พร้อมสำหรับ demo/pilot แล้ว แต่ถ้าจะขายแบบ subscription จริง ต้องเปิด Supabase/Stripe และตั้งค่า environment production ก่อน

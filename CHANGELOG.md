@@ -1,5 +1,22 @@
 # Changelog
 
+## phase-58-release-metadata-refresh - 2026-05-25
+
+### Updated
+
+- Refreshed release metadata after the production static-demo deployment and recent BuildPlan Pro planning features.
+- Documented the current production URL, regression quality gate, and latest feature surface for handoff.
+- Clarified that the current web deployment is a static-demo/pilot build; paid SaaS still needs real Supabase and Stripe environment activation.
+
+### Recent Feature Baseline
+
+- Default sample project data loads for first-time users.
+- Project value header is synced with the cost summary total.
+- Installment payment tracking now includes paid dates, cumulative paid value, and Executive Dashboard paid/earned reporting.
+- Executive Dashboard supports report-date selection, schedule day status, and earned-vs-paid value delta.
+- Actual Progress allows editing 100% values on the selected completion date.
+- tools/phase-regression-preflight.js is now part of the quality gate to protect recent behavior.
+
 ## structured-phase-10 - 2026-05-19
 
 ### Added

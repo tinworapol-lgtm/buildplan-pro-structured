@@ -2,9 +2,9 @@
   "productName": "BuildPlan Pro",
   "packageName": "buildplan-pro-structured",
   "version": "structured-phase-24",
-  "releaseDate": "2026-05-19",
+  "releaseDate": "2026-05-25",
   "locale": "th-TH",
-  "appType": "browser-plus-serverless-app-shell-ct-saas-mock-prototype",
+  "appType": "browser-plus-serverless-static-demo-buildplan-saas-prototype",
   "entrypoint": "index.html",
   "config": "assets/js/config/app-config.js",
   "verification": "tools/verify-structured.js",
@@ -113,7 +113,15 @@
     "no-enterprise-tier",
     "buildplan-pro-branding",
     "english-professional-landing-copy",
-    "compact-login-card"
+    "compact-login-card",
+    "default-sample-project-data",
+    "project-value-summary-sync",
+    "installment-payment-tracking",
+    "paid-value-by-report-date",
+    "dashboard-date-reporting",
+    "actual-selected-date-editing",
+    "phase-regression-quality-gate",
+    "static-demo-production-mode"
   ],
   "subscriptionReadiness": {
     "mode": "serverless-scaffold-local-demo-default",
@@ -152,13 +160,16 @@
   "productionReadiness": {
     "audit": "tools/audit-production-readiness.js",
     "latestReport": "reports/production-readiness-phase-13.json",
-    "status": "external-cdn-removed-env-pending",
+    "status": "static-demo-production-pilot-ready-env-required-for-paid-saas",
     "knownExternalDependencies": []
   },
   "qualityGate": {
     "command": "node tools/quality-gate.js",
     "npmScript": "npm run quality",
-    "latestReport": "reports/quality-gate-phase-14.json"
+    "latestReport": "reports/quality-gate-phase-14.json",
+    "regressionPreflight": "tools/phase-regression-preflight.js",
+    "latestRegressionReport": "reports/phase-regression-preflight-phase-57.json",
+    "status": "passed-with-phase-regression"
   },
   "launchers": {
     "windowsCmd": "Start-BuildPlan-Pro.cmd",
@@ -166,7 +177,7 @@
     "quickStartThai": "docs/USER_QUICK_START_TH.md"
   },
   "webDeploy": {
-    "status": "deployed-production-phase-40-mock-billing-upgrade-modal-clean",
+    "status": "deployed-production-phase-58-release-metadata-refresh",
     "recommended": "vercel",
     "vercelConfig": "vercel.json",
     "netlifyConfig": "netlify.toml",
@@ -175,7 +186,7 @@
     "limitation": "Backend scaffold is present, but production login/payment/cloud save needs Supabase and Stripe environment variables.",
     "provider": "vercel",
     "productionUrl": "https://buildplan-pro-structured.vercel.app/",
-    "deploymentUrl": "https://buildplan-pro-structured-am6e83rx1-tinworapol-1514s-projects.vercel.app",
+    "deploymentUrl": "https://buildplan-pro-structured-ncguwvdc4-tinworapol-1514s-projects.vercel.app",
     "inspectorUrl": "https://vercel.com/tinworapol-1514s-projects/buildplan-pro-structured/HGPYF83aug8Wr4JsA2YRjHxDf5rR",
     "latestReport": "reports/web-deploy-phase-40-mock-billing-upgrade-modal.json",
     "latestProductionSmoke": "reports/production-url-smoke-phase-38.json"
@@ -256,7 +267,7 @@
     "latestReport": "reports/production-saas-readiness-phase-23.json"
   },
   "appShell": {
-    "status": "deployed-production-phase-40-mock-billing-upgrade-modal-clean",
+    "status": "deployed-production-phase-58-release-metadata-refresh",
     "preflight": "tools/app-shell-preflight.js",
     "smoke": "tools/app-shell-smoke.js",
     "service": "assets/js/services/app-shell.js",
@@ -273,15 +284,19 @@
       "workspace"
     ],
     "latestSmokeReport": "reports/app-shell-smoke-phase-37.json",
-    "enhancementStatus": "phase-40-mock-billing-upgrade-modal-clean",
+    "enhancementStatus": "phase-58-release-metadata-refresh",
     "homeBackground": "assets/images/home-construction-bg.png"
   },
-  "phase": "phase-45-buildplan-pro-landing",
-  "updatedAt": "2026-05-23T01:32:07.310Z",
+  "phase": "phase-58-release-metadata-refresh",
+  "updatedAt": "2026-05-25T00:00:00.000+07:00",
   "qualityGates": [
     "phase41-reference-landing-ui",
     "phase42-workspace-back-home-button",
     "phase43-reference-user-dashboard",
-    "phase44-plan-only-entry-pricing"
+    "phase44-plan-only-entry-pricing",
+    "phase55-static-demo-production-mode",
+    "phase56-dashboard-date-reporting",
+    "phase57-regression-quality-gate",
+    "phase58-release-metadata-refresh"
   ]
 }
