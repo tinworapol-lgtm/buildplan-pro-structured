@@ -79,12 +79,18 @@
     });
   }
 
+  async function exportUserData() {
+    const endpoint = '/api/export';
+    return requestJson(endpoint);
+  }
+
   global.BuildPlanCloud = {
     isCloudConfigured,
     listProjects,
     saveProject,
     loadProject,
     deleteProject,
+    exportUserData,
     applyCloudProject,
   };
 })(window);

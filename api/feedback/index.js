@@ -1,4 +1,4 @@
-const { sendJson, getBearerToken, readJsonBody, getSupabaseUser, hasSupabaseEnv, supabaseRest, envGuardPayload } = require('../_shared');
+const { sendJson, getBearerToken, readJsonBody, getSupabaseUser, hasSupabaseEnv, supabaseRest, envGuardPayload, writeAuditLog } = require('../_shared');
 
 module.exports = async function handler(request, response) {
   if (!hasSupabaseEnv()) {
@@ -31,6 +31,7 @@ module.exports = async function handler(request, response) {
       }),
     });
     const feedback = Array.isArray(rows) ? rows[0] : rows;
+    await writeAuditLog(session.user.id, 'feedback.submit', { feedbackId: feedback?.id, rating: rating || null });
     return sendJson(response, 200, { feedback: { id: feedback.id, createdAt: feedback.created_at } });
   }
 

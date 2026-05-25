@@ -119,6 +119,27 @@ async function ensureBetaTrial(user) {
   return normalizeSubscription(Array.isArray(rows) ? rows[0] : rows);
 }
 
+async function writeAuditLog(userId, action, metadata = {}) {
+  if (!userId || !action || !hasSupabaseEnv()) return { logged: false };
+  try {
+    await supabaseRest('audit_logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        action,
+        metadata,
+      }),
+    });
+    return { logged: true };
+  } catch (error) {
+    return { logged: false, message: error.message };
+  }
+}
+
 function getMissingEnv(names) {
   return names.filter((name) => !String(process.env[name] || '').trim());
 }
@@ -196,6 +217,7 @@ module.exports = {
   envGuardPayload,
   getSupabaseUser,
   ensureBetaTrial,
+  writeAuditLog,
   getLatestSubscription,
   normalizeSubscription,
   supabaseRest,

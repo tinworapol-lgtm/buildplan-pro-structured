@@ -74,6 +74,17 @@
           "createdAt": "2026-05-25T00:00:00.000Z"
         }
       }
+    },
+    {
+      "method": "GET",
+      "path": "/api/export",
+      "purpose": "Export beta user data",
+      "response": {
+        "exportType": "buildplan-user-export",
+        "projects": [],
+        "feedback": [],
+        "subscriptions": []
+      }
     }
   ]
 }

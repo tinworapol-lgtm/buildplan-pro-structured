@@ -1,4 +1,4 @@
-const { sendJson, getBearerToken, readJsonBody, getSupabaseUser, hasSupabaseEnv, supabaseRest, envGuardPayload } = require('../_shared');
+const { sendJson, getBearerToken, readJsonBody, getSupabaseUser, hasSupabaseEnv, supabaseRest, envGuardPayload, writeAuditLog } = require('../_shared');
 
 const BETA_PROJECT_LIMIT = Number(process.env.BETA_PROJECT_LIMIT || 10);
 const BETA_PROJECT_PAYLOAD_BYTES = Number(process.env.BETA_PROJECT_PAYLOAD_BYTES || 750000);
@@ -28,9 +28,11 @@ module.exports = async function handler(request, response) {
       const rows = await supabaseRest('projects?id=eq.' + encodeURIComponent(projectId) + '&user_id=eq.' + encodeURIComponent(session.user.id) + '&archived_at=is.null&select=id,name,payload,updated_at,created_at&limit=1');
       const project = Array.isArray(rows) ? rows[0] : null;
       if (!project) return sendJson(response, 404, { message: 'Project not found' });
+      await writeAuditLog(session.user.id, 'project.load', { projectId });
       return sendJson(response, 200, { project: { id: project.id, name: project.name, payload: project.payload, updatedAt: project.updated_at, createdAt: project.created_at } });
     }
     const rows = await supabaseRest('projects?user_id=eq.' + encodeURIComponent(session.user.id) + '&archived_at=is.null&select=id,name,updated_at,created_at&order=updated_at.desc');
+    await writeAuditLog(session.user.id, 'project.list', { count: (rows || []).length });
     return sendJson(response, 200, { projects: (rows || []).map(summarize) });
   }
 
@@ -65,6 +67,7 @@ module.exports = async function handler(request, response) {
       body: JSON.stringify(row),
     });
     const project = Array.isArray(rows) ? rows[0] : rows;
+    await writeAuditLog(session.user.id, 'project.save', { projectId: project?.id, name, payloadBytes });
     return sendJson(response, 200, { project: summarize(project) });
   }
 
@@ -83,6 +86,7 @@ module.exports = async function handler(request, response) {
     });
     const project = Array.isArray(rows) ? rows[0] : null;
     if (!project) return sendJson(response, 404, { message: 'Project not found' });
+    await writeAuditLog(session.user.id, 'project.archive', { projectId });
     return sendJson(response, 200, { archived: true, project: summarize(project) });
   }
 
