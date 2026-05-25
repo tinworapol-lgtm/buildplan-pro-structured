@@ -70,23 +70,23 @@
     return payload;
   }
 
-  async function requestEmailOtp(email) {
+  async function requestEmailOtp(email, memberProfile = null, signupMode = false) {
     const endpoint = authConfig.endpoints?.startOtp || '';
     if (!endpoint) throw new Error('Login code endpoint is not configured');
     return requestJson(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, memberProfile, signupMode }),
     });
   }
 
-  async function verifyEmailOtp(email, token) {
+  async function verifyEmailOtp(email, token, memberProfile = null) {
     const endpoint = authConfig.endpoints?.verifyOtp || '';
     if (!endpoint) throw new Error('Login verify endpoint is not configured');
     const payload = await requestJson(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, token }),
+      body: JSON.stringify({ email, token, memberProfile }),
     });
     if (payload.accessToken) setAccessToken(payload.accessToken);
     if (payload.refreshToken) setRefreshToken(payload.refreshToken);
@@ -94,6 +94,7 @@
       authenticated: !!payload.authenticated,
       configured: payload.configured !== false,
       user: payload.user || null,
+      memberProfile: payload.memberProfile || null,
       checkedAt: new Date().toISOString(),
       message: payload.authenticated ? 'Signed in' : (payload.message || ''),
     };
@@ -108,6 +109,7 @@
         authenticated: config.licensing?.loginRequired !== true,
         configured: !staticDemoMode,
         user: null,
+        memberProfile: null,
         checkedAt: new Date().toISOString(),
         message: staticDemoMode ? 'Static demo mode' : 'Auth endpoint is not configured',
       };
@@ -120,6 +122,7 @@
         authenticated: !!payload.authenticated,
         configured: payload.configured !== false,
         user: payload.user || null,
+        memberProfile: payload.memberProfile || null,
         checkedAt: new Date().toISOString(),
         message: payload.message || '',
       };
@@ -128,6 +131,7 @@
         authenticated: false,
         configured: error.status !== 501,
         user: null,
+        memberProfile: null,
         checkedAt: new Date().toISOString(),
         message: error.message,
       };

@@ -1,5 +1,15 @@
 # Changelog
 
+## phase-65-member-signup - 2026-05-26
+
+### Added
+
+- Public beta member signup button and Email OTP signup modal.
+- Member profile fields on `profiles` for full name, phone, organization, role, status, source, and last seen time.
+- Profile API and auth/session responses that include `memberProfile`.
+- Admin beta summary member counts and latest member list.
+- Member signup preflight in the quality gate.
+
 ## phase-64E-supabase-rls-grants - 2026-05-26
 
 ### Added

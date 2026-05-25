@@ -151,6 +151,12 @@ const steps = [
     args: ['tools/supabase-rls-grants-preflight.js'],
     required: true,
   },
+  {
+    id: 'member-signup',
+    command: process.execPath,
+    args: ['tools/member-signup-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

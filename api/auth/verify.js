@@ -1,4 +1,4 @@
-const { sendJson, readJsonBody, envGuardPayload, ensureBetaTrial, hasSupabaseEnv, writeAuditLog } = require('../_shared');
+const { sendJson, readJsonBody, envGuardPayload, ensureBetaTrial, hasSupabaseEnv, writeAuditLog, normalizeMemberProfile, upsertMemberProfile } = require('../_shared');
 
 function getSupabaseAuthEnv() {
   return {
@@ -20,6 +20,7 @@ module.exports = async function handler(request, response) {
   const body = await readJsonBody(request);
   const email = String(body.email || '').trim().toLowerCase();
   const token = String(body.token || '').trim();
+  const memberProfile = normalizeMemberProfile(body.memberProfile || {}, email);
   if (!/^\S+@\S+\.\S+$/.test(email)) return sendJson(response, 400, { message: 'Valid email is required' });
   if (!token) return sendJson(response, 400, { message: 'Login code is required' });
 
@@ -48,6 +49,7 @@ module.exports = async function handler(request, response) {
     name: payload.user.user_metadata?.name || '',
   } : null;
   const trial = user && hasSupabaseEnv() ? await ensureBetaTrial(user) : null;
+  const profile = user && hasSupabaseEnv() ? await upsertMemberProfile(user, memberProfile) : null;
   if (user) await writeAuditLog(user.id, 'auth.login', { provider: 'supabase-otp', email: user.email });
 
   return sendJson(response, 200, {
@@ -57,6 +59,7 @@ module.exports = async function handler(request, response) {
     refreshToken: payload.refresh_token || '',
     expiresAt: payload.expires_at || null,
     user,
+    memberProfile: profile,
     subscription: trial,
   });
 };

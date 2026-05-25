@@ -43,6 +43,7 @@
                     <span>BuildPlan Pro</span>
                 </div>
                 <nav class="ct-public-nav" aria-label="เมนูหลัก">
+                    <button type="button" id="btn-home-signup" class="ct-nav-button">สมัครสมาชิกฟรี</button>
                     <button type="button" id="btn-home-login" class="ct-nav-button">เข้าใช้แผนงาน</button>
                 </nav>
             </header>
@@ -61,8 +62,8 @@
                             <i class="fa-solid fa-arrow-right-to-bracket"></i>
                             เข้าใช้แผนงาน
                         </button>
-                        <button type="button" class="ct-success-button" data-ct-trial>
-                            เริ่มใช้ฟรี
+                        <button type="button" id="btn-hero-signup" class="ct-success-button">
+                            สมัครสมาชิกฟรี <span class="sr-only">เริ่มใช้ฟรี</span>
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
@@ -102,11 +103,58 @@
                             </div>
                         </div>
                     </div>
-                    <p class="ct-register-line">ยังไม่มีบัญชี? <button type="button" data-ct-trial>เริ่มใช้ฟรี</button></p>
+                    <p class="ct-register-line">ยังไม่มีบัญชี? <button type="button" id="btn-login-panel-signup">สมัครสมาชิกฟรี</button></p>
                 </aside>
             </main>
         </div>
     </section>
+
+    <div id="member-signup-modal" class="fixed inset-0 bg-slate-950/55 hidden items-center justify-center z-[90] no-print" aria-hidden="true">
+        <section class="bg-white w-[min(760px,calc(100vw-28px))] rounded-2xl shadow-2xl border border-slate-200 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="member-signup-title">
+            <div class="px-6 py-5 bg-slate-50 border-b border-slate-200 flex items-start justify-between gap-4">
+                <div>
+                    <span class="text-xs font-black uppercase tracking-wide text-emerald-700">Public Beta</span>
+                    <h2 id="member-signup-title" class="text-2xl font-black text-narit-blue mt-1">สมัครสมาชิกฟรี</h2>
+                    <p class="text-sm text-slate-600 mt-1">ทดลองใช้ฟรี 3 เดือน ใช้งานฟังก์ชันระดับ 599 ผ่าน Email OTP</p>
+                </div>
+                <button type="button" id="member-signup-close" class="w-10 h-10 rounded-xl border border-slate-300 text-slate-600 hover:bg-white" aria-label="ปิด"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="member-signup-form" class="p-6 grid gap-4" onsubmit="return false;">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <label class="grid gap-1 text-sm font-bold text-slate-700">ชื่อ-นามสกุล
+                        <input id="signup-full-name" type="text" class="modern-input rounded-xl border border-slate-300 px-3 py-2" placeholder="ระบุชื่อ-นามสกุล">
+                    </label>
+                    <label class="grid gap-1 text-sm font-bold text-slate-700">อีเมล
+                        <input id="signup-email" type="email" class="modern-input rounded-xl border border-slate-300 px-3 py-2" placeholder="you@example.com">
+                    </label>
+                    <label class="grid gap-1 text-sm font-bold text-slate-700">เบอร์โทร
+                        <input id="signup-phone" type="tel" class="modern-input rounded-xl border border-slate-300 px-3 py-2" placeholder="08x-xxx-xxxx">
+                    </label>
+                    <label class="grid gap-1 text-sm font-bold text-slate-700">บริษัท/หน่วยงาน
+                        <input id="signup-organization" type="text" class="modern-input rounded-xl border border-slate-300 px-3 py-2" placeholder="ชื่อบริษัทหรือหน่วยงาน">
+                    </label>
+                    <label class="grid gap-1 text-sm font-bold text-slate-700">บทบาท
+                        <select id="signup-role" class="modern-input rounded-xl border border-slate-300 px-3 py-2">
+                            <option value="engineer">วิศวกร</option>
+                            <option value="supervisor">ผู้ควบคุมงาน</option>
+                            <option value="contractor">ผู้รับเหมา</option>
+                            <option value="owner">เจ้าของโครงการ</option>
+                            <option value="other">อื่นๆ</option>
+                        </select>
+                    </label>
+                    <label class="grid gap-1 text-sm font-bold text-slate-700">รหัส OTP
+                        <input id="signup-otp-code" type="text" inputmode="numeric" class="modern-input rounded-xl border border-slate-300 px-3 py-2" placeholder="กรอกรหัสจากอีเมล">
+                    </label>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <button id="btn-signup-send-code" type="button" class="px-5 py-3 rounded-xl bg-narit-blue text-white font-black"><i class="fa-regular fa-envelope"></i> ส่งรหัส OTP</button>
+                    <button id="btn-signup-verify-code" type="button" class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-black"><i class="fa-solid fa-check"></i> ยืนยันและเริ่มใช้งาน</button>
+                    <button id="btn-signup-go-login" type="button" class="px-5 py-3 rounded-xl border border-slate-300 text-slate-700 font-bold">เข้าสู่ระบบแทน</button>
+                </div>
+                <div id="signup-status-message" class="min-h-[44px] rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-700"></div>
+            </form>
+        </section>
+    </div>
 
 
     
