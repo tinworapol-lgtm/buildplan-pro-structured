@@ -49,6 +49,31 @@
           "payload": {}
         }
       }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/projects/:id",
+      "purpose": "Archive one project owned by the logged-in user.",
+      "response": {
+        "archived": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/feedback",
+      "purpose": "Submit beta feedback for the logged-in user.",
+      "request": {
+        "rating": 5,
+        "message": "Feedback text",
+        "feature_request": "Optional feature request",
+        "project_context": {}
+      },
+      "response": {
+        "feedback": {
+          "id": "uuid",
+          "createdAt": "2026-05-25T00:00:00.000Z"
+        }
+      }
     }
   ]
 }

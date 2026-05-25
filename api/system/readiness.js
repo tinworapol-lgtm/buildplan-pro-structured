@@ -5,7 +5,7 @@ function hasValue(name) {
 }
 
 const envGroups = {
-  app: ['APP_BASE_URL'],
+  app: ['APP_BASE_URL', 'BETA_ADMIN_TOKEN'],
   supabase: ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
   stripe: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_199_MONTHLY', 'STRIPE_PRICE_199_YEARLY', 'STRIPE_PRICE_599_MONTHLY', 'STRIPE_PRICE_599_YEARLY'],
 };
@@ -39,10 +39,12 @@ function getReadiness() {
   };
   const app = {
     baseUrl: hasValue('APP_BASE_URL'),
+    betaAdminToken: hasValue('BETA_ADMIN_TOKEN'),
   };
   const envStatus = {
     app: getGroupStatus({
       APP_BASE_URL: app.baseUrl,
+      BETA_ADMIN_TOKEN: app.betaAdminToken,
     }),
     supabase: getGroupStatus({
       SUPABASE_URL: supabase.url,

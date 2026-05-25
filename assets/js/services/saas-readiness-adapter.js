@@ -47,6 +47,8 @@
         supabase: payload.supabase || {},
         stripe: payload.stripe || {},
         app: payload.app || {},
+        envStatus: payload.envStatus || {},
+        nextActions: Array.isArray(payload.nextActions) ? payload.nextActions : [],
         checkedAt: new Date().toISOString(),
       };
     } catch (error) {

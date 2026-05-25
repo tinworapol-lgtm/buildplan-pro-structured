@@ -31,6 +31,8 @@
       '<button type="button" id="account-cloud-refresh" class="px-3 py-2 rounded-lg border border-slate-300 text-sm font-bold text-slate-700">Refresh status</button>',
       '<button type="button" id="account-cloud-save" class="px-3 py-2 rounded-lg bg-narit-blue text-white text-sm font-bold">Save to cloud</button>',
       '<button type="button" id="account-cloud-list" class="px-3 py-2 rounded-lg border border-slate-300 text-sm font-bold text-slate-700">List projects</button>',
+      '<button type="button" id="account-cloud-delete" class="px-3 py-2 rounded-lg border border-amber-200 text-sm font-bold text-amber-700">Archive project</button>',
+      '<button type="button" id="account-cloud-feedback" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-bold">ส่ง Feedback</button>',
       '<button type="button" id="account-cloud-signout" class="px-3 py-2 rounded-lg border border-red-200 text-sm font-bold text-red-600">Sign out</button>',
       '</div>',
       '<div id="account-cloud-output" class="min-h-[72px] rounded-lg bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700 whitespace-pre-wrap"></div>',
@@ -44,6 +46,8 @@
     global.document.getElementById('account-cloud-refresh')?.addEventListener('click', refreshStatus);
     global.document.getElementById('account-cloud-save')?.addEventListener('click', saveCloud);
     global.document.getElementById('account-cloud-list')?.addEventListener('click', loadCloudList);
+    global.document.getElementById('account-cloud-delete')?.addEventListener('click', deleteCloudProject);
+    global.document.getElementById('account-cloud-feedback')?.addEventListener('click', submitFeedback);
     global.document.getElementById('account-cloud-signout')?.addEventListener('click', signOut);
     panelReady = true;
   }
@@ -132,6 +136,45 @@
     setOutput(projects.length ? projects.map((project) => project.name + ' | ' + project.updatedAt).join('\n') : (result?.message || 'No cloud projects found'));
   }
 
+  async function deleteCloudProject() {
+    const projectId = global.prompt?.('Project ID to archive');
+    if (!projectId) return;
+    setOutput('Archiving cloud project...');
+    const result = await global.BuildPlanCloud?.deleteProject?.(projectId.trim());
+    setOutput(result?.archived ? 'Archived project: ' + projectId : (result?.message || 'Archive request finished'));
+  }
+
+  async function submitFeedback() {
+    const message = global.prompt?.('Feedback / ปัญหาที่พบ / ฟีเจอร์ที่อยากได้');
+    if (!message) return;
+    setOutput('Sending feedback...');
+    const endpoint = global.BuildPlanConfig?.cloud?.endpoints?.feedback || '';
+    if (!endpoint) {
+      setOutput('Feedback endpoint is not configured');
+      return;
+    }
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...global.BuildPlanAuth?.getAuthorizationHeaders?.(),
+      },
+      body: JSON.stringify({
+        rating: 5,
+        message,
+        feature_request: '',
+        project_context: {
+          projectName: global.document?.getElementById('proj-name')?.value || '',
+          route: global.location?.hash || '',
+        },
+      }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    setOutput(response.ok ? 'Feedback sent. Thank you.' : (payload.message || 'Unable to send feedback'));
+  }
+
   function signOut() {
     global.BuildPlanAuth?.clearAccessToken?.();
     setOutput('Signed out.');
@@ -154,6 +197,8 @@
     verifyOtp,
     saveCloud,
     loadCloudList,
+    deleteCloudProject,
+    submitFeedback,
   };
 
   if (global.document?.readyState === 'loading') {

@@ -11,7 +11,7 @@
     expiresAt: null,
     checkedAt: null,
     loginRequired: !!licensing.loginRequired,
-    message: licenseConfig.mode === 'static-demo' ? 'Static demo mode' : 'Local demo mode',
+    message: licensing.mode === 'static-demo' ? 'Static demo mode' : 'Local demo mode',
   };
 
   function publishLicenseState() {
@@ -111,9 +111,9 @@
     const licenseConfig = getLicenseConfig();
     if (licenseConfig.mode === 'local-demo' || licenseConfig.mode === 'static-demo' || !licenseConfig.endpoints.licenseStatus) {
       return setLicenseState({
-        mode: 'local-demo',
+        mode: licenseConfig.mode === 'static-demo' ? 'static-demo' : 'local-demo',
         status: 'active',
-        plan: 'local-demo',
+        plan: licenseConfig.mode === 'static-demo' ? 'static-demo' : 'local-demo',
         expiresAt: null,
         loginRequired: false,
         message: 'Local demo mode',

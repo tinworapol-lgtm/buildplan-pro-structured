@@ -20,6 +20,8 @@ create table if not exists public.subscriptions (
   plan text,
   package_code text,
   billing_cycle text,
+  trial_started_at timestamptz,
+  trial_ends_at timestamptz,
   current_period_end timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -31,15 +33,44 @@ create table if not exists public.projects (
   name text not null default 'Untitled project',
   payload jsonb not null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  archived_at timestamptz
 );
+
+create table if not exists public.feedback (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  rating integer check (rating between 1 and 5),
+  message text not null,
+  feature_request text,
+  project_context jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  action text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+alter table public.subscriptions add column if not exists package_code text;
+alter table public.subscriptions add column if not exists billing_cycle text;
+alter table public.subscriptions add column if not exists trial_started_at timestamptz;
+alter table public.subscriptions add column if not exists trial_ends_at timestamptz;
+alter table public.projects add column if not exists archived_at timestamptz;
 
 create index if not exists subscriptions_user_id_idx on public.subscriptions(user_id);
 create index if not exists projects_user_id_updated_at_idx on public.projects(user_id, updated_at desc);
+create index if not exists feedback_user_id_created_at_idx on public.feedback(user_id, created_at desc);
+create index if not exists audit_logs_user_id_created_at_idx on public.audit_logs(user_id, created_at desc);
 
 alter table public.profiles enable row level security;
 alter table public.subscriptions enable row level security;
 alter table public.projects enable row level security;
+alter table public.feedback enable row level security;
+alter table public.audit_logs enable row level security;
 
 drop policy if exists profiles_select_own on public.profiles;
 create policy profiles_select_own on public.profiles for select using (auth.uid() = id);
@@ -61,3 +92,12 @@ create policy projects_update_own on public.projects for update using (auth.uid(
 
 drop policy if exists projects_delete_own on public.projects;
 create policy projects_delete_own on public.projects for delete using (auth.uid() = user_id);
+
+drop policy if exists feedback_insert_own on public.feedback;
+create policy feedback_insert_own on public.feedback for insert with check (auth.uid() = user_id);
+
+drop policy if exists feedback_select_own on public.feedback;
+create policy feedback_select_own on public.feedback for select using (auth.uid() = user_id);
+
+drop policy if exists audit_logs_select_own on public.audit_logs;
+create policy audit_logs_select_own on public.audit_logs for select using (auth.uid() = user_id);

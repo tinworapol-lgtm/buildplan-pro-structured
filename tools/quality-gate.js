@@ -109,6 +109,12 @@ const steps = [
     args: ['tools/subscription-packages-preflight.js'],
     required: true,
   },
+  {
+    id: 'public-beta',
+    command: process.execPath,
+    args: ['tools/public-beta-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

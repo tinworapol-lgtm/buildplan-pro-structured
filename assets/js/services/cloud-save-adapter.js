@@ -70,11 +70,21 @@
     return result;
   }
 
+  async function deleteProject(projectId) {
+    const endpoint = getEndpoint();
+    if (!endpoint) return { configured: false, archived: false };
+    if (!projectId) throw new Error('projectId is required');
+    return requestJson(endpoint + '?id=' + encodeURIComponent(projectId), {
+      method: 'DELETE',
+    });
+  }
+
   global.BuildPlanCloud = {
     isCloudConfigured,
     listProjects,
     saveProject,
     loadProject,
+    deleteProject,
     applyCloudProject,
   };
 })(window);

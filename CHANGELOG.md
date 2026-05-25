@@ -1,5 +1,20 @@
 # Changelog
 
+## phase-61-public-beta-trial - 2026-05-25
+
+### Added
+
+- Public beta mode for real signup/cloud-save rollout.
+- Automatic 90-day beta trial creation with package `599` and billing cycle `trial`.
+- Cloud project beta quota, payload limit, and project archive endpoint.
+- Feedback API and admin beta summary scaffold.
+- Public beta quality gate coverage.
+
+### Updated
+
+- Runtime config now points auth, license, readiness, cloud project, and feedback adapters at API endpoints.
+- Supabase schema now includes trial fields, archived projects, feedback, and audit log tables.
+
 ## phase-60A-real-subscription-packages - 2026-05-25
 
 ### Added

@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $required = @(
   "APP_BASE_URL",
+  "BETA_ADMIN_TOKEN",
   "SUPABASE_URL",
   "SUPABASE_ANON_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",

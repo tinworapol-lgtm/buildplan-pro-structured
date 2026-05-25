@@ -35,13 +35,13 @@ const requiredFiles = [
 for (const file of requiredFiles) readText(file);
 
 const config = readText('assets/js/config/app-config.js');
-for (const marker of [
-  "version: 'structured-phase-24'",
-  "system: {",
-  "readiness: '/api/system/readiness'",
-]) {
-  if (!config.includes("readiness: ''")) fail('Static demo config missing disabled SaaS readiness marker', marker);
-}
+for (const marker of [
+  "version: 'structured-phase-24'",
+  "system: {",
+  "readiness: '/api/system/readiness'",
+]) {
+  if (!config.includes(marker)) fail('Public beta config missing SaaS readiness marker', marker);
+}
 
 const html = readText('index.html');
 if (!html.includes('assets/js/services/saas-readiness-adapter.js')) {
