@@ -1,4 +1,4 @@
-const { sendJson, readJsonBody, envGuardPayload, ensureBetaTrial, hasSupabaseEnv } = require('../_shared');
+const { sendJson, readJsonBody, envGuardPayload, ensureBetaTrial, hasSupabaseEnv, writeAuditLog } = require('../_shared');
 
 function getSupabaseAuthEnv() {
   return {
@@ -48,6 +48,7 @@ module.exports = async function handler(request, response) {
     name: payload.user.user_metadata?.name || '',
   } : null;
   const trial = user && hasSupabaseEnv() ? await ensureBetaTrial(user) : null;
+  if (user) await writeAuditLog(user.id, 'auth.login', { provider: 'supabase-otp', email: user.email });
 
   return sendJson(response, 200, {
     configured: true,

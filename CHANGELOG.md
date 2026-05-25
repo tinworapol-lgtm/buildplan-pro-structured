@@ -1,5 +1,14 @@
 # Changelog
 
+## phase-64-public-beta-hardening - 2026-05-25
+
+### Added
+
+- User data export endpoint for beta users.
+- Audit logging for login, project save/load/archive, feedback, and user export.
+- Account/Cloud export action.
+- Public beta flow smoke coverage.
+
 ## phase-61-public-beta-trial - 2026-05-25
 
 ### Added

@@ -115,6 +115,18 @@ const steps = [
     args: ['tools/public-beta-preflight.js'],
     required: true,
   },
+  {
+    id: 'public-beta-hardening',
+    command: process.execPath,
+    args: ['tools/public-beta-hardening-preflight.js'],
+    required: true,
+  },
+  {
+    id: 'public-beta-flow-smoke',
+    command: process.execPath,
+    args: ['tools/public-beta-flow-smoke.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

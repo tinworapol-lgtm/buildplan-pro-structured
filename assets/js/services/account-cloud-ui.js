@@ -32,6 +32,7 @@
       '<button type="button" id="account-cloud-save" class="px-3 py-2 rounded-lg bg-narit-blue text-white text-sm font-bold">Save to cloud</button>',
       '<button type="button" id="account-cloud-list" class="px-3 py-2 rounded-lg border border-slate-300 text-sm font-bold text-slate-700">List projects</button>',
       '<button type="button" id="account-cloud-delete" class="px-3 py-2 rounded-lg border border-amber-200 text-sm font-bold text-amber-700">Archive project</button>',
+      '<button type="button" id="account-cloud-export" class="px-3 py-2 rounded-lg border border-slate-300 text-sm font-bold text-slate-700">Export my data</button>',
       '<button type="button" id="account-cloud-feedback" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-bold">ส่ง Feedback</button>',
       '<button type="button" id="account-cloud-signout" class="px-3 py-2 rounded-lg border border-red-200 text-sm font-bold text-red-600">Sign out</button>',
       '</div>',
@@ -47,6 +48,7 @@
     global.document.getElementById('account-cloud-save')?.addEventListener('click', saveCloud);
     global.document.getElementById('account-cloud-list')?.addEventListener('click', loadCloudList);
     global.document.getElementById('account-cloud-delete')?.addEventListener('click', deleteCloudProject);
+    global.document.getElementById('account-cloud-export')?.addEventListener('click', exportUserData);
     global.document.getElementById('account-cloud-feedback')?.addEventListener('click', submitFeedback);
     global.document.getElementById('account-cloud-signout')?.addEventListener('click', signOut);
     panelReady = true;
@@ -175,6 +177,14 @@
     setOutput(response.ok ? 'Feedback sent. Thank you.' : (payload.message || 'Unable to send feedback'));
   }
 
+  async function exportUserData() {
+    setOutput('Exporting user data...');
+    const result = await global.BuildPlanCloud?.exportUserData?.();
+    setOutput(result?.exportType === 'buildplan-user-export'
+      ? 'Export ready: ' + (result.projects?.length || 0) + ' projects, ' + (result.feedback?.length || 0) + ' feedback items'
+      : (result?.message || 'Export request finished'));
+  }
+
   function signOut() {
     global.BuildPlanAuth?.clearAccessToken?.();
     setOutput('Signed out.');
@@ -199,6 +209,7 @@
     loadCloudList,
     deleteCloudProject,
     submitFeedback,
+    exportUserData,
   };
 
   if (global.document?.readyState === 'loading') {
