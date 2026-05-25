@@ -133,7 +133,13 @@ const steps = [
     args: ['tools/public-beta-error-logging-preflight.js'],
     required: true,
   },
-];
+  {
+    id: 'live-beta-readiness',
+    command: process.execPath,
+    args: ['tools/live-beta-readiness-preflight.js'],
+    required: true,
+  },
+];
 
 function runStep(step) {
   const startedAt = new Date().toISOString();
