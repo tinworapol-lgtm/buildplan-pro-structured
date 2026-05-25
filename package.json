@@ -22,6 +22,7 @@
     "saas:doctor": "node tools/saas-launch-doctor.js",
     "beta:doctor": "node tools/live-beta-readiness-doctor.js",
     "beta:cloud-smoke": "node tools/live-beta-cloud-flow-smoke.js",
+    "beta:supabase-preflight": "node tools/supabase-rls-grants-preflight.js",
     "saas:env": "node tools/vercel-env-plan.js",
     "saas:env:push:dry": "powershell -ExecutionPolicy Bypass -File tools/vercel-env-push.ps1",
     "saas:env:push": "powershell -ExecutionPolicy Bypass -File tools/vercel-env-push.ps1 -Apply",

@@ -145,6 +145,12 @@ const steps = [
     args: ['tools/live-beta-cloud-flow-preflight.js'],
     required: true,
   },
+  {
+    id: 'supabase-rls-grants',
+    command: process.execPath,
+    args: ['tools/supabase-rls-grants-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
