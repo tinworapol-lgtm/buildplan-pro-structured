@@ -1,4 +1,4 @@
-const { sendJson, readJsonBody, envGuardPayload } = require('../_shared');
+const { sendJson, readJsonBody, envGuardPayload, ensureBetaTrial, hasSupabaseEnv } = require('../_shared');
 
 function getSupabaseAuthEnv() {
   return {
@@ -42,16 +42,20 @@ module.exports = async function handler(request, response) {
     return sendJson(response, supabaseResponse.status, { message: payload.msg || payload.message || 'Unable to verify login code' });
   }
 
+  const user = payload.user ? {
+    id: payload.user.id,
+    email: payload.user.email || email,
+    name: payload.user.user_metadata?.name || '',
+  } : null;
+  const trial = user && hasSupabaseEnv() ? await ensureBetaTrial(user) : null;
+
   return sendJson(response, 200, {
     configured: true,
     authenticated: true,
     accessToken: payload.access_token || '',
     refreshToken: payload.refresh_token || '',
     expiresAt: payload.expires_at || null,
-    user: payload.user ? {
-      id: payload.user.id,
-      email: payload.user.email || email,
-      name: payload.user.user_metadata?.name || '',
-    } : null,
+    user,
+    subscription: trial,
   });
 };

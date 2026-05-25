@@ -34,13 +34,13 @@ const requiredFiles = [
 for (const file of requiredFiles) readText(file);
 
 const config = readText('assets/js/config/app-config.js');
-for (const marker of [
-  "version: 'structured-phase-24'",
-  "startOtp: '/api/auth/start'",
-  "verifyOtp: '/api/auth/verify'",
-]) {
-  if (!config.includes(marker.replace(/'\/api\/auth\/[a-z]+?'/, "''"))) fail('Static demo config missing disabled account/cloud marker', marker);
-}
+for (const marker of [
+  "version: 'structured-phase-24'",
+  "startOtp: '/api/auth/start'",
+  "verifyOtp: '/api/auth/verify'",
+]) {
+  if (!config.includes(marker)) fail('Public beta config missing account/cloud marker', marker);
+}
 
 const authAdapter = readText('assets/js/services/auth-adapter.js');
 for (const marker of ['requestEmailOtp', 'verifyEmailOtp', 'setAccessToken']) {

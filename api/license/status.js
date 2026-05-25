@@ -1,4 +1,4 @@
-const { sendJson, getBearerToken, getSupabaseUser, hasSupabaseEnv, supabaseRest } = require('../_shared');
+const { sendJson, getBearerToken, getSupabaseUser, hasSupabaseEnv, ensureBetaTrial } = require('../_shared');
 
 module.exports = async function handler(request, response) {
   if (request.method !== 'GET') {
@@ -11,18 +11,20 @@ module.exports = async function handler(request, response) {
   const session = await getSupabaseUser(getBearerToken(request));
   if (!session.ok) return sendJson(response, session.status, session.payload);
 
-  const rows = await supabaseRest('subscriptions?user_id=eq.' + encodeURIComponent(session.user.id) + '&select=status,plan,package_code,billing_cycle,current_period_end,stripe_customer_id&order=current_period_end.desc&limit=1');
-  const subscription = Array.isArray(rows) ? rows[0] : null;
+  const subscription = await ensureBetaTrial(session.user);
   if (!subscription) {
     return sendJson(response, 200, { status: 'inactive', plan: null, expiresAt: null, message: 'No active subscription found' });
   }
 
   return sendJson(response, 200, {
-    status: subscription.status || 'inactive',
-    plan: subscription.package_code || subscription.plan || null,
-    packageCode: subscription.package_code || subscription.plan || null,
-    billingCycle: subscription.billing_cycle || null,
-    expiresAt: subscription.current_period_end || null,
+    status: subscription.status || 'trialing',
+    plan: subscription.packageCode || subscription.plan || null,
+    packageCode: subscription.packageCode || subscription.plan || null,
+    billingCycle: subscription.billingCycle || null,
+    trialStartedAt: subscription.trialStartedAt || null,
+    trialEndsAt: subscription.trialEndsAt || null,
+    daysLeft: subscription.daysLeft || 0,
+    expiresAt: subscription.expiresAt || null,
     message: '',
   });
 };

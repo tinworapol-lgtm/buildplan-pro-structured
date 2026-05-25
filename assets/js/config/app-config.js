@@ -17,37 +17,38 @@
       durationPlanning: true,
       actualProgressDashboard: true,
     },
-    auth: {
-      provider: 'static-demo',
-      tokenStorageKey: 'buildplan_auth_token',
-      endpoints: {
-        session: '',
-        startOtp: '',
-        verifyOtp: '',
-      },
-    },
+    auth: {
+      provider: 'supabase-otp',
+      tokenStorageKey: 'buildplan_auth_token',
+      endpoints: {
+        session: '/api/session',
+        startOtp: '/api/auth/start',
+        verifyOtp: '/api/auth/verify',
+      },
+    },
     licensing: {
-      mode: 'static-demo',
-      loginRequired: false,
+      mode: 'public-beta',
+      loginRequired: true,
       plans: ['Free', '199', '599'],
       packages: ['Free', '199', '599'],
       billingCycles: ['monthly', 'yearly'],
       endpoints: {
-        session: '',
-        licenseStatus: '',
-        checkout: '',
-      },
-    },
-    cloud: {
-      provider: 'static-demo',
-      endpoints: {
-        projects: '',
+        session: '/api/session',
+        licenseStatus: '/api/license/status',
+        checkout: '/api/checkout',
       },
-    },
-    system: {
-      endpoints: {
-        readiness: '',
-      },
+    },
+    cloud: {
+      provider: 'supabase',
+      endpoints: {
+        projects: '/api/projects',
+        feedback: '/api/feedback',
+      },
+    },
+    system: {
+      endpoints: {
+        readiness: '/api/system/readiness',
+      },
     },
   };
 

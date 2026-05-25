@@ -56,19 +56,19 @@ for (const marker of [
   "version: 'structured-phase-24'",
   "auth: {",
   "cloud: {",
-  "mode: 'static-demo'",
+  "mode: 'public-beta'",
 ]) {
   if (!config.includes(marker)) fail('Config missing backend marker', marker);
 }
 
 for (const marker of [
-  "session: ''",
-  "licenseStatus: ''",
-  "checkout: ''",
-  "projects: ''",
+  "session: '/api/session'",
+  "licenseStatus: '/api/license/status'",
+  "checkout: '/api/checkout'",
+  "projects: '/api/projects'",
 ]) {
-  if (!config.includes(marker)) fail('Static demo config missing disabled backend marker', marker);
-}
+  if (!config.includes(marker)) fail('Public beta config missing backend endpoint marker', marker);
+}
 
 const html = requireFile('index.html');
 for (const script of [

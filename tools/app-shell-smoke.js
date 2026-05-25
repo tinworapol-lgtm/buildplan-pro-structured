@@ -137,8 +137,8 @@ check('phase46-project-popup-shell', readText('assets/js/services/app-shell.js')
 check('plan-only-pricing', html.includes('ct-plan-price-row') && html.includes('data-plan="199"') && html.includes('data-plan="599"') && !html.includes('value="Enterprise"'));
 check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase27'));
 check('cache-busted-app-shell-js', html.includes('assets/js/services/app-shell.js?v=phase27'));
-check('static-demo-saas-mode', readText('assets/js/config/app-config.js').includes("mode: 'static-demo'"));
-check('static-demo-no-startup-api', !readText('assets/js/config/app-config.js').includes("session: '/api/") && !readText('assets/js/config/app-config.js').includes("readiness: '/api/"));
+check('public-beta-saas-mode', readText('assets/js/config/app-config.js').includes("mode: 'public-beta'"));
+check('public-beta-startup-api', readText('assets/js/config/app-config.js').includes("session: '/api/session'") && readText('assets/js/config/app-config.js').includes("readiness: '/api/system/readiness'"));
 const appShellCss = readText('assets/css/modules/05-app-shell.css');
 check('home-background-image-css', appShellCss.includes('home-construction-bg.png?v=phase28'));
 check('ct-saas-css', appShellCss.includes('Phase 37: Construction Tech SaaS mock frontend prototype'));
