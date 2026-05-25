@@ -1,5 +1,14 @@
 # Changelog
 
+## phase-64D-live-beta-cloud-flow - 2026-05-26
+
+### Added
+
+- Live beta cloud flow smoke for authenticated production project save/load/archive checks.
+- `beta:cloud-smoke` script for testing a real beta user session without storing secrets in repo.
+- Thai runbook for `BETA_LIVE_ACCESS_TOKEN` based cloud smoke verification.
+- Quality gate coverage for the cloud flow smoke scaffold.
+
 ## phase-64C-live-beta-readiness - 2026-05-26
 
 ### Added

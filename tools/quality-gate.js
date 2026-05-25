@@ -139,6 +139,12 @@ const steps = [
     args: ['tools/live-beta-readiness-preflight.js'],
     required: true,
   },
+  {
+    id: 'live-beta-cloud-flow',
+    command: process.execPath,
+    args: ['tools/live-beta-cloud-flow-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
