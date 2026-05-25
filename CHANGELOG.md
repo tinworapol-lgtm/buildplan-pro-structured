@@ -1,5 +1,14 @@
 # Changelog
 
+## phase-64B-public-beta-error-logging - 2026-05-25
+
+### Added
+
+- Frontend error logger for public beta support triage.
+- `/api/errors` endpoint and `error_events` Supabase table.
+- Admin beta summary now includes latest error events.
+- Quality gate coverage for beta error logging.
+
 ## phase-64-public-beta-hardening - 2026-05-25
 
 ### Added

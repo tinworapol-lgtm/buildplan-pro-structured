@@ -17,6 +17,8 @@ const checks = [
   { id: 'feedback-audit', ok: read('api/feedback/index.js').includes('feedback.submit') },
   { id: 'auth-audit', ok: read('api/auth/verify.js').includes('auth.login') },
   { id: 'account-ui-export', ok: read('assets/js/services/account-cloud-ui.js').includes('account-cloud-export') },
+  { id: 'error-logger-loaded', ok: read('index.html').includes('error-logger') },
+  { id: 'errors-endpoint', ok: read('api/errors/index.js').includes('/api/errors') || read('api/errors/index.js').includes('error.report') },
 ];
 
 const report = {
@@ -27,6 +29,7 @@ const report = {
     'Verify OTP login with a Supabase test email.',
     'Save a project to cloud, reload the page, list/load it, then export user data.',
     'Submit feedback and confirm it appears in admin beta summary.',
+    'Trigger a test frontend error and confirm it appears in admin beta summary errors.',
   ],
 };
 

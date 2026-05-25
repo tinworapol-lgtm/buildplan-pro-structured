@@ -23,12 +23,13 @@ module.exports = async function handler(request, response) {
   const admin = requireAdmin(request);
   if (!admin.ok) return sendJson(response, admin.status, admin.payload);
 
-  const [profiles, subscriptions, projects, feedback, audit] = await Promise.all([
+  const [profiles, subscriptions, projects, feedback, audit, errors] = await Promise.all([
     count('profiles?select=id'),
     supabaseRest('subscriptions?select=id,status,package_code,trial_ends_at,created_at&order=created_at.desc&limit=50'),
     count('projects?archived_at=is.null&select=id'),
     supabaseRest('feedback?select=id,rating,message,feature_request,created_at&order=created_at.desc&limit=20'),
     supabaseRest('audit_logs?select=id,action,metadata,created_at&order=created_at.desc&limit=20'),
+    supabaseRest('error_events?select=id,message,source,route,created_at&order=created_at.desc&limit=20'),
   ]);
 
   const activeUsers = (subscriptions || []).filter((item) => ['trialing', 'active'].includes(item.status)).length;
@@ -38,5 +39,6 @@ module.exports = async function handler(request, response) {
     projectsSaved: projects,
     feedback: feedback || [],
     audit: audit || [],
+    errors: errors || [],
   });
 };
