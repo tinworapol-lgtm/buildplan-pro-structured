@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-64E-supabase-rls-grants - 2026-05-26
+
+### Added
+
+- Explicit Supabase Data API grants for authenticated public beta tables.
+- Supabase RLS/grants preflight to protect cloud schema readiness.
+- Thai runbook for applying `supabase/schema.sql` before public beta activation.
+
 ## phase-64D-live-beta-cloud-flow - 2026-05-26
 
 ### Added

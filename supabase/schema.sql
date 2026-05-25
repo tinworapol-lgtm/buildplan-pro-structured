@@ -86,6 +86,14 @@ alter table public.feedback enable row level security;
 alter table public.audit_logs enable row level security;
 alter table public.error_events enable row level security;
 
+grant usage on schema public to authenticated;
+grant select, update on public.profiles to authenticated;
+grant select on public.subscriptions to authenticated;
+grant select, insert, update, delete on public.projects to authenticated;
+grant select, insert on public.feedback to authenticated;
+grant select on public.audit_logs to authenticated;
+grant select, insert on public.error_events to authenticated;
+
 drop policy if exists profiles_select_own on public.profiles;
 create policy profiles_select_own on public.profiles for select using (auth.uid() = id);
 
