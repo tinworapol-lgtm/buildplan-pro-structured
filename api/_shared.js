@@ -44,6 +44,30 @@ function hasSupabaseEnv() {
 
 const BETA_TRIAL_DAYS = Number(process.env.BETA_TRIAL_DAYS || 90);
 
+function cleanText(value, maxLength = 160) {
+  return String(value || '').trim().slice(0, maxLength);
+}
+
+function normalizeMemberProfile(input = {}, fallbackEmail = '') {
+  const email = cleanText(input.email || fallbackEmail, 254).toLowerCase();
+  const fullName = cleanText(input.fullName || input.full_name || input.displayName || input.display_name, 160);
+  const organization = cleanText(input.organization, 160);
+  const role = cleanText(input.role, 80);
+  const phone = cleanText(input.phone, 40);
+  const betaSource = cleanText(input.betaSource || input.beta_source, 80);
+  return {
+    email,
+    display_name: fullName,
+    full_name: fullName,
+    phone,
+    organization,
+    role,
+    member_status: cleanText(input.memberStatus || input.member_status, 40),
+    beta_source: betaSource,
+    last_seen_at: new Date().toISOString(),
+  };
+}
+
 function addDays(date, days) {
   const next = new Date(date);
   next.setUTCDate(next.getUTCDate() + days);
@@ -80,18 +104,25 @@ async function getLatestSubscription(userId) {
 
 async function ensureBetaTrial(user) {
   const now = new Date();
+  const profilePatch = {
+    id: user.id,
+    email: user.email || '',
+    member_status: 'beta',
+    beta_source: 'otp-login',
+    last_seen_at: now.toISOString(),
+    updated_at: now.toISOString(),
+  };
+  if (user.name) {
+    profilePatch.display_name = user.name;
+    profilePatch.full_name = user.name;
+  }
   await supabaseRest('profiles?on_conflict=id', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Prefer: 'resolution=merge-duplicates,return=minimal',
     },
-    body: JSON.stringify({
-      id: user.id,
-      email: user.email || '',
-      display_name: user.name || '',
-      updated_at: now.toISOString(),
-    }),
+    body: JSON.stringify(profilePatch),
   });
 
   const existing = await getLatestSubscription(user.id);
@@ -117,6 +148,63 @@ async function ensureBetaTrial(user) {
     }),
   });
   return normalizeSubscription(Array.isArray(rows) ? rows[0] : rows);
+}
+
+async function upsertMemberProfile(user, memberProfile = {}) {
+  if (!user?.id || !hasSupabaseEnv()) return null;
+  const now = new Date().toISOString();
+  const normalized = normalizeMemberProfile(memberProfile, user.email || '');
+  const row = {
+    id: user.id,
+    email: normalized.email || user.email || '',
+    member_status: normalized.member_status || 'beta',
+    last_seen_at: now,
+    updated_at: now,
+  };
+  for (const key of ['display_name', 'full_name', 'phone', 'organization', 'role', 'beta_source']) {
+    if (normalized[key]) row[key] = normalized[key];
+  }
+  const rows = await supabaseRest('profiles?on_conflict=id', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=representation',
+    },
+    body: JSON.stringify(row),
+  });
+  const profile = Array.isArray(rows) ? rows[0] : rows;
+  return profile ? {
+    id: profile.id,
+    email: profile.email,
+    fullName: profile.full_name || profile.display_name || '',
+    phone: profile.phone || '',
+    organization: profile.organization || '',
+    role: profile.role || '',
+    memberStatus: profile.member_status || '',
+    betaSource: profile.beta_source || '',
+    lastSeenAt: profile.last_seen_at || null,
+    createdAt: profile.created_at || null,
+    updatedAt: profile.updated_at || null,
+  } : null;
+}
+
+async function getMemberProfile(userId) {
+  if (!userId || !hasSupabaseEnv()) return null;
+  const rows = await supabaseRest('profiles?id=eq.' + encodeURIComponent(userId) + '&select=id,email,display_name,full_name,phone,organization,role,member_status,beta_source,last_seen_at,created_at,updated_at&limit=1');
+  const profile = Array.isArray(rows) ? rows[0] : null;
+  return profile ? {
+    id: profile.id,
+    email: profile.email,
+    fullName: profile.full_name || profile.display_name || '',
+    phone: profile.phone || '',
+    organization: profile.organization || '',
+    role: profile.role || '',
+    memberStatus: profile.member_status || '',
+    betaSource: profile.beta_source || '',
+    lastSeenAt: profile.last_seen_at || null,
+    createdAt: profile.created_at || null,
+    updatedAt: profile.updated_at || null,
+  } : null;
 }
 
 async function writeAuditLog(userId, action, metadata = {}) {
@@ -220,5 +308,8 @@ module.exports = {
   writeAuditLog,
   getLatestSubscription,
   normalizeSubscription,
+  normalizeMemberProfile,
+  upsertMemberProfile,
+  getMemberProfile,
   supabaseRest,
 };

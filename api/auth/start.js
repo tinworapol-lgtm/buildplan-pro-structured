@@ -1,4 +1,4 @@
-const { sendJson, readJsonBody, envGuardPayload } = require('../_shared');
+const { sendJson, readJsonBody, envGuardPayload, normalizeMemberProfile } = require('../_shared');
 
 function getSupabaseAuthEnv() {
   return {
@@ -19,6 +19,8 @@ module.exports = async function handler(request, response) {
 
   const body = await readJsonBody(request);
   const email = String(body.email || '').trim().toLowerCase();
+  const signupMode = body.signupMode === true || body.signupMode === 'signup';
+  const memberProfile = normalizeMemberProfile(body.memberProfile || {}, email);
   if (!/^\S+@\S+\.\S+$/.test(email)) {
     return sendJson(response, 400, { message: 'Valid email is required' });
   }
@@ -34,7 +36,13 @@ module.exports = async function handler(request, response) {
     body: JSON.stringify({
       email,
       create_user: true,
-      data: { source: 'buildplan-pro' },
+      data: {
+        source: 'buildplan-pro',
+        signupMode,
+        full_name: memberProfile.full_name,
+        organization: memberProfile.organization,
+        role: memberProfile.role,
+      },
     }),
   });
   const payload = await supabaseResponse.json().catch(() => ({}));
@@ -46,6 +54,14 @@ module.exports = async function handler(request, response) {
     configured: true,
     sent: true,
     email,
+    signupMode,
+    memberProfile: {
+      email: memberProfile.email,
+      fullName: memberProfile.full_name,
+      phone: memberProfile.phone,
+      organization: memberProfile.organization,
+      role: memberProfile.role,
+    },
     message: 'Login code sent',
   });
 };

@@ -7,6 +7,13 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
   display_name text,
+  full_name text,
+  phone text,
+  organization text,
+  role text,
+  member_status text not null default 'beta',
+  beta_source text,
+  last_seen_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -72,8 +79,16 @@ alter table public.subscriptions add column if not exists billing_cycle text;
 alter table public.subscriptions add column if not exists trial_started_at timestamptz;
 alter table public.subscriptions add column if not exists trial_ends_at timestamptz;
 alter table public.projects add column if not exists archived_at timestamptz;
+alter table public.profiles add column if not exists full_name text;
+alter table public.profiles add column if not exists phone text;
+alter table public.profiles add column if not exists organization text;
+alter table public.profiles add column if not exists role text;
+alter table public.profiles add column if not exists member_status text not null default 'beta';
+alter table public.profiles add column if not exists beta_source text;
+alter table public.profiles add column if not exists last_seen_at timestamptz;
 
 create index if not exists subscriptions_user_id_idx on public.subscriptions(user_id);
+create index if not exists profiles_member_status_created_at_idx on public.profiles(member_status, created_at desc);
 create index if not exists projects_user_id_updated_at_idx on public.projects(user_id, updated_at desc);
 create index if not exists feedback_user_id_created_at_idx on public.feedback(user_id, created_at desc);
 create index if not exists audit_logs_user_id_created_at_idx on public.audit_logs(user_id, created_at desc);

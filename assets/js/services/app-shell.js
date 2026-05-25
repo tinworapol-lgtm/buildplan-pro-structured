@@ -279,6 +279,91 @@
     };
   }
 
+  function setSignupMessage(message) {
+    const output = global.document?.getElementById('signup-status-message');
+    if (output) output.textContent = message || '';
+  }
+
+  function isMemberSignupEnabled() {
+    const readiness = global.BuildPlanSaaS?.getReadinessState?.();
+    const supabase = readiness?.envStatus?.supabase;
+    return supabase?.complete === true || readiness?.supabase?.url === true;
+  }
+
+  function getSignupProfile() {
+    const email = global.document?.getElementById('signup-email')?.value?.trim() || '';
+    return {
+      email,
+      fullName: global.document?.getElementById('signup-full-name')?.value?.trim() || '',
+      phone: global.document?.getElementById('signup-phone')?.value?.trim() || '',
+      organization: global.document?.getElementById('signup-organization')?.value?.trim() || '',
+      role: global.document?.getElementById('signup-role')?.value || 'engineer',
+      betaSource: 'public-signup',
+    };
+  }
+
+  function openSignup() {
+    const modal = global.document?.getElementById('member-signup-modal');
+    if (!modal) return navigateLogin();
+    modal.classList.replace('hidden', 'flex');
+    modal.setAttribute('aria-hidden', 'false');
+    setSignupMessage(isMemberSignupEnabled() ? 'กรอกข้อมูลสมาชิก แล้วกดส่งรหัส OTP ไปยังอีเมล' : 'ระบบสมาชิกยังไม่เปิดใช้งาน');
+    global.document?.getElementById('signup-full-name')?.focus?.();
+    return 'signup';
+  }
+
+  function closeSignup() {
+    const modal = global.document?.getElementById('member-signup-modal');
+    if (!modal) return;
+    modal.classList.replace('flex', 'hidden');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  async function submitSignupProfile() {
+    if (!isMemberSignupEnabled()) {
+      setSignupMessage('ระบบสมาชิกยังไม่เปิดใช้งาน');
+      return { ok: false, message: 'ระบบสมาชิกยังไม่เปิดใช้งาน' };
+    }
+    const memberProfile = getSignupProfile();
+    if (!memberProfile.email || !memberProfile.fullName) {
+      setSignupMessage('กรุณากรอกชื่อ-นามสกุลและอีเมล');
+      return { ok: false, message: 'Missing member profile' };
+    }
+    setSignupMessage('กำลังส่งรหัส OTP...');
+    try {
+      const result = await global.BuildPlanAuth?.requestEmailOtp?.(memberProfile.email, memberProfile, true);
+      setSignupMessage(result?.message || 'ส่งรหัส OTP แล้ว กรุณาตรวจอีเมล');
+      return result;
+    } catch (error) {
+      setSignupMessage(error.message || 'ไม่สามารถส่งรหัส OTP ได้');
+      return { ok: false, message: error.message };
+    }
+  }
+
+  async function verifySignupCode() {
+    if (!isMemberSignupEnabled()) {
+      setSignupMessage('ระบบสมาชิกยังไม่เปิดใช้งาน');
+      return { authenticated: false, message: 'ระบบสมาชิกยังไม่เปิดใช้งาน' };
+    }
+    const memberProfile = getSignupProfile();
+    const code = global.document?.getElementById('signup-otp-code')?.value?.trim() || '';
+    setSignupMessage('กำลังยืนยันสมาชิก...');
+    try {
+      const session = await global.BuildPlanAuth?.verifyEmailOtp?.(memberProfile.email, code, memberProfile);
+      if (session?.authenticated) {
+        setSignupMessage('สมัครสมาชิกสำเร็จ กำลังเปิดแผนงาน...');
+        closeSignup();
+        navigateWorkspace();
+      } else {
+        setSignupMessage(session?.message || 'ยืนยันสมาชิกแล้ว');
+      }
+      return session;
+    } catch (error) {
+      setSignupMessage(error.message || 'ไม่สามารถยืนยันรหัส OTP ได้');
+      return { authenticated: false, message: error.message };
+    }
+  }
+
   async function sendLoginCode() {
     const { email } = getLoginValues();
     setMessage('Sending login code...');
@@ -349,6 +434,16 @@
   function initializeAppShell() {
     bindButton('btn-home-open-workspace', navigateWorkspace);
     bindButton('btn-home-login', navigateWorkspace);
+    bindButton('btn-home-signup', openSignup);
+    bindButton('btn-hero-signup', openSignup);
+    bindButton('btn-login-panel-signup', openSignup);
+    bindButton('member-signup-close', closeSignup);
+    bindButton('btn-signup-send-code', submitSignupProfile);
+    bindButton('btn-signup-verify-code', verifySignupCode);
+    bindButton('btn-signup-go-login', () => {
+      closeSignup();
+      navigateLogin();
+    });
     bindButton('btn-home-open-setup', () => toggleSetupPanel(true));
     bindButton('btn-home-close-setup', () => toggleSetupPanel(false));
     bindButton('btn-login-back-home', navigateHome);
@@ -386,6 +481,9 @@
     closeProjectStartPopup,
     sendLoginCode,
     verifyLoginCode,
+    openSignup,
+    submitSignupProfile,
+    verifySignupCode,
     startCheckout,
     applyReadiness,
     refreshShellReadiness,
