@@ -85,6 +85,23 @@
         "feedback": [],
         "subscriptions": []
       }
+    },
+    {
+      "method": "POST",
+      "path": "/api/errors",
+      "purpose": "Record frontend beta error events for support triage.",
+      "request": {
+        "message": "Error message",
+        "source": "window.error",
+        "stack": "stack trace",
+        "route": "https://buildplan-pro-structured.vercel.app/#workspace"
+      },
+      "response": {
+        "errorEvent": {
+          "id": "uuid",
+          "createdAt": "2026-05-25T00:00:00.000Z"
+        }
+      }
     }
   ]
 }

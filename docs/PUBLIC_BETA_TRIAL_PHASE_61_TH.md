@@ -14,6 +14,7 @@
 - Trial ใช้ `package_code = 599`, `billing_cycle = trial`, `status = trialing`
 - จำกัด beta cloud project เริ่มต้น 10 project/user และ payload 750 KB/project
 - Audit log บันทึก login, save/load/archive project, feedback และ user export
+- Error logger บันทึก frontend error/unhandled rejection ไปที่ `/api/errors`
 
 ## ต้องตั้งค่าก่อนใช้งานจริง
 
@@ -35,6 +36,7 @@
 - `node tools\public-beta-preflight.js`
 - `node tools\public-beta-hardening-preflight.js`
 - `node tools\public-beta-flow-smoke.js`
+- `node tools\public-beta-error-logging-preflight.js`
 - `node tools\quality-gate.js`
 - ทดสอบจริง: signup -> verify OTP -> save cloud -> reload -> list/load project
 

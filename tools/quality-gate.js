@@ -127,6 +127,12 @@ const steps = [
     args: ['tools/public-beta-flow-smoke.js'],
     required: true,
   },
+  {
+    id: 'public-beta-error-logging',
+    command: process.execPath,
+    args: ['tools/public-beta-error-logging-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

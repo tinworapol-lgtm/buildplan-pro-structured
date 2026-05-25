@@ -55,6 +55,18 @@ create table if not exists public.audit_logs (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.error_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  message text not null,
+  source text,
+  stack text,
+  route text,
+  user_agent text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 alter table public.subscriptions add column if not exists package_code text;
 alter table public.subscriptions add column if not exists billing_cycle text;
 alter table public.subscriptions add column if not exists trial_started_at timestamptz;
@@ -65,12 +77,14 @@ create index if not exists subscriptions_user_id_idx on public.subscriptions(use
 create index if not exists projects_user_id_updated_at_idx on public.projects(user_id, updated_at desc);
 create index if not exists feedback_user_id_created_at_idx on public.feedback(user_id, created_at desc);
 create index if not exists audit_logs_user_id_created_at_idx on public.audit_logs(user_id, created_at desc);
+create index if not exists error_events_user_id_created_at_idx on public.error_events(user_id, created_at desc);
 
 alter table public.profiles enable row level security;
 alter table public.subscriptions enable row level security;
 alter table public.projects enable row level security;
 alter table public.feedback enable row level security;
 alter table public.audit_logs enable row level security;
+alter table public.error_events enable row level security;
 
 drop policy if exists profiles_select_own on public.profiles;
 create policy profiles_select_own on public.profiles for select using (auth.uid() = id);
@@ -101,3 +115,9 @@ create policy feedback_select_own on public.feedback for select using (auth.uid(
 
 drop policy if exists audit_logs_select_own on public.audit_logs;
 create policy audit_logs_select_own on public.audit_logs for select using (auth.uid() = user_id);
+
+drop policy if exists error_events_insert_own on public.error_events;
+create policy error_events_insert_own on public.error_events for insert with check (auth.uid() = user_id or user_id is null);
+
+drop policy if exists error_events_select_own on public.error_events;
+create policy error_events_select_own on public.error_events for select using (auth.uid() = user_id);
