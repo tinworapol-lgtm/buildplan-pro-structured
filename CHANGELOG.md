@@ -1,5 +1,14 @@
 # Changelog
 
+## phase-64C-live-beta-readiness - 2026-05-26
+
+### Added
+
+- Live beta readiness doctor for production public beta checks.
+- Non-mutating beta endpoint verification with optional strict and write-probe modes.
+- Documentation for `BETA_LIVE_ACCESS_TOKEN`, `BETA_ADMIN_TOKEN`, and the `beta:doctor` workflow.
+- Quality gate coverage for live beta readiness scaffolding.
+
 ## phase-64B-public-beta-error-logging - 2026-05-25
 
 ### Added
