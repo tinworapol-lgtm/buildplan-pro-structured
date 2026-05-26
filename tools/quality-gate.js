@@ -169,6 +169,12 @@ const steps = [
     args: ['tools/member-signup-smoke.js'],
     required: true,
   },
+  {
+    id: 'beta-activation',
+    command: process.execPath,
+    args: ['tools/beta-activation-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
