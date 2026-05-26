@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-67-beta-activation-plan - 2026-05-26
+
+### Added
+
+- Public beta activation plan tool that requires Supabase/App/Admin env only.
+- Beta activation docs for signup, schema, Vercel env, doctor, and cloud smoke workflow.
+- Quality gate coverage for the beta activation checklist.
+
 ## phase-66-member-signup-smoke - 2026-05-26
 
 ### Added
