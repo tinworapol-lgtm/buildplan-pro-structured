@@ -110,6 +110,19 @@
   }
 
   async function refreshShellReadiness() {
+    if (global.BuildPlanSaaS?.shouldUseAutomaticApiChecks?.() !== true) {
+      const cached = global.BuildPlanSaaS?.getReadinessState?.() || {};
+      const fallback = {
+        configured: false,
+        mode: 'api-checks-paused',
+        missing: [],
+        message: 'Automatic backend readiness checks are paused to reduce Vercel Function Invocations.',
+        checkedAt: new Date().toISOString(),
+        ...cached,
+      };
+      applyReadiness(fallback);
+      return fallback;
+    }
     try {
       const readiness = await global.BuildPlanSaaS?.refreshReadiness?.();
       applyReadiness(readiness);

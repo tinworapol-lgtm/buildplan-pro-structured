@@ -8,15 +8,17 @@
     storage: {
       autosaveKey: 'buildplan_pro_autosave_v2',
     },
-    featureFlags: {
+    featureFlags: {
       localAutosave: true,
       projectImportExport: true,
       cloudProjects: true,
       smoothSCurve: true,
       installmentLines: true,
       durationPlanning: true,
-      actualProgressDashboard: true,
-    },
+      actualProgressDashboard: true,
+      automaticApiChecks: false,
+      frontendErrorLogging: false,
+    },
     auth: {
       provider: 'supabase-otp',
       tokenStorageKey: 'buildplan_auth_token',

@@ -4,6 +4,7 @@
   const config = global.BuildPlanConfig || {};
   const endpoint = config.system?.endpoints?.readiness || '';
   const staticDemoMode = config.licensing?.mode === 'static-demo';
+  const automaticApiChecks = config.featureFlags?.automaticApiChecks === true;
 
   let readinessState = {
     configured: false,
@@ -68,9 +69,14 @@
     return readinessState.configured === true;
   }
 
+  function shouldUseAutomaticApiChecks() {
+    return automaticApiChecks;
+  }
+
   global.BuildPlanSaaS = {
     getReadinessState,
     refreshReadiness,
     canEnablePaidMode,
+    shouldUseAutomaticApiChecks,
   };
 })(window);

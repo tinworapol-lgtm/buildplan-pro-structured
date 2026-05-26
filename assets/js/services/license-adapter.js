@@ -3,6 +3,7 @@
 (function bootstrapBuildPlanLicense(global) {
   const config = global.BuildPlanConfig || {};
   const licensing = config.licensing || {};
+  const automaticApiChecks = config.featureFlags?.automaticApiChecks === true;
 
   let licenseState = {
     mode: licensing.mode || 'local-demo',
@@ -144,6 +145,16 @@
 
   function initializeLicenseGate() {
     publishLicenseState();
+    if (!automaticApiChecks && licensing.mode !== 'local-demo' && licensing.mode !== 'static-demo') {
+      return setLicenseState({
+        mode: licensing.mode || 'public-beta',
+        status: 'active',
+        plan: '599',
+        expiresAt: null,
+        loginRequired: !!licensing.loginRequired,
+        message: 'Automatic license checks are paused to reduce Vercel Function Invocations.',
+      });
+    }
     return refreshLicenseStatus();
   }
 

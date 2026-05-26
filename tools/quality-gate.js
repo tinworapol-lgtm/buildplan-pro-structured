@@ -181,6 +181,12 @@ const steps = [
     args: ['tools/beta-env-template-preflight.js'],
     required: true,
   },
+  {
+    id: 'function-invocation-guard',
+    command: process.execPath,
+    args: ['tools/function-invocation-guard-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

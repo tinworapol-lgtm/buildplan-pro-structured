@@ -194,8 +194,12 @@
   function initializeAccountCloudUi() {
     ensurePanel();
     global.document?.getElementById('btn-account-cloud')?.addEventListener('click', openPanel);
-    global.addEventListener?.('buildplan:auth-state', refreshStatus);
-    refreshStatus();
+    global.addEventListener?.('buildplan:auth-state', () => {
+      const panel = global.document?.getElementById('account-cloud-panel');
+      if (panel && !panel.classList.contains('hidden')) refreshStatus();
+    });
+    setStatus('Account');
+    setOutput('Open Account & Cloud to check login, license, and cloud status.');
   }
 
   global.BuildPlanAccountCloud = {
