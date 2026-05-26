@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-66-member-signup-smoke - 2026-05-26
+
+### Added
+
+- VM DOM smoke coverage for the public beta member signup modal.
+- Signup fallback verification for missing Supabase environment setup.
+- Signup member profile payload verification for OTP request and verification flows.
+
 ## phase-65-member-signup - 2026-05-26
 
 ### Added
