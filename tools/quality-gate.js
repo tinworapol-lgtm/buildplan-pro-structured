@@ -157,6 +157,18 @@ const steps = [
     args: ['tools/member-signup-preflight.js'],
     required: true,
   },
+  {
+    id: 'member-signup-smoke-preflight',
+    command: process.execPath,
+    args: ['tools/member-signup-smoke-preflight.js'],
+    required: true,
+  },
+  {
+    id: 'member-signup-smoke',
+    command: process.execPath,
+    args: ['tools/member-signup-smoke.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {

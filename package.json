@@ -19,6 +19,7 @@
     "vendor": "node tools/vendor-dependency-preflight.js",
     "smoke:saas": "node tools/production-saas-readiness-smoke.js",
     "smoke:shell": "node tools/app-shell-smoke.js",
+    "smoke:member-signup": "node tools/member-signup-smoke.js",
     "saas:doctor": "node tools/saas-launch-doctor.js",
     "beta:doctor": "node tools/live-beta-readiness-doctor.js",
     "beta:cloud-smoke": "node tools/live-beta-cloud-flow-smoke.js",
