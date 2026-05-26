@@ -16,6 +16,7 @@
     "account": "node tools/account-cloud-preflight.js",
     "smoke:account": "node tools/browser-account-cloud-smoke.js",
     "smoke:prod": "node tools/production-url-smoke.js",
+    "smoke:static-first": "node tools/static-first-no-api-smoke.js",
     "vendor": "node tools/vendor-dependency-preflight.js",
     "smoke:saas": "node tools/production-saas-readiness-smoke.js",
     "smoke:shell": "node tools/app-shell-smoke.js",

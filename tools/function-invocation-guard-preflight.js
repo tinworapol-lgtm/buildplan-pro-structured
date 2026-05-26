@@ -22,6 +22,7 @@ const readiness = read('assets/js/services/saas-readiness-adapter.js');
 const license = read('assets/js/services/license-adapter.js');
 const errorLogger = read('assets/js/services/error-logger.js');
 const quality = read('tools/quality-gate.js');
+const packageJson = JSON.parse(read('package.json'));
 const changelog = read('CHANGELOG.md');
 
 for (const marker of [
@@ -58,6 +59,14 @@ for (const marker of [
 
 if (!quality.includes('function-invocation-guard-preflight.js')) {
   fail('quality gate missing function invocation guard preflight');
+}
+
+if (!quality.includes('static-first-no-api-smoke.js')) {
+  fail('quality gate missing static-first no-api smoke');
+}
+
+if (packageJson.scripts?.['smoke:static-first'] !== 'node tools/static-first-no-api-smoke.js') {
+  fail('package.json missing smoke:static-first script');
 }
 
 if (!changelog.includes('phase-69-function-invocation-guard')) {

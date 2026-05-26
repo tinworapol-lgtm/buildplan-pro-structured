@@ -7,6 +7,7 @@
 - Paused automatic frontend readiness/session/license checks on initial page load.
 - Account & Cloud status now refreshes only when the panel is opened or user action requires it.
 - Frontend error logging is gated off by default to avoid accidental Vercel Function Invocation spikes before beta activation.
+- Added a static-first smoke test that fails if initial app bootstrap calls `/api/*`.
 
 ## phase-68-beta-env-template - 2026-05-26
 

@@ -187,6 +187,12 @@ const steps = [
     args: ['tools/function-invocation-guard-preflight.js'],
     required: true,
   },
+  {
+    id: 'static-first-no-api-smoke',
+    command: process.execPath,
+    args: ['tools/static-first-no-api-smoke.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
