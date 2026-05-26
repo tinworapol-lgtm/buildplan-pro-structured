@@ -50,3 +50,12 @@ node tools\beta-activation-plan.js --file=.env.production.local
 - trial 90 วันถูกสร้างใน `subscriptions`
 - project save/load/archive ทำงานบน Cloud จริง
 - Admin beta summary เห็นสมาชิกและ feedback ได้
+# Beta env helper
+
+ก่อนกรอกค่า production beta สามารถสร้างไฟล์ตัวอย่างได้จาก `.env.beta.example`
+
+```powershell
+npm run beta:env:init -- --write
+```
+
+ไฟล์นี้สร้าง `.env.production.local` สำหรับตรวจ readiness ในเครื่อง โดยไม่ต้องตั้ง Stripe ในช่วง Public Beta

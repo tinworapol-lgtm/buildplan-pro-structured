@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-68-beta-env-template - 2026-05-26
+
+### Added
+
+- Public beta environment template that omits Stripe for the free beta period.
+- `beta:env:init` helper for creating `.env.production.local` safely.
+- Quality gate coverage for the beta environment setup workflow.
+
 ## phase-67-beta-activation-plan - 2026-05-26
 
 ### Added
