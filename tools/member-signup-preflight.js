@@ -32,6 +32,7 @@ const authAdapter = read('assets/js/services/auth-adapter.js');
 const quality = read('tools/quality-gate.js');
 const packageJson = readJson('package.json');
 const docs = read('docs/MEMBER_SIGNUP_PHASE_65_TH.md');
+const vercel = read('vercel.json');
 
 for (const marker of [
   'full_name text',
@@ -64,8 +65,14 @@ for (const marker of ['memberProfile', 'getMemberProfile']) {
   if (!sessionApi.includes(marker)) fail('session API missing marker', marker);
 }
 
+if (profileApi) fail('api/profile.js must not exist on Vercel Hobby plan; use /api/session via rewrite');
+
 for (const marker of ['PATCH', 'upsertMemberProfile', 'memberProfile']) {
-  if (!profileApi.includes(marker)) fail('profile API missing marker', marker);
+  if (!sessionApi.includes(marker)) fail('session profile PATCH missing marker', marker);
+}
+
+for (const marker of ['"/api/profile"', '"/api/session"']) {
+  if (!vercel.includes(marker)) fail('vercel rewrite missing profile marker', marker);
 }
 
 for (const marker of ['totalMembers', 'membersToday', 'membersThisWeek', 'latestMembers', 'full_name', 'organization']) {
