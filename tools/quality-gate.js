@@ -175,6 +175,12 @@ const steps = [
     args: ['tools/beta-activation-preflight.js'],
     required: true,
   },
+  {
+    id: 'beta-env-template',
+    command: process.execPath,
+    args: ['tools/beta-env-template-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
