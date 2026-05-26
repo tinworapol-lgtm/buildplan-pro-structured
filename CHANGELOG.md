@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-69-function-invocation-guard - 2026-05-26
+
+### Updated
+
+- Paused automatic frontend readiness/session/license checks on initial page load.
+- Account & Cloud status now refreshes only when the panel is opened or user action requires it.
+- Frontend error logging is gated off by default to avoid accidental Vercel Function Invocation spikes before beta activation.
+
 ## phase-68-beta-env-template - 2026-05-26
 
 ### Added

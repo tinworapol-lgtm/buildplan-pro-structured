@@ -1,6 +1,7 @@
 // BuildPlan Pro public beta frontend error logger.
 (function bootstrapBuildPlanErrorLogger(global) {
   const endpoint = '/api/errors';
+  const enabled = global.BuildPlanConfig?.featureFlags?.frontendErrorLogging === true;
   let lastSentAt = 0;
 
   function serializeError(error) {
@@ -14,6 +15,7 @@
   }
 
   async function reportError(error, metadata = {}) {
+    if (!enabled) return { skipped: true, reason: 'frontend-error-logging-disabled' };
     const now = Date.now();
     if (now - lastSentAt < 1000) return { skipped: true };
     lastSentAt = now;
@@ -43,6 +45,7 @@
   }
 
   function initialize() {
+    if (!enabled) return;
     window.addEventListener('error', (event) => {
       reportError(event.error || event.message, {
         source: 'window.error',
