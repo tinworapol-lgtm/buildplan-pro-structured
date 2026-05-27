@@ -205,6 +205,12 @@ const steps = [
     args: ['tools/function-budget-audit.js'],
     required: true,
   },
+  {
+    id: 'supabase-beta-activation',
+    command: process.execPath,
+    args: ['tools/supabase-beta-activation-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
