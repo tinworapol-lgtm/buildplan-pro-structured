@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-71-function-budget-audit - 2026-05-28
+
+### Added
+
+- Function budget audit for checking static-first API guards and Vercel usage risk.
+- Thai Vercel Function Budget runbook for interpreting accumulated usage warnings.
+- Long-cache immutable headers for versioned static assets under `/assets/*`.
+
 ## phase-69-function-invocation-guard - 2026-05-26
 
 ### Updated

@@ -193,6 +193,18 @@ const steps = [
     args: ['tools/static-first-no-api-smoke.js'],
     required: true,
   },
+  {
+    id: 'function-budget-audit-preflight',
+    command: process.execPath,
+    args: ['tools/function-budget-audit-preflight.js'],
+    required: true,
+  },
+  {
+    id: 'function-budget-audit',
+    command: process.execPath,
+    args: ['tools/function-budget-audit.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
