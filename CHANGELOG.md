@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-72-supabase-beta-activation - 2026-05-28
+
+### Added
+
+- Public beta Supabase activation checklist and report tool.
+- Beta-only Vercel env push helper that does not require Stripe values.
+- Thai runbook for activating Email OTP signup, Supabase schema, Vercel env, and live cloud smoke.
+
 ## phase-71-function-budget-audit - 2026-05-28
 
 ### Added
