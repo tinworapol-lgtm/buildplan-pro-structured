@@ -60,27 +60,34 @@ function getReadiness() {
       STRIPE_PRICE_599_YEARLY: stripe.price599Yearly,
     }),
   };
-  const missing = [
+  const betaMissing = [
     ...envStatus.app.missing,
     ...envStatus.supabase.missing,
+  ];
+  const paidMissing = [
+    ...betaMissing,
     ...envStatus.stripe.missing,
   ];
-  const configured = missing.length === 0;
+  const betaConfigured = betaMissing.length === 0;
+  const paidConfigured = paidMissing.length === 0;
   return {
-    configured,
-    mode: configured ? 'production-ready-env' : 'scaffold-env-missing',
+    configured: betaConfigured,
+    betaConfigured,
+    paidConfigured,
+    mode: paidConfigured ? 'paid-production-ready-env' : betaConfigured ? 'public-beta-ready-env' : 'scaffold-env-missing',
     supabase,
     stripe,
     app,
     envGroups,
     envStatus,
-    missing,
-    nextActions: configured ? [
-      'Run production smoke tests with a paid test account.',
-      'Enable paid mode messaging in the public UI.',
+    missing: betaMissing,
+    paidMissing,
+    nextActions: betaConfigured ? [
+      'Run real Email OTP signup test.',
+      'Run npm run beta:cloud-smoke with BETA_LIVE_ACCESS_TOKEN.',
+      paidConfigured ? 'Paid launch env is ready.' : 'Stripe is optional during Public Beta and can be configured before paid launch.',
     ] : [
       envStatus.supabase.complete ? null : 'Create Supabase project, run supabase/schema.sql, then set Supabase env vars in Vercel.',
-      envStatus.stripe.complete ? null : 'Create Stripe monthly/yearly prices, configure webhook, then set Stripe env vars in Vercel.',
       envStatus.app.complete ? null : 'Set APP_BASE_URL to the production domain.',
       'Redeploy production after env vars are set.',
     ].filter(Boolean),

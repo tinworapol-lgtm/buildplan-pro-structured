@@ -211,6 +211,12 @@ const steps = [
     args: ['tools/supabase-beta-activation-preflight.js'],
     required: true,
   },
+  {
+    id: 'public-beta-readiness',
+    command: process.execPath,
+    args: ['tools/public-beta-readiness-preflight.js'],
+    required: true,
+  },
 ];
 
 function runStep(step) {
