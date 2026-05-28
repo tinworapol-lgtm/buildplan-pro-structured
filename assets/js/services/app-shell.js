@@ -27,11 +27,11 @@
   }
 
   function describeReadiness(readiness) {
-    if (readiness?.configured) {
+    if (readiness?.betaConfigured || readiness?.configured) {
       return {
-        status: 'พร้อมใช้งานจริง',
+        status: readiness?.paidConfigured ? 'พร้อมใช้งานจริง' : 'พร้อมใช้ Public Beta',
         tone: 'ready',
-        detail: 'เชื่อมต่อ Supabase / Stripe แล้ว สามารถเปิดใช้ Login, Cloud Save และ Subscription ได้',
+        detail: readiness?.paidConfigured ? 'เชื่อมต่อ Supabase / Stripe แล้ว สามารถเปิดใช้ Login, Cloud Save และ Subscription ได้' : 'เชื่อมต่อ Supabase แล้ว สามารถเปิดสมัครสมาชิก Public Beta และ Cloud Save ได้',
         loginHint: 'ระบบพร้อมส่ง Email OTP ผ่าน Supabase Auth',
       };
     }
@@ -299,8 +299,13 @@
 
   function isMemberSignupEnabled() {
     const readiness = global.BuildPlanSaaS?.getReadinessState?.();
+    if (readiness?.betaConfigured || readiness?.configured) return true;
     const supabase = readiness?.envStatus?.supabase;
-    return supabase?.complete === true || readiness?.supabase?.url === true;
+    if (supabase?.complete === true || readiness?.supabase?.url === true) return true;
+    const config = global.BuildPlanConfig || {};
+    return config.licensing?.mode === 'public-beta'
+      && !!config.auth?.endpoints?.startOtp
+      && !!config.auth?.endpoints?.verifyOtp;
   }
 
   function getSignupProfile() {

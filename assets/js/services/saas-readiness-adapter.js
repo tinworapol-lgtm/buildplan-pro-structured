@@ -43,8 +43,11 @@
       const payload = await response.json().catch(() => ({}));
       readinessState = {
         configured: !!payload.configured,
+        betaConfigured: !!payload.betaConfigured,
+        paidConfigured: !!payload.paidConfigured,
         mode: payload.mode || (response.ok ? 'unknown' : 'unavailable'),
         missing: Array.isArray(payload.missing) ? payload.missing : [],
+        paidMissing: Array.isArray(payload.paidMissing) ? payload.paidMissing : [],
         supabase: payload.supabase || {},
         stripe: payload.stripe || {},
         app: payload.app || {},

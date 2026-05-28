@@ -1,5 +1,13 @@
 # Changelog
 
+## phase-73-public-beta-readiness - 2026-05-28
+
+### Updated
+
+- SaaS readiness now separates Public Beta readiness from paid Stripe launch readiness.
+- Member signup can open in Public Beta mode without an initial readiness API call.
+- Readiness responses expose `betaConfigured`, `paidConfigured`, and `paidMissing`.
+
 ## phase-72-supabase-beta-activation - 2026-05-28
 
 ### Added
