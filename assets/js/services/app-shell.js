@@ -2,6 +2,7 @@
 (function bootstrapBuildPlanAppShell(global) {
   const routes = ['home', 'login', 'programs', 'billing', 'user-dashboard', 'admin-dashboard', 'workspace'];
   let currentRoute = 'home';
+  let otpCooldownUntil = 0;
 
   function getRoute() {
     return currentRoute;
@@ -297,6 +298,34 @@
     if (output) output.textContent = message || '';
   }
 
+  function getOtpCooldownSeconds() {
+    return Math.max(0, Math.ceil((otpCooldownUntil - Date.now()) / 1000));
+  }
+
+  function updateOtpButtons() {
+    const seconds = getOtpCooldownSeconds();
+    for (const id of ['btn-signup-send-code', 'btn-login-send-code']) {
+      const button = global.document?.getElementById(id);
+      if (!button) continue;
+      button.disabled = seconds > 0;
+      button.dataset.cooldown = seconds ? String(seconds) : '';
+    }
+    if (seconds > 0) global.setTimeout?.(updateOtpButtons, 1000);
+  }
+
+  function startOtpCooldown(seconds = 60) {
+    otpCooldownUntil = Math.max(otpCooldownUntil, Date.now() + (seconds * 1000));
+    updateOtpButtons();
+  }
+
+  function getAuthErrorMessage(error) {
+    const message = error?.message || '';
+    if (error?.status === 429 || /rate limit/i.test(message)) {
+      return 'ส่งอีเมลยืนยันถี่เกินไป กรุณารอประมาณ 5-10 นาที แล้วค่อยกดส่งใหม่';
+    }
+    return message || 'ไม่สามารถส่งอีเมลยืนยันได้';
+  }
+
   function isMemberSignupEnabled() {
     const readiness = global.BuildPlanSaaS?.getReadinessState?.();
     if (readiness?.betaConfigured || readiness?.configured) return true;
@@ -349,7 +378,13 @@
     }
     setSignupMessage('กำลังส่งรหัส OTP...');
     try {
+      const waitingSeconds = getOtpCooldownSeconds();
+      if (waitingSeconds > 0) {
+        setSignupMessage('กรุณารออีก ' + waitingSeconds + ' วินาที ก่อนส่งอีเมลใหม่');
+        return { ok: false, message: 'OTP cooldown active' };
+      }
       const result = await global.BuildPlanAuth?.requestEmailOtp?.(memberProfile.email, memberProfile, true);
+      startOtpCooldown(60);
       setSignupMessage(result?.message || 'ส่งรหัส OTP แล้ว กรุณาตรวจอีเมล');
       return result;
     } catch (error) {
@@ -386,7 +421,13 @@
     const { email } = getLoginValues();
     setMessage('Sending login code...');
     try {
+      const waitingSeconds = getOtpCooldownSeconds();
+      if (waitingSeconds > 0) {
+        setMessage('กรุณารออีก ' + waitingSeconds + ' วินาที ก่อนส่งอีเมลใหม่');
+        return { ok: false, message: 'OTP cooldown active' };
+      }
       const result = await global.BuildPlanAuth?.requestEmailOtp?.(email);
+      startOtpCooldown(60);
       setMessage(result?.message || 'Login code sent. Check your email.');
       return result;
     } catch (error) {
@@ -449,6 +490,25 @@
     if (button) button.addEventListener('click', handler);
   }
 
+  function applyAuthCallbackSession(session) {
+    if (session.authenticated) {
+      setMessage('Signed in. Opening workspace...');
+      navigateWorkspace({ skipProjectPopup: true });
+      return;
+    }
+    setMessage(session.message || 'Login link could not be verified.');
+    navigateLogin();
+  }
+
+  function handleInitialAuthCallback() {
+    const sessionOrPromise = global.BuildPlanAuth?.acceptAuthCallback?.();
+    if (!sessionOrPromise) return false;
+    Promise.resolve(sessionOrPromise).then((session) => {
+      if (session) applyAuthCallbackSession(session);
+    });
+    return true;
+  }
+
   function initializeAppShell() {
     bindButton('btn-home-open-workspace', navigateWorkspace);
     bindButton('btn-home-login', navigateWorkspace);
@@ -485,7 +545,7 @@
     applyReadiness(global.BuildPlanSaaS?.getReadinessState?.());
     refreshShellReadiness();
     const initialHash = String(global.location?.hash || '').replace(/^#/, '');
-    navigateTo(normalizeRoute(initialHash || 'home'));
+    if (!handleInitialAuthCallback()) navigateTo(normalizeRoute(initialHash || 'home'));
   }
 
   global.BuildPlanAppShell = {

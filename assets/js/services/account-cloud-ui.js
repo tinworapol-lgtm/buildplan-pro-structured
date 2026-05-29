@@ -2,6 +2,7 @@
 // This adds a compact operator-facing panel without coupling the planner to a specific auth vendor UI.
 (function bootstrapAccountCloudUi(global) {
   let panelReady = false;
+  let otpCooldownUntil = 0;
 
   function getText(value, fallback = '') {
     return value == null || value === '' ? fallback : String(value);
@@ -112,9 +113,20 @@
 
   async function requestOtp() {
     const { email } = getEmailAndCode();
+    const waitingSeconds = Math.max(0, Math.ceil((otpCooldownUntil - Date.now()) / 1000));
+    if (waitingSeconds > 0) {
+      setOutput('กรุณารออีก ' + waitingSeconds + ' วินาที ก่อนส่งอีเมลใหม่');
+      return;
+    }
     setOutput('Sending login code...');
-    const result = await global.BuildPlanAuth?.requestEmailOtp?.(email);
-    setOutput(result?.message || 'Login code sent. Check your email.');
+    try {
+      const result = await global.BuildPlanAuth?.requestEmailOtp?.(email);
+      otpCooldownUntil = Date.now() + 60000;
+      setOutput(result?.message || 'Login code sent. Check your email.');
+    } catch (error) {
+      if (error?.status === 429) otpCooldownUntil = Date.now() + 600000;
+      setOutput(error?.message || 'Unable to send login code.');
+    }
   }
 
   async function verifyOtp() {
