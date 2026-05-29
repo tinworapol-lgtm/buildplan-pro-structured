@@ -49,7 +49,15 @@ module.exports = async function handler(request, response) {
   });
   const payload = await supabaseResponse.json().catch(() => ({}));
   if (!supabaseResponse.ok) {
-    return sendJson(response, supabaseResponse.status, { message: payload.msg || payload.message || 'Unable to send login code' });
+    const upstreamMessage = payload.msg || payload.message || '';
+    const rateLimited = supabaseResponse.status === 429 || /rate limit/i.test(upstreamMessage);
+    return sendJson(response, supabaseResponse.status, {
+      message: rateLimited
+        ? 'ส่งอีเมลยืนยันถี่เกินไป กรุณารอประมาณ 5-10 นาที แล้วค่อยกดส่งใหม่'
+        : upstreamMessage || 'Unable to send login code',
+      code: rateLimited ? 'email_rate_limit_exceeded' : (payload.error_code || payload.code || 'auth_start_failed'),
+      retryAfterSeconds: rateLimited ? 600 : null,
+    });
   }
 
   return sendJson(response, 200, {

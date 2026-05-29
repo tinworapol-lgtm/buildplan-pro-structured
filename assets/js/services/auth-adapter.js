@@ -49,6 +49,34 @@
     global.dispatchEvent?.(new CustomEvent('buildplan:auth-state', { detail: getSessionState() }));
   }
 
+  function formatAuthError(payload = {}, status = 0) {
+    const rawMessage = String(payload.message || payload.msg || payload.error_description || 'Auth request failed');
+    const code = String(payload.code || payload.error_code || '');
+    if (status === 429 || code === 'email_rate_limit_exceeded' || /rate limit/i.test(rawMessage)) {
+      return 'ส่งอีเมลยืนยันถี่เกินไป กรุณารอประมาณ 5-10 นาที แล้วค่อยกดส่งใหม่';
+    }
+    if (/otp_expired|expired|invalid/i.test(code + ' ' + rawMessage)) {
+      return 'ลิงก์หรือรหัสหมดอายุแล้ว กรุณากดส่งอีเมลใหม่อีกครั้ง';
+    }
+    return rawMessage;
+  }
+
+  function parseUrlParams(rawValue) {
+    const raw = String(rawValue || '').replace(/^[#?]/, '');
+    const params = {};
+    if (!raw) return { get() { return ''; } };
+    for (const pair of raw.split('&')) {
+      const [key, value = ''] = pair.split('=');
+      if (!key) continue;
+      params[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, ' '));
+    }
+    return {
+      get(name) {
+        return params[name] || '';
+      },
+    };
+  }
+
   async function requestJson(url, options = {}) {
     const token = getAccessToken();
     const response = await fetch(url, {
@@ -62,7 +90,7 @@
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = new Error(payload.message || 'Auth request failed');
+      const error = new Error(formatAuthError(payload, response.status));
       error.status = response.status;
       error.payload = payload;
       throw error;
@@ -100,6 +128,38 @@
     };
     publishSessionState();
     return getSessionState();
+  }
+
+  function acceptAuthCallback() {
+    const hashParams = parseUrlParams(global.location?.hash || '');
+    const searchParams = parseUrlParams(global.location?.search || '');
+    const errorCode = searchParams.get('error_code') || hashParams.get('error_code') || '';
+    const errorDescription = searchParams.get('error_description') || hashParams.get('error_description') || '';
+    if (errorCode || errorDescription) {
+      sessionState = {
+        authenticated: false,
+        configured: true,
+        user: null,
+        memberProfile: null,
+        checkedAt: new Date().toISOString(),
+        message: formatAuthError({ error_code: errorCode, error_description: errorDescription }, 400),
+      };
+      publishSessionState();
+      return getSessionState();
+    }
+
+    const accessToken = hashParams.get('access_token') || searchParams.get('access_token') || '';
+    const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token') || '';
+    if (!accessToken) return null;
+
+    setAccessToken(accessToken);
+    if (refreshToken) setRefreshToken(refreshToken);
+    try {
+      global.history?.replaceState?.(null, '', global.location.origin + global.location.pathname + '#workspace');
+    } catch (error) {
+      // Best effort only. Token storage already succeeded.
+    }
+    return refreshSession();
   }
 
   async function refreshSession() {
@@ -150,6 +210,7 @@
     setAccessToken,
     clearAccessToken,
     getSessionState,
+    acceptAuthCallback,
     requestEmailOtp,
     verifyEmailOtp,
     refreshSession,
