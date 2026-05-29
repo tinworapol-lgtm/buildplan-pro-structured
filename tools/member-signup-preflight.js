@@ -53,7 +53,7 @@ for (const marker of ['normalizeMemberProfile', 'upsertMemberProfile', 'getMembe
   if (!shared.includes(marker)) fail('shared helper missing marker', marker);
 }
 
-for (const marker of ['memberProfile', 'normalizeMemberProfile', 'signupMode']) {
+for (const marker of ['memberProfile', 'normalizeMemberProfile', 'signupMode', 'APP_BASE_URL', 'email_redirect_to']) {
   if (!authStart.includes(marker)) fail('auth start missing marker', marker);
 }
 
