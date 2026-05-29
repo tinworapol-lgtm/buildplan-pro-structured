@@ -4,6 +4,7 @@ function getSupabaseAuthEnv() {
   return {
     url: process.env.SUPABASE_URL || '',
     anonKey: process.env.SUPABASE_ANON_KEY || '',
+    appBaseUrl: (process.env.APP_BASE_URL || 'https://buildplan-pro-structured.vercel.app').replace(/\/$/, ''),
   };
 }
 
@@ -36,6 +37,7 @@ module.exports = async function handler(request, response) {
     body: JSON.stringify({
       email,
       create_user: true,
+      email_redirect_to: env.appBaseUrl,
       data: {
         source: 'buildplan-pro',
         signupMode,
