@@ -30,7 +30,8 @@
     },
     licensing: {
       mode: 'public-beta',
-      loginRequired: true,
+      loginRequired: false,
+      publicFreeAccess: true,
       plans: ['Free', '199', '599'],
       packages: ['Free', '199', '599'],
       billingCycles: ['monthly', 'yearly'],
