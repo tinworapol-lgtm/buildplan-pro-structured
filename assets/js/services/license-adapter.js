@@ -8,7 +8,7 @@
   let licenseState = {
     mode: licensing.mode || 'local-demo',
     status: 'active',
-    plan: 'local-demo',
+    plan: licensing.publicFreeAccess ? '599' : 'local-demo',
     expiresAt: null,
     checkedAt: null,
     loginRequired: !!licensing.loginRequired,
@@ -39,6 +39,8 @@
     return {
       mode: licensing.mode || 'local-demo',
       loginRequired: !!licensing.loginRequired,
+      publicFreeAccess: !!licensing.publicFreeAccess,
+      defaultPlan: licensing.publicFreeAccess ? '599' : null,
       plans: Array.isArray(licensing.plans) ? [...licensing.plans] : [],
       endpoints: { ...(licensing.endpoints || {}) },
     };
@@ -75,6 +77,14 @@
 
   async function getSessionStatus() {
     const licenseConfig = getLicenseConfig();
+    if (licenseConfig.publicFreeAccess) {
+      return {
+        authenticated: true,
+        user: null,
+        mode: 'public-free-access',
+        plan: '599',
+      };
+    }
     if (licenseConfig.mode === 'local-demo' || licenseConfig.mode === 'static-demo' || !licenseConfig.endpoints.session) {
       return {
         authenticated: true,
@@ -110,6 +120,16 @@
 
   async function refreshLicenseStatus() {
     const licenseConfig = getLicenseConfig();
+    if (licenseConfig.publicFreeAccess) {
+      return setLicenseState({
+        mode: 'public-free-access',
+        status: 'active',
+        plan: '599',
+        expiresAt: null,
+        loginRequired: false,
+        message: 'Public beta free access: all 599 features unlocked.',
+      });
+    }
     if (licenseConfig.mode === 'local-demo' || licenseConfig.mode === 'static-demo' || !licenseConfig.endpoints.licenseStatus) {
       return setLicenseState({
         mode: licenseConfig.mode === 'static-demo' ? 'static-demo' : 'local-demo',
@@ -145,6 +165,16 @@
 
   function initializeLicenseGate() {
     publishLicenseState();
+    if (licensing.publicFreeAccess) {
+      return setLicenseState({
+        mode: 'public-free-access',
+        status: 'active',
+        plan: '599',
+        expiresAt: null,
+        loginRequired: false,
+        message: 'Public beta free access: all 599 features unlocked.',
+      });
+    }
     if (!automaticApiChecks && licensing.mode !== 'local-demo' && licensing.mode !== 'static-demo') {
       return setLicenseState({
         mode: licensing.mode || 'public-beta',
