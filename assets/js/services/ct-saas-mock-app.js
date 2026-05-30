@@ -1,6 +1,8 @@
 // Mock Construction Tech SaaS flow for frontend-only subscription, role, and module permission demos.
 (function bootstrapConstructionSaaSMock(global) {
   const storageKey = 'buildplan.ctSaasMockState.v1';
+  const publicFreeAccess = global.BuildPlanConfig?.licensing?.publicFreeAccess === true;
+  const unlockedPlan = publicFreeAccess ? '599' : null;
 
   const plans = {
     Free: { users: 1, storage: '50 MB', price: 0, label: 'Free' },
@@ -104,6 +106,15 @@
       if (saved.billingCycle) state.billingCycle = saved.billingCycle === 'yearly' ? 'yearly' : 'monthly';
       if (saved.subscription) state.subscription = { ...state.subscription, ...saved.subscription };
     } catch (_error) {}
+    if (publicFreeAccess) {
+      state.plan = unlockedPlan;
+      state.subscription = {
+        ...state.subscription,
+        scenario: 'active',
+        expiresAt: '2026-08-30',
+        locked: false,
+      };
+    }
   }
 
   function navigate(route) {
@@ -127,10 +138,12 @@
   }
 
   function isSubscriptionActive() {
+    if (publicFreeAccess) return true;
     return subscriptionTone() !== 'expired';
   }
 
   function canUse(module) {
+    if (publicFreeAccess) return true;
     return isSubscriptionActive() && (modulePermissions[module.id] || []).includes(state.plan);
   }
 
@@ -140,6 +153,7 @@
   }
 
   function isFeatureAllowedForPlan(feature, plan = state.plan) {
+    if (publicFreeAccess) return true;
     const rule = workspaceFeatureRules[feature];
     if (!rule) return isSubscriptionActive();
     return isSubscriptionActive() && planRank(plan) >= planRank(rule.minPlan);
@@ -160,6 +174,15 @@
   }
 
   function setSubscriptionScenario(scenario) {
+    if (publicFreeAccess) {
+      state.plan = unlockedPlan;
+      state.subscription.scenario = 'active';
+      state.subscription.expiresAt = '2026-08-30';
+      state.subscription.locked = false;
+      persist();
+      renderAll();
+      return;
+    }
     state.subscription.scenario = scenario;
     if (scenario === 'active') {
       state.subscription.expiresAt = '2026-06-22';
@@ -207,12 +230,13 @@
   }
 
   function renderSubscription() {
-    const tone = subscriptionTone();
+    const tone = publicFreeAccess ? 'active' : subscriptionTone();
     const labels = {
       active: { text: 'ใช้งานได้', badge: 'Active' },
       warning: { text: 'ใกล้หมดอายุ', badge: 'Due soon' },
       expired: { text: 'หมดอายุ / ถูกล็อก', badge: 'Locked' },
     };
+    if (publicFreeAccess) labels.active = { text: 'ทดลองใช้ฟรีเต็มฟังก์ชัน 599', badge: 'Full 599 Free' };
     qsa('[data-ct-subscription-status]').forEach((item) => {
       item.textContent = labels[tone].text;
     });
@@ -220,7 +244,7 @@
       item.textContent = formatThaiDate(state.subscription.expiresAt);
     });
     qsa('[data-ct-subscription-days]').forEach((item) => {
-      item.textContent = String(Math.max(daysLeft(), 0));
+      item.textContent = publicFreeAccess ? 'ไม่จำกัด' : String(Math.max(daysLeft(), 0));
     });
     qsa('[data-ct-subscription-tone]').forEach((item) => {
       item.textContent = labels[tone].badge;
@@ -239,7 +263,7 @@
     if (!grid) return;
     const tone = subscriptionTone();
     grid.innerHTML = modules.map((module) => {
-      const planEnabled = (modulePermissions[module.id] || []).includes(state.plan);
+      const planEnabled = publicFreeAccess || (modulePermissions[module.id] || []).includes(state.plan);
       const enabled = canUse(module);
       const lockText = tone === 'expired' ? 'สมาชิกหมดอายุ ต่ออายุก่อนใช้งาน' : 'ต้องใช้แพ็กเกจ ' + requiredPlanText(module.id);
       return [
@@ -267,7 +291,7 @@
     const planNames = planOrder;
     body.innerHTML = modules.map((module) => {
       const cells = planNames.map((plan) => {
-        const ok = (modulePermissions[module.id] || []).includes(plan);
+        const ok = publicFreeAccess || (modulePermissions[module.id] || []).includes(plan);
         return '<td class="' + (ok ? 'ok' : 'locked') + '">' + (ok ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-lock"></i>') + '</td>';
       }).join('');
       return '<tr><td>' + module.title + '</td>' + cells + '</tr>';
@@ -356,7 +380,7 @@
 
   function choosePlan(plan) {
     if (!plans[plan]) return;
-    state.plan = plan;
+    state.plan = publicFreeAccess ? unlockedPlan : plan;
     renewSubscription({ silent: true });
     closeBilling();
     if (global.Swal?.fire) {
@@ -428,12 +452,12 @@
     }));
     qsa('[data-ct-trial]').forEach((button) => button.addEventListener('click', () => {
       setSubscriptionScenario('active');
-      state.plan = 'Free';
+      state.plan = publicFreeAccess ? unlockedPlan : 'Free';
       persist();
       global.BuildPlanAppShell?.navigateWorkspace?.();
     }));
     qsa('[data-ct-plan-select]').forEach((select) => select.addEventListener('change', () => {
-      if (plans[select.value]) state.plan = select.value;
+      if (plans[select.value]) state.plan = publicFreeAccess ? unlockedPlan : select.value;
       persist();
       renderAll();
     }));

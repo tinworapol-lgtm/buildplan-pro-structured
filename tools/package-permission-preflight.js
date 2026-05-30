@@ -18,6 +18,16 @@ const requiredSnippets = [
     pattern: /isFeatureAllowedForPlan|isWorkspaceFeatureAllowed/,
   },
   {
+    label: 'public free access unlocks all workspace features',
+    source: mockApp,
+    pattern: /publicFreeAccess[\s\S]*return true/,
+  },
+  {
+    label: 'public free access forces package 599',
+    source: mockApp,
+    pattern: /unlockedPlan[\s\S]*599/,
+  },
+  {
     label: 'workspace feature lock renderer',
     source: mockApp,
     pattern: /applyWorkspaceFeatureLocks/,
