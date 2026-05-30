@@ -33,7 +33,8 @@ const contract = read('contracts/cloud-projects-api.contract.json');
 
 for (const marker of [
   "mode: 'public-beta'",
-  "loginRequired: true",
+  "loginRequired: false",
+  "publicFreeAccess: true",
   "session: '/api/session'",
   "licenseStatus: '/api/license/status'",
   "projects: '/api/projects'",

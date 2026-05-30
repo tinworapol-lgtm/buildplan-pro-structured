@@ -30,10 +30,10 @@
   function describeReadiness(readiness) {
     if (readiness?.betaConfigured || readiness?.configured) {
       return {
-        status: readiness?.paidConfigured ? 'พร้อมใช้งานจริง' : 'พร้อมใช้ Public Beta',
+        status: 'ใช้ฟรีช่วงทดสอบ',
         tone: 'ready',
-        detail: readiness?.paidConfigured ? 'เชื่อมต่อ Supabase / Stripe แล้ว สามารถเปิดใช้ Login, Cloud Save และ Subscription ได้' : 'เชื่อมต่อ Supabase แล้ว สามารถเปิดสมัครสมาชิก Public Beta และ Cloud Save ได้',
-        loginHint: 'ระบบพร้อมส่ง Email OTP ผ่าน Supabase Auth',
+        detail: 'เปิดให้ใช้งาน BuildPlan Pro ได้ทันทีโดยไม่ต้องสมัครสมาชิก ระหว่างเก็บ feedback และปรับปรุง Public Beta',
+        loginHint: 'ช่วงทดสอบนี้ไม่ต้องสมัครสมาชิก กดเข้าใช้แผนงานได้ทันที',
       };
     }
     const missingCount = Array.isArray(readiness?.missing) ? readiness.missing.length : 0;
@@ -47,7 +47,7 @@
       status: 'โหมดทดลอง',
       tone: 'demo',
       detail: groupText + ' แต่เปิดทดลองและจัดทำแผนงานได้',
-      loginHint: 'ยังไม่เปิดใช้ Email OTP จริง ให้กดปุ่ม Demo เพื่อเข้า Workspace ระหว่างทดสอบ',
+      loginHint: 'ช่วงทดสอบนี้ไม่ต้องสมัครสมาชิก กดเข้าใช้แผนงานได้ทันที',
     };
   }
 
@@ -350,6 +350,9 @@
   }
 
   function openSignup() {
+    if ((global.BuildPlanConfig || {}).licensing?.publicFreeAccess === true) {
+      return navigateWorkspace();
+    }
     const modal = global.document?.getElementById('member-signup-modal');
     if (!modal) return navigateLogin();
     modal.classList.replace('hidden', 'flex');
@@ -512,9 +515,9 @@
   function initializeAppShell() {
     bindButton('btn-home-open-workspace', navigateWorkspace);
     bindButton('btn-home-login', navigateWorkspace);
-    bindButton('btn-home-signup', openSignup);
-    bindButton('btn-hero-signup', openSignup);
-    bindButton('btn-login-panel-signup', openSignup);
+    bindButton('btn-home-signup', navigateWorkspace);
+    bindButton('btn-hero-signup', navigateWorkspace);
+    bindButton('btn-login-panel-signup', navigateWorkspace);
     bindButton('member-signup-close', closeSignup);
     bindButton('btn-signup-send-code', submitSignupProfile);
     bindButton('btn-signup-verify-code', verifySignupCode);

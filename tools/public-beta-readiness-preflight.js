@@ -29,7 +29,7 @@ for (const marker of ['betaConfigured', 'paidConfigured', 'paidMissing']) {
   if (!adapter.includes(marker)) fail('readiness adapter missing marker', marker);
 }
 
-for (const marker of ["config.licensing?.mode === 'public-beta'", 'startOtp', 'verifyOtp', 'พร้อมใช้ Public Beta']) {
+for (const marker of ["config.licensing?.mode === 'public-beta'", 'publicFreeAccess', 'ใช้ฟรีช่วงทดสอบ']) {
   if (!appShell.includes(marker)) fail('app shell signup readiness missing marker', marker);
 }
 
