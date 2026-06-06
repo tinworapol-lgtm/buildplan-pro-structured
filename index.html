@@ -25,7 +25,7 @@
         }
     </script>
 
-        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase32">
+        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase33">
 </head>
 <body class="flex flex-col h-screen text-slate-800 bg-slate-50" data-app-route="home">
 
@@ -43,7 +43,7 @@
                     <span>BuildPlan Pro</span>
                 </div>
                 <nav class="ct-public-nav" aria-label="เมนูหลัก">
-                    <button type="button" id="btn-home-signup" class="ct-nav-button">สมัครสมาชิกเพื่อเริ่มใช้งานฟรี</button>
+                    <button type="button" id="btn-home-signup" class="ct-nav-button">เข้าใช้ฟรี</button>
                     <button type="button" id="btn-home-login" class="ct-nav-button">เข้าใช้แผนงาน</button>
                 </nav>
             </header>
@@ -52,10 +52,10 @@
                 <section class="ct-hero-copy">
                     <h1>BuildPlan Pro</h1>
                     <p class="ct-hero-subtitle">A modern construction planning platform for Gantt Charts, S-Curves, payment milestones, and professional project reports in one streamlined workspace.</p>
-                    <div class="ct-plan-price-row" aria-label="แพ็กเกจแผนงาน">
-                        <span><b>Free</b><small>เริ่มจัดทำแผนงานพื้นฐาน</small></span>
-                        <span><b>199</b><small>เหมาะกับงานเดี่ยวและทีมเล็ก</small></span>
-                        <span><b>599</b><small>ครบสำหรับทีมโครงการ</small></span>
+                    <div class="ct-free-access-row" aria-label="สถานะการใช้ฟรี">
+                        <span><i class="fa-solid fa-unlock"></i><b>ใช้ฟรีเต็มฟังก์ชัน</b><small>ช่วงทดลองเปิดให้ทุกคนใช้งาน BuildPlan Pro ได้ทันที</small></span>
+                        <span><i class="fa-solid fa-credit-card"></i><b>ไม่ต้องใช้บัตรเครดิต</b><small>เริ่มทำแผนงานได้เลย แล้วค่อยบันทึก/ส่งออกตาม workflow เดิม</small></span>
+                        <span><i class="fa-solid fa-mug-hot"></i><b>สนับสนุนได้ตามสมัครใจ</b><small>ผู้สนับสนุนจะได้รับป้าย Supporter และสิทธิ์ทดลองฟังก์ชันใหม่ในอนาคต</small></span>
                     </div>
                     <div class="ct-hero-actions">
                         <button id="btn-home-open-workspace" type="button" class="ct-primary-button" data-ct-login-user>
@@ -63,8 +63,12 @@
                             เข้าใช้แผนงาน
                         </button>
                         <button type="button" id="btn-hero-signup" class="ct-success-button">
-                            สมัครสมาชิกเพื่อเริ่มใช้งานฟรี <span class="sr-only">ใช้ฟรีเต็มฟังก์ชัน</span>
+                            เข้าใช้ BuildPlan Pro ฟรี <span class="sr-only">ใช้ฟรีเต็มฟังก์ชัน</span>
                             <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button type="button" id="btn-support-coffee" class="ct-coffee-button" data-ct-open-support>
+                            <i class="fa-solid fa-mug-hot"></i>
+                            สนับสนุนค่ากาแฟ
                         </button>
                     </div>
                     <div class="ct-trust-row" aria-label="จุดเด่น">
@@ -90,24 +94,59 @@
                             <span><i class="fa-solid fa-lock"></i><input type="password" value="password" aria-label="รหัสผ่าน"><i class="fa-regular fa-eye-slash"></i></span>
                         </label>
                         <div class="ct-form-row"><label><input type="checkbox" checked> จดจำฉัน</label><a href="#">ลืมรหัสผ่าน?</a></div>
-                        <button type="button" class="ct-login-submit" data-ct-login-user><i class="fa-solid fa-unlock"></i> สมัครสมาชิกเพื่อเริ่มใช้งานฟรี</button>
+                        <button type="button" class="ct-login-submit" data-ct-login-user><i class="fa-solid fa-unlock"></i> เข้าใช้งานฟรี</button>
                     </form>
                     <div class="ct-current-package">
-                        <h3>แพ็กเกจที่คุณใช้งาน</h3>
+                        <h3>สถานะการใช้งาน</h3>
                         <div class="ct-package-card">
-                            <span class="ct-package-badge">599</span>
+                            <span class="ct-package-badge"><i class="fa-solid fa-unlock"></i></span>
                             <div>
-                                <strong>แพ็กเกจ 599</strong>
-                                <p>ผู้ใช้ <span data-ct-plan-users>10</span> คน / พื้นที่เก็บข้อมูล <span data-ct-plan-storage>100 GB</span></p>
-                                <small>หมดอายุ: 31 ธ.ค. 2568 <b>ใช้งานอยู่</b></small>
+                                <strong>Free Beta Access</strong>
+                                <p>เปิดให้ใช้ฟรีเต็มฟังก์ชันในช่วงทดลองใช้งาน</p>
+                                <small>ไม่ต้องชำระเงิน · ไม่ต้องใช้บัตรเครดิต · <b>พร้อมใช้งาน</b></small>
                             </div>
                         </div>
                     </div>
-                    <p class="ct-register-line">ช่วงทดสอบเปิดให้ใช้ฟรี ไม่ต้องสมัครสมาชิก</p>
+                    <p class="ct-register-line">ต้องการช่วยพัฒนาระบบต่อ? <button type="button" data-ct-open-support>สนับสนุนค่ากาแฟ</button></p>
                 </aside>
             </main>
         </div>
     </section>
+
+    <div id="ct-support-modal" class="ct-support-modal" hidden aria-modal="true" role="dialog" aria-label="สนับสนุนค่ากาแฟ">
+        <div class="ct-support-backdrop" data-ct-close-support></div>
+        <section class="ct-support-dialog">
+            <header class="ct-support-head">
+                <div>
+                    <span>Support BuildPlan Pro</span>
+                    <h2>สนับสนุนค่ากาแฟผู้พัฒนา</h2>
+                    <p>ใช้ฟรีต่อได้เหมือนเดิม การสนับสนุนเป็นทางเลือกสำหรับช่วยพัฒนาเครื่องมือให้ดีขึ้น และรับป้าย Supporter สำหรับสิทธิ์ทดลองฟังก์ชันใหม่ในอนาคต</p>
+                </div>
+                <button type="button" data-ct-close-support aria-label="ปิดหน้าสนับสนุน"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+            <div class="ct-support-grid">
+                <button type="button" class="ct-support-tier" data-ct-support-amount="59" data-ct-support-tier="Bronze">
+                    <i class="fa-solid fa-medal"></i><strong>Bronze</strong><b>59 บาท</b><span>ป้ายผู้สนับสนุนเริ่มต้น</span>
+                </button>
+                <button type="button" class="ct-support-tier" data-ct-support-amount="99" data-ct-support-tier="Silver">
+                    <i class="fa-solid fa-award"></i><strong>Silver</strong><b>99 บาท</b><span>ป้ายเงิน + Supporter Wall</span>
+                </button>
+                <button type="button" class="ct-support-tier" data-ct-support-amount="159" data-ct-support-tier="Gold">
+                    <i class="fa-solid fa-crown"></i><strong>Gold</strong><b>159 บาท</b><span>ทดลองฟังก์ชันใหม่ก่อนใคร</span>
+                </button>
+                <button type="button" class="ct-support-tier" data-ct-support-amount="299" data-ct-support-tier="Platinum">
+                    <i class="fa-solid fa-gem"></i><strong>Platinum</strong><b>299 บาท</b><span>สิทธิ์ beta feature เพิ่มในอนาคต</span>
+                </button>
+                <button type="button" class="ct-support-tier is-diamond" data-ct-support-amount="599" data-ct-support-tier="Diamond">
+                    <i class="fa-solid fa-diamond"></i><strong>Diamond</strong><b>599 บาท</b><span>ป้ายพิเศษ + early access ระดับสูง</span>
+                </button>
+            </div>
+            <div class="ct-support-note">
+                <i class="fa-solid fa-circle-info"></i>
+                รอบนี้เป็นหน้าต้นแบบ ยังไม่ตัดเงินจริง เมื่อพร้อมจะเชื่อมระบบรับชำระและบันทึกสถานะ Supporter เข้าฐานข้อมูล
+            </div>
+        </section>
+    </div>
 
     <div id="member-signup-modal" class="fixed inset-0 bg-slate-950/55 hidden items-center justify-center z-[90] no-print" aria-hidden="true">
         <section class="bg-white w-[min(760px,calc(100vw-28px))] rounded-2xl shadow-2xl border border-slate-200 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="member-signup-title">
@@ -1122,7 +1161,7 @@
   <script src="assets/js/services/error-logger.js"></script>
   <script src="assets/js/services/account-cloud-ui.js?v=phase27"></script>
   <script src="assets/js/services/app-shell.js?v=phase31"></script>
-  <script src="assets/js/services/ct-saas-mock-app.js?v=phase38"></script>
+  <script src="assets/js/services/ct-saas-mock-app.js?v=phase39"></script>
 <script src="assets/js/modules/01-core-state.js?v=phase32"></script>
   <script src="assets/js/modules/02-storage.js?v=phase31"></script>
   <script src="assets/js/modules/03-ui-controls-print.js"></script>
