@@ -58,7 +58,6 @@ let todayForMock = new Date();
         let durationPlanSettings = {};
         let actualSettings = { frequency: 'weekly' };
         let actualEntries = {};
-        let actualCurveZoom = 1;
 
         function updateSidebarOffset() {
             const ribbon = document.getElementById('top-ribbon');
