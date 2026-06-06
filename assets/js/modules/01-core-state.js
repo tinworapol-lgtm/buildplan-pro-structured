@@ -58,32 +58,7 @@ let todayForMock = new Date();
         let durationPlanSettings = {};
         let actualSettings = { frequency: 'weekly' };
         let actualEntries = {};
-        const BUILDPLAN_VIEW_MODE_KEY = 'buildplan_pro_view_mode';
-        let viewMode = 'light';
-
-        function applyViewMode(mode = viewMode) {
-            const allowed = ['light', 'dark', 'read'];
-            viewMode = allowed.includes(mode) ? mode : 'light';
-            document.documentElement.dataset.viewMode = viewMode;
-            document.body?.setAttribute('data-view-mode', viewMode);
-            document.querySelectorAll('[data-view-mode-choice]').forEach(btn => {
-                const active = btn.dataset.viewModeChoice === viewMode;
-                btn.classList.toggle('view-mode-active', active);
-                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-            });
-            try { localStorage.setItem(BUILDPLAN_VIEW_MODE_KEY, viewMode); } catch (_) {}
-        }
-
-        function setViewMode(mode) {
-            applyViewMode(mode);
-            scheduleAutoSave();
-        }
-
-        function initializeViewMode() {
-            let saved = 'light';
-            try { saved = localStorage.getItem(BUILDPLAN_VIEW_MODE_KEY) || 'light'; } catch (_) {}
-            applyViewMode(saved);
-        }
+        let actualCurveZoom = 1;
 
         function updateSidebarOffset() {
             const ribbon = document.getElementById('top-ribbon');
