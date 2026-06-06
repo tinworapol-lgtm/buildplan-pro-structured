@@ -682,6 +682,93 @@ body[data-view-mode="dark"] .text-slate-700,
 body[data-view-mode="dark"] .text-slate-800 {
   color: #cbd5e1 !important;
 }
+body[data-view-mode="dark"] h1,
+body[data-view-mode="dark"] h2,
+body[data-view-mode="dark"] h3,
+body[data-view-mode="dark"] h4,
+body[data-view-mode="dark"] label,
+body[data-view-mode="dark"] .font-bold,
+body[data-view-mode="dark"] .font-black,
+body[data-view-mode="dark"] .kpi-label,
+body[data-view-mode="dark"] .chart-title-text,
+body[data-view-mode="dark"] .actual-task-name-col,
+body[data-view-mode="dark"] .actual-header .actual-cell {
+  color: #f8fbff !important;
+  fill: #f8fbff !important;
+}
+body[data-view-mode="dark"] .actual-header,
+body[data-view-mode="dark"] .actual-header .actual-cell {
+  background: #243149 !important;
+  border-color: #5b6f91 !important;
+}
+body[data-view-mode="dark"] .actual-wbs {
+  background: #1e2a3f !important;
+  color: #dbeafe !important;
+}
+body[data-view-mode="dark"] .actual-task-name-col {
+  color: #eef6ff !important;
+}
+body[data-view-mode="dark"] .actual-planned {
+  color: #ff6b6b !important;
+}
+body[data-view-mode="dark"] .actual-input-col {
+  color: #f8fbff !important;
+}
+body[data-view-mode="dark"] .actual-input,
+body[data-view-mode="dark"] .actual-locked-value {
+  background: #111f36 !important;
+  color: #f8fbff !important;
+  border-color: #7086a8 !important;
+}
+body[data-view-mode="dark"] .actual-complete-row,
+body[data-view-mode="dark"] .actual-complete-cell,
+body[data-view-mode="dark"] .actual-date-complete,
+body[data-view-mode="dark"] .actual-locked-value {
+  background: #0f3d2e !important;
+  color: #b9f6d3 !important;
+  border-color: #34d399 !important;
+}
+body[data-view-mode="dark"] .actual-date-active {
+  background: #102d4a !important;
+  color: #b9ddff !important;
+}
+body[data-view-mode="dark"] .actual-latest-saved,
+body[data-view-mode="dark"] .actual-table-shell .actual-row,
+body[data-view-mode="dark"] #actual-progress-table {
+  border-color: #536783 !important;
+}
+body[data-view-mode="dark"] .chart-axis-text {
+  fill: #dbeafe !important;
+}
+body[data-view-mode="dark"] .chart-grid-line,
+body[data-view-mode="dark"] .chart-axis-line {
+  stroke: #7086a8 !important;
+}
+body[data-view-mode="dark"] .text-blue-700,
+body[data-view-mode="dark"] .text-narit-blue {
+  color: #93c5fd !important;
+}
+body[data-view-mode="dark"] .text-emerald-700 {
+  color: #6ee7b7 !important;
+}
+body[data-view-mode="dark"] .text-red-700 {
+  color: #fb7185 !important;
+}
+body[data-view-mode="dark"] .bg-slate-50,
+body[data-view-mode="dark"] .bg-slate-100 {
+  background-color: #182235 !important;
+}
+body[data-view-mode="dark"] .border-slate-200,
+body[data-view-mode="dark"] .border-slate-300 {
+  border-color: #475569 !important;
+}
+body[data-view-mode="dark"] .plan-toolbar,
+body[data-view-mode="dark"] .plan-card,
+body[data-view-mode="dark"] .scurve-toggle-panel {
+  background: #111827 !important;
+  color: #e5f0ff !important;
+  border-color: #475569 !important;
+}
 
 body[data-view-mode="read"] {
   background: #f4ecd8 !important;
