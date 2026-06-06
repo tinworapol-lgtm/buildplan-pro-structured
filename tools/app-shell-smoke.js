@@ -135,7 +135,8 @@ check('phase46-actual-table-markers', readText('assets/js/modules/06-actual-dash
 check('phase46-gantt-actual-markers', readText('assets/js/modules/05-gantt-rendering.js').includes('actual-gantt-bar') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-progress-popover'));
 check('phase46-project-popup-shell', readText('assets/js/services/app-shell.js').includes('openProjectStartPopup') && readText('assets/js/services/app-shell.js').includes('applyProjectStartForm'));
 check('plan-only-pricing', html.includes('ct-plan-price-row') && html.includes('data-plan="199"') && html.includes('data-plan="599"') && !html.includes('value="Enterprise"'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase29'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase30'));
+check('dark-mode-contrast-css', readText('assets/css/buildplan.css').includes('actual-date-complete') && readText('assets/css/buildplan.css').includes('chart-axis-text') && readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"] .text-blue-700'));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase29'));
 check('display-mode-controls', html.includes('data-view-mode-choice="light"') && html.includes('data-view-mode-choice="dark"') && html.includes('data-view-mode-choice="read"'));
 check('actual-start-date-column', readText('assets/js/modules/06-actual-dashboard.js').includes('getTaskActualStartRecord') && readText('assets/js/modules/06-actual-dashboard.js').includes('actual-start-date'));
