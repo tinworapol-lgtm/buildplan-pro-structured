@@ -25,7 +25,7 @@
         }
     </script>
 
-        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase28">
+        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase29">
 </head>
 <body class="flex flex-col h-screen text-slate-800 bg-slate-50" data-app-route="home">
 
@@ -534,7 +534,13 @@
             </button>
         </div>
 
-        <div class="flex gap-2 items-center no-print overflow-x-auto custom-scrollbar">
+        <div class="view-mode-switch no-print" role="group" aria-label="Display mode">
+            <button type="button" data-view-mode-choice="light" onclick="setViewMode('light')" title="Light Mode" aria-pressed="true"><i class="fa-solid fa-sun"></i><span>Light</span></button>
+            <button type="button" data-view-mode-choice="dark" onclick="setViewMode('dark')" title="Dark Mode" aria-pressed="false"><i class="fa-solid fa-moon"></i><span>Dark</span></button>
+            <button type="button" data-view-mode-choice="read" onclick="setViewMode('read')" title="Read Mode" aria-pressed="false"><i class="fa-solid fa-eye"></i><span>Read</span></button>
+        </div>
+
+        <div class="flex gap-2 items-center no-print overflow-x-auto custom-scrollbar">
             <!-- เมนูเลือกขนาดกระดาษ -->
             <div class="flex items-center gap-1 bg-white/10 text-white px-2 py-1.5 rounded-lg text-sm border border-white/20 shadow-sm mr-1">
                 <i class="fa-solid fa-file-lines text-[12px]"></i>
@@ -1126,14 +1132,14 @@
   <script src="assets/js/services/account-cloud-ui.js?v=phase27"></script>
   <script src="assets/js/services/app-shell.js?v=phase31"></script>
   <script src="assets/js/services/ct-saas-mock-app.js?v=phase38"></script>
-<script src="assets/js/modules/01-core-state.js"></script>
-  <script src="assets/js/modules/02-storage.js"></script>
+<script src="assets/js/modules/01-core-state.js?v=phase29"></script>
+  <script src="assets/js/modules/02-storage.js?v=phase29"></script>
   <script src="assets/js/modules/03-ui-controls-print.js"></script>
   <script src="assets/js/modules/04-duration-installments.js"></script>
-  <script src="assets/js/modules/05-gantt-rendering.js"></script>
-  <script src="assets/js/modules/06-actual-dashboard.js"></script>
+  <script src="assets/js/modules/05-gantt-rendering.js?v=phase29"></script>
+  <script src="assets/js/modules/06-actual-dashboard.js?v=phase29"></script>
   <script src="assets/js/modules/07-cost-scurve.js"></script>
-  <script src="assets/js/modules/08-task-editing-bootstrap.js"></script>
+  <script src="assets/js/modules/08-task-editing-bootstrap.js?v=phase29"></script>
   <script src="assets/js/modules/09-public-api.js"></script>
 </body>
 </html>

@@ -167,7 +167,7 @@
             const table = document.getElementById('actual-progress-table');
             if (table) {
                 syncActualTaskNameColumnWidth();
-                const header = `\n                    <div class="actual-table-shell">\n                        <div id="actual-task-name-resizer" class="actual-task-name-resizer actual-task-name-resizer-overlay" title="ลากเพื่อปรับความกว้าง"></div>`;
+                const header = `\n                    <div class="actual-table-shell">\n                        <div id="actual-task-name-resizer" hidden aria-hidden="true"></div>`;
                 const rows = getWorkTasksForActual().map(task => {
                     const plannedPct = getTaskPlannedPercentAtDate(task, selectedDate);
                     const value = getEffectiveActualPercentForTask(task.id, dateKey);
@@ -335,7 +335,6 @@ ${actualControl}
             } else if (nextPage === 'dashboard') {
                 renderDashboard();
             } else {
-                applyPlanPageDefaultToggles();
                 renderUI();
             }
 
@@ -454,10 +453,12 @@ ${actualControl}
         function renderDashboardList(tasksForList, emptyText) {
             if (!tasksForList.length) return `<div class="text-slate-400 text-sm">${emptyText}</div>`;
             return tasksForList.map(task => {
+                const startRecord = typeof getTaskActualStartRecord === 'function' ? getTaskActualStartRecord(task.id) : null;
                 const completeRecord = getTaskCompletionRecord(task.id);
+                const actualStartLine = startRecord ? `เริ่มจริง ${formatDateDisplay(startRecord.date)}` : `เริ่มแผน ${formatDateDisplay(task.startDateObj)}`;
                 const dateLine = completeRecord
-                    ? `Complete วันที่ ${formatDateDisplay(completeRecord.date)}`
-                    : `${formatDateDisplay(task.startDateObj)} - ${formatDateDisplay(task.endDateObj)}`;
+                    ? `${actualStartLine} | Complete ${formatDateDisplay(completeRecord.date)}`
+                    : `${actualStartLine} | แผนจบ ${formatDateDisplay(task.endDateObj)}`;
                 const progress = getTaskProgressForDisplay(task, tasks.indexOf(task));
                 const completeClass = progress >= 100 ? 'dashboard-complete-item' : '';
                 return `
