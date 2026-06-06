@@ -93,7 +93,8 @@
                     showInstallmentLines,
                     taskNameColumnWidth,
                     durationTaskNameColumnWidth,
-                    actualTaskNameColumnWidth
+                    actualTaskNameColumnWidth,
+                    viewMode
                 },
                 installmentSettings: { ...installmentSettings },
                 durationPlanSettings: { ...durationPlanSettings },
@@ -134,6 +135,7 @@
                 actualTaskNameColumnWidth = clampActualTaskNameColumnWidth(projectData.prefs.actualTaskNameColumnWidth || actualTaskNameColumnWidth);
                 isSignatureVisible = projectData.prefs.isSignatureVisible !== undefined ? !!projectData.prefs.isSignatureVisible : isSignatureVisible;
                 showInstallmentLines = projectData.prefs.showInstallmentLines !== undefined ? !!projectData.prefs.showInstallmentLines : showInstallmentLines;
+                if (projectData.prefs.viewMode) applyViewMode(projectData.prefs.viewMode);
             }
             const scaleSelector = document.getElementById('scale-selector');
             if (scaleSelector) scaleSelector.value = userScalePreference;

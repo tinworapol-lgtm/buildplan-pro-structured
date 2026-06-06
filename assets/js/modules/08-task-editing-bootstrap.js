@@ -194,6 +194,7 @@
 
         // Initialize App
         window.BuildPlanLicense?.initializeLicenseGate?.();
+        initializeViewMode();
         updateSidebarOffset();
         calculateDates(true);
         normalizeCostSettingsInputs();

@@ -1035,6 +1035,7 @@
             if (sCurveToggle) sCurveToggle.checked = false;
             const todayToggle = document.getElementById('show-today-line');
             if (todayToggle) todayToggle.checked = false;
+            applyPlanPageDefaultToggles();
             clearAutoSavedProject();
             historyStack = [];
             currentHistoryIndex = -1;
