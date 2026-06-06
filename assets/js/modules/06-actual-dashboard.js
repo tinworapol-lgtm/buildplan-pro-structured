@@ -243,31 +243,17 @@ ${actualControl}
                 });
         }
 
-        function bindActualCurveZoom(container) {
-            if (!container || container.dataset.zoomBound === '1') return;
-            container.dataset.zoomBound = '1';
-            container.addEventListener('wheel', event => {
-                event.preventDefault();
-                const step = event.deltaY > 0 ? -0.1 : 0.1;
-                actualCurveZoom = clampNumber((actualCurveZoom || 1) + step, 0.7, 3);
-                renderActualCurveChart();
-            }, { passive: false });
-        }
-
         function renderActualCurveChart() {
             const container = document.getElementById('actual-curve-chart');
             if (!container) return;
-            bindActualCurveZoom(container);
             const series = getActualSeries();
             const sData = getSCurveData();
             if (!series.length || !sData.points.length) {
                 container.innerHTML = `<div class="h-[360px] flex items-center justify-center text-slate-400 text-sm border border-dashed border-slate-300 rounded-lg bg-slate-50">บันทึก Actual อย่างน้อย 1 วันที่เพื่อแสดงกราฟเปรียบเทียบ</div>`;
                 return;
             }
-            const zoom = clampNumber(actualCurveZoom || 1, 0.7, 3);
             const width = 900;
             const height = 360;
-            const renderedWidth = Math.round(width * zoom);
             const margin = { top: 24, right: 24, bottom: 54, left: 64 };
             const plotWidth = width - margin.left - margin.right;
             const plotHeight = height - margin.top - margin.bottom;
@@ -289,12 +275,8 @@ ${actualControl}
             }).join('');
             const circles = series.map(point => `<circle cx="${xForDate(point.date).toFixed(2)}" cy="${yForPct(point.actual).toFixed(2)}" r="4" class="chart-point-red" style="fill:#dc2626"></circle>`).join('');
             container.innerHTML = `
-                <div class="actual-curve-zoom-bar">
-                    <span><i class="fa-solid fa-magnifying-glass-chart"></i> Scroll mouse เพื่อซูม S-Curve</span>
-                    <strong>${Math.round(zoom * 100)}%</strong>
-                </div>
                 <div class="w-full overflow-auto custom-scrollbar actual-curve-scroll">
-                    <svg viewBox="0 0 ${width} ${height}" class="actual-curve-svg" style="width:${renderedWidth}px; min-width:720px; max-width:none; height:${height}px;" role="img" aria-label="Planned and actual progress chart">
+                    <svg viewBox="0 0 ${width} ${height}" class="w-full min-w-[720px] h-[360px]" role="img" aria-label="Planned and actual progress chart">
                         ${yGrid}
                         <line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${margin.left + plotWidth}" y2="${margin.top + plotHeight}" class="chart-axis-line"></line>
                         <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" class="chart-axis-line"></line>

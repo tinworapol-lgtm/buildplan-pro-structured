@@ -629,23 +629,6 @@ textarea,
   box-shadow: 0 8px 18px rgba(234, 88, 12, .22), inset 0 1px 0 rgba(255,255,255,.18) !important;
 }
 .dashboard-nav-orange:hover { filter: brightness(1.06); transform: translateY(-1px); }
-.actual-curve-zoom-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 800;
-}
-.actual-curve-zoom-bar strong {
-  color: #0f3b78;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 999px;
-  padding: 2px 8px;
-}
 .actual-curve-scroll {
   overscroll-behavior: contain;
 }
