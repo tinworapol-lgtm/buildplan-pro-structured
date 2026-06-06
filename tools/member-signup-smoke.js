@@ -191,7 +191,7 @@ function check(id, ok, detail = '') {
   if (!ok) throw new Error(id + (detail ? ': ' + detail : ''));
 }
 
-check('member-signup-button-markup', html.includes('id="btn-home-signup"') && html.includes('สมัครสมาชิกฟรี'));
+check('member-signup-button-markup', html.includes('id="btn-home-signup"') && html.includes('id="btn-hero-signup"') && html.includes('ct-free-access-row'));
 check('member-signup-modal-markup', html.includes('id="member-signup-modal"') && html.includes('id="signup-full-name"'));
 check('member-signup-otp-markup', html.includes('id="signup-otp-code"') && html.includes('id="btn-signup-verify-code"'));
 check('member-signup-shell-functions', shell.includes('submitSignupProfile') && shell.includes('verifySignupCode'));

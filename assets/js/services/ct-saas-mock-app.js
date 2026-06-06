@@ -352,6 +352,36 @@
     global.document?.body?.classList?.remove('ct-billing-open');
   }
 
+  function openSupport() {
+    const modal = qs('#ct-support-modal');
+    if (!modal) return;
+    modal.hidden = false;
+    global.document?.body?.classList?.add('ct-support-open');
+  }
+
+  function closeSupport() {
+    const modal = qs('#ct-support-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    global.document?.body?.classList?.remove('ct-support-open');
+  }
+
+  function chooseSupportTier(button) {
+    const amount = button?.dataset?.ctSupportAmount || '';
+    const tier = button?.dataset?.ctSupportTier || 'Supporter';
+    closeSupport();
+    if (global.Swal?.fire) {
+      global.Swal.fire({
+        icon: 'info',
+        title: `ขอบคุณสำหรับ ${tier} Supporter`,
+        text: amount ? `รอบนี้เป็นตัวอย่าง ยังไม่ตัดเงินจริง ยอดสนับสนุน ${Number(amount).toLocaleString('th-TH')} บาทจะพร้อมใช้งานเมื่อเชื่อมระบบชำระเงินจริง` : 'รอบนี้เป็นตัวอย่าง ยังไม่ตัดเงินจริง',
+        confirmButtonText: 'รับทราบ',
+      });
+    } else {
+      global.alert?.('Supporter demo: ' + tier + (amount ? ' ' + amount + ' บาท' : ''));
+    }
+  }
+
   function setBillingCycle(cycle) {
     state.billingCycle = cycle === 'yearly' ? 'yearly' : 'monthly';
     persist();
@@ -467,6 +497,9 @@
     qsa('[data-ct-renew-subscription]').forEach((button) => button.addEventListener('click', renewSubscription));
     qsa('[data-ct-open-billing]').forEach((button) => button.addEventListener('click', openBilling));
     qsa('[data-ct-close-billing]').forEach((button) => button.addEventListener('click', closeBilling));
+    qsa('[data-ct-open-support]').forEach((button) => button.addEventListener('click', openSupport));
+    qsa('[data-ct-close-support]').forEach((button) => button.addEventListener('click', closeSupport));
+    qsa('[data-ct-support-amount]').forEach((button) => button.addEventListener('click', () => chooseSupportTier(button)));
     qsa('[data-ct-billing-cycle]').forEach((button) => button.addEventListener('click', () => setBillingCycle(button.dataset.ctBillingCycle)));
     qsa('[data-ct-choose-plan]').forEach((button) => button.addEventListener('click', () => choosePlan(button.dataset.ctChoosePlan)));
     qs('#ct-module-grid')?.addEventListener('click', (event) => {
@@ -506,6 +539,8 @@
     renewSubscription,
     openBilling,
     closeBilling,
+    openSupport,
+    closeSupport,
     choosePlan,
     isSubscriptionActive,
     isFeatureAllowedForPlan,
