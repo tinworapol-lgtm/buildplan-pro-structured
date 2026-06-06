@@ -605,222 +605,8 @@ textarea,
 .today-line-drag-zone::after { z-index: 1; }
 
 
-/* Phase 53: persistent toolbar state, actual dates, and display modes */
-.view-mode-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
-}
-.view-mode-switch button {
-  min-height: 34px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 9px;
-  border-radius: 8px;
-  color: rgba(255,255,255,.78);
-  font-size: 12px;
-  font-weight: 900;
-  white-space: nowrap;
-}
-.view-mode-switch button:hover,
-.view-mode-switch button.view-mode-active {
-  background: rgba(255,255,255,.95);
-  color: #07348d;
-}
+/* Phase 53: persistent toolbar state and actual dates */
 .actual-table-shell > .actual-task-name-resizer-overlay { display: none !important; }
-
-body[data-view-mode="dark"] {
-  background: #0b1220 !important;
-  color: #dbeafe;
-}
-body[data-view-mode="dark"] #gantt-page,
-body[data-view-mode="dark"] #actual-page,
-body[data-view-mode="dark"] #dashboard-page,
-body[data-view-mode="dark"] #cost-page,
-body[data-view-mode="dark"] #duration-page,
-body[data-view-mode="dark"] #project-info-header {
-  background: #0f172a !important;
-  color: #dbeafe !important;
-}
-body[data-view-mode="dark"] .bg-white,
-body[data-view-mode="dark"] .kpi-card,
-body[data-view-mode="dark"] .actual-status-card,
-body[data-view-mode="dark"] .dashboard-panel,
-body[data-view-mode="dark"] .actual-table-shell,
-body[data-view-mode="dark"] #data-pane,
-body[data-view-mode="dark"] #gantt-pane,
-body[data-view-mode="dark"] #timeline-header-wrapper {
-  background: #111827 !important;
-  color: #dbeafe !important;
-  border-color: #334155 !important;
-}
-body[data-view-mode="dark"] .cell,
-body[data-view-mode="dark"] .actual-row,
-body[data-view-mode="dark"] .dashboard-task-item,
-body[data-view-mode="dark"] .header-cell {
-  background: #172033 !important;
-  color: #dbeafe !important;
-  border-color: #334155 !important;
-}
-body[data-view-mode="dark"] input,
-body[data-view-mode="dark"] select,
-body[data-view-mode="dark"] textarea {
-  background: #0f172a !important;
-  color: #e5f0ff !important;
-  border-color: #475569 !important;
-}
-body[data-view-mode="dark"] .text-slate-400,
-body[data-view-mode="dark"] .text-slate-500,
-body[data-view-mode="dark"] .text-slate-600,
-body[data-view-mode="dark"] .text-slate-700,
-body[data-view-mode="dark"] .text-slate-800 {
-  color: #cbd5e1 !important;
-}
-body[data-view-mode="dark"] h1,
-body[data-view-mode="dark"] h2,
-body[data-view-mode="dark"] h3,
-body[data-view-mode="dark"] h4,
-body[data-view-mode="dark"] label,
-body[data-view-mode="dark"] .font-bold,
-body[data-view-mode="dark"] .font-black,
-body[data-view-mode="dark"] .kpi-label,
-body[data-view-mode="dark"] .chart-title-text,
-body[data-view-mode="dark"] .actual-task-name-col,
-body[data-view-mode="dark"] .actual-header .actual-cell {
-  color: #f8fbff !important;
-  fill: #f8fbff !important;
-}
-body[data-view-mode="dark"] .actual-header,
-body[data-view-mode="dark"] .actual-header .actual-cell {
-  background: #243149 !important;
-  border-color: #5b6f91 !important;
-}
-body[data-view-mode="dark"] .actual-wbs {
-  background: #1e2a3f !important;
-  color: #dbeafe !important;
-}
-body[data-view-mode="dark"] .actual-task-name-col {
-  color: #eef6ff !important;
-}
-body[data-view-mode="dark"] .actual-planned {
-  color: #ff6b6b !important;
-}
-body[data-view-mode="dark"] .actual-input-col {
-  color: #f8fbff !important;
-}
-body[data-view-mode="dark"] .actual-input,
-body[data-view-mode="dark"] .actual-locked-value {
-  background: #111f36 !important;
-  color: #f8fbff !important;
-  border-color: #7086a8 !important;
-}
-body[data-view-mode="dark"] .actual-complete-row,
-body[data-view-mode="dark"] .actual-complete-cell,
-body[data-view-mode="dark"] .actual-date-complete,
-body[data-view-mode="dark"] .actual-locked-value {
-  background: #0f3d2e !important;
-  color: #b9f6d3 !important;
-  border-color: #34d399 !important;
-}
-body[data-view-mode="dark"] .actual-date-active {
-  background: #102d4a !important;
-  color: #b9ddff !important;
-}
-body[data-view-mode="dark"] .actual-latest-saved,
-body[data-view-mode="dark"] .actual-table-shell .actual-row,
-body[data-view-mode="dark"] #actual-progress-table {
-  border-color: #536783 !important;
-}
-body[data-view-mode="dark"] .chart-axis-text {
-  fill: #dbeafe !important;
-}
-body[data-view-mode="dark"] .chart-grid-line,
-body[data-view-mode="dark"] .chart-axis-line {
-  stroke: #7086a8 !important;
-}
-body[data-view-mode="dark"] .text-blue-700,
-body[data-view-mode="dark"] .text-narit-blue {
-  color: #93c5fd !important;
-}
-body[data-view-mode="dark"] .text-emerald-700 {
-  color: #6ee7b7 !important;
-}
-body[data-view-mode="dark"] .text-red-700 {
-  color: #fb7185 !important;
-}
-body[data-view-mode="dark"] .bg-slate-50,
-body[data-view-mode="dark"] .bg-slate-100 {
-  background-color: #182235 !important;
-}
-body[data-view-mode="dark"] .border-slate-200,
-body[data-view-mode="dark"] .border-slate-300 {
-  border-color: #475569 !important;
-}
-body[data-view-mode="dark"] .plan-toolbar,
-body[data-view-mode="dark"] .plan-card,
-body[data-view-mode="dark"] .scurve-toggle-panel {
-  background: #111827 !important;
-  color: #e5f0ff !important;
-  border-color: #475569 !important;
-}
-
-body[data-view-mode="read"] {
-  background: #f4ecd8 !important;
-  color: #2f2618;
-}
-body[data-view-mode="read"] #gantt-page,
-body[data-view-mode="read"] #actual-page,
-body[data-view-mode="read"] #dashboard-page,
-body[data-view-mode="read"] #cost-page,
-body[data-view-mode="read"] #duration-page,
-body[data-view-mode="read"] #project-info-header {
-  background: #f7f0df !important;
-  color: #2f2618 !important;
-}
-body[data-view-mode="read"] .bg-white,
-body[data-view-mode="read"] .kpi-card,
-body[data-view-mode="read"] .actual-status-card,
-body[data-view-mode="read"] .dashboard-panel,
-body[data-view-mode="read"] .actual-table-shell,
-body[data-view-mode="read"] #data-pane,
-body[data-view-mode="read"] #gantt-pane,
-body[data-view-mode="read"] #timeline-header-wrapper {
-  background: #fff9ea !important;
-  color: #2f2618 !important;
-  border-color: #d9caa8 !important;
-}
-body[data-view-mode="read"] .cell,
-body[data-view-mode="read"] .actual-row,
-body[data-view-mode="read"] .dashboard-task-item,
-body[data-view-mode="read"] .header-cell {
-  background: #fff6df !important;
-  color: #2f2618 !important;
-  border-color: #d9caa8 !important;
-}
-body[data-view-mode="read"] input,
-body[data-view-mode="read"] select,
-body[data-view-mode="read"] textarea {
-  background: #fffaf0 !important;
-  color: #2f2618 !important;
-  border-color: #c9b98f !important;
-}
-body[data-view-mode="read"] .text-slate-400,
-body[data-view-mode="read"] .text-slate-500,
-body[data-view-mode="read"] .text-slate-600,
-body[data-view-mode="read"] .text-slate-700,
-body[data-view-mode="read"] .text-slate-800 {
-  color: #5f5138 !important;
-}
-@media (max-width: 900px) {
-  .view-mode-switch button span { display: none; }
-  .view-mode-switch button { padding: 0 8px; }
-}
 .today-progress-popover { z-index: 270 !important; }
 
 
@@ -843,6 +629,26 @@ body[data-view-mode="read"] .text-slate-800 {
   box-shadow: 0 8px 18px rgba(234, 88, 12, .22), inset 0 1px 0 rgba(255,255,255,.18) !important;
 }
 .dashboard-nav-orange:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.actual-curve-zoom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+}
+.actual-curve-zoom-bar strong {
+  color: #0f3b78;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.actual-curve-scroll {
+  overscroll-behavior: contain;
+}
 
 /* Phase 59A: visible workspace locks for package-based feature access */
 [data-plan-locked="true"] {

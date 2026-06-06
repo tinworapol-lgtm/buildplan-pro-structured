@@ -25,7 +25,7 @@
         }
     </script>
 
-        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase30">
+        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase31">
 </head>
 <body class="flex flex-col h-screen text-slate-800 bg-slate-50" data-app-route="home">
 
@@ -534,12 +534,6 @@
             </button>
         </div>
 
-        <div class="view-mode-switch no-print" role="group" aria-label="Display mode">
-            <button type="button" data-view-mode-choice="light" onclick="setViewMode('light')" title="Light Mode" aria-pressed="true"><i class="fa-solid fa-sun"></i><span>Light</span></button>
-            <button type="button" data-view-mode-choice="dark" onclick="setViewMode('dark')" title="Dark Mode" aria-pressed="false"><i class="fa-solid fa-moon"></i><span>Dark</span></button>
-            <button type="button" data-view-mode-choice="read" onclick="setViewMode('read')" title="Read Mode" aria-pressed="false"><i class="fa-solid fa-eye"></i><span>Read</span></button>
-        </div>
-
         <div class="flex gap-2 items-center no-print overflow-x-auto custom-scrollbar">
             <!-- เมนูเลือกขนาดกระดาษ -->
             <div class="flex items-center gap-1 bg-white/10 text-white px-2 py-1.5 rounded-lg text-sm border border-white/20 shadow-sm mr-1">
@@ -906,38 +900,7 @@
                 </div>
             </div>
 
-            <div class="mx-6 bg-white rounded-xl border-2 border-black shadow-modern overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-amber-50 to-white">
-                    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-                        <div>
-                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fa-solid fa-flag text-amber-500"></i>
-                                สร้างกำหนดส่งงวดงาน
-                            </h2>
-                            <p class="text-sm text-slate-500">คำนวณวันส่งงวดจากวันเริ่มต้นโครงการ + ระยะเวลาแต่ละงวด แล้วแสดงเป็นเส้นแนวตั้งสีส้มบนหน้าแผนงาน</p>
-                        </div>
-                        <div class="flex flex-wrap items-end gap-3">
-                            <label class="flex flex-col gap-1 min-w-[130px]">
-                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">จำนวนงวดงาน</span>
-                                <input id="installment-count-input" type="number" min="1" max="60" step="1" value="3" class="border border-slate-300 rounded-lg px-3 py-2 text-right font-bold text-slate-800 outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500">
-                            </label>
-                            <label class="flex flex-col gap-1 min-w-[150px]">
-                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">ระยะเวลา/งวด (วัน)</span>
-                                <input id="installment-duration-input" type="number" min="1" max="3650" step="1" value="30" class="border border-slate-300 rounded-lg px-3 py-2 text-right font-bold text-amber-700 outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500">
-                            </label>
-                            <button type="button" onclick="createInstallmentSchedule()" class="h-[42px] px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold shadow-md shadow-amber-500/20 transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> สร้างงวดงาน
-                            </button>
-                            <button type="button" onclick="clearInstallmentSchedule()" class="h-[42px] px-4 rounded-lg bg-white hover:bg-slate-50 text-slate-600 text-sm font-bold border border-slate-300 transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-eraser"></i> ล้าง
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div id="installment-preview" class="px-6 py-4 bg-white"></div>
-            </div>
-
-            <div class="mx-6 bg-white rounded-xl border-2 border-black shadow-modern overflow-hidden">
+            <div class="mx-6 bg-white rounded-xl border-2 border-black shadow-modern overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
@@ -1002,11 +965,11 @@
     <div id="duration-page" class="flex-1 p-4 lg:p-6 overflow-auto custom-scrollbar page-view page-hidden bg-slate-50">
         <div class="max-w-7xl mx-auto flex flex-col gap-4">
             <div class="bg-white rounded-xl border-2 border-black shadow-modern overflow-hidden">
-                <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-white flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-                    <div>
-                        <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-check text-narit-blue"></i>
-                            การคำนวณระยะเวลาการทำงาน
+                <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-white flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-narit-blue"></i>
+                            การคำนวณระยะเวลาการทำงาน
                         </h2>
                         <p class="text-sm text-slate-500 mt-1">กระจาย % งานตามงวดงาน แล้วเลือกวันเริ่มที่ระบบแนะนำเพื่อปรับแท่ง Gantt ให้สอดคล้องกับแผนงวด</p>
                     </div>
@@ -1016,13 +979,41 @@
                         </button>
                         <button type="button" onclick="applyDurationPlanToAll()" class="px-4 py-2 rounded-lg bg-narit-blue text-white text-sm font-bold hover:bg-blue-900 transition-all flex items-center gap-2">
                             <i class="fa-solid fa-arrow-right-to-bracket"></i> ใช้กับ Gantt ทั้งหมด
-                        </button>
-                    </div>
-                </div>
-                <div class="px-6 py-3 bg-amber-50 border-b border-amber-100 text-sm text-amber-800 flex items-start gap-2">
-                    <i class="fa-solid fa-circle-info mt-0.5"></i>
-                    <div>ใส่ % ในแต่ละงวดให้ผลรวมเท่ากับ 100% ต่อหนึ่งงาน ระบบจะคำนวณช่วงวันที่ที่เหมาะสมจากงวดแรกถึงงวดสุดท้ายที่มี % และแนะนำวันเริ่มให้เลือก</div>
-                </div>
+                        </button>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-amber-50 to-white">
+                    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-flag text-amber-500"></i>
+                                สร้างกำหนดส่งงวดงาน
+                            </h3>
+                            <p class="text-sm text-slate-500">คำนวณวันส่งงวดจากวันเริ่มต้นโครงการ + ระยะเวลาแต่ละงวด แล้วใช้เป็นคอลัมน์งวดงานและเส้นแนวตั้งสีส้มบนหน้าแผนงาน</p>
+                        </div>
+                        <div class="flex flex-wrap items-end gap-3">
+                            <label class="flex flex-col gap-1 min-w-[130px]">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">จำนวนงวดงาน</span>
+                                <input id="installment-count-input" type="number" min="1" max="60" step="1" value="3" class="border border-slate-300 rounded-lg px-3 py-2 text-right font-bold text-slate-800 outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500">
+                            </label>
+                            <label class="flex flex-col gap-1 min-w-[150px]">
+                                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">ระยะเวลา/งวด (วัน)</span>
+                                <input id="installment-duration-input" type="number" min="1" max="3650" step="1" value="30" class="border border-slate-300 rounded-lg px-3 py-2 text-right font-bold text-amber-700 outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500">
+                            </label>
+                            <button type="button" onclick="createInstallmentSchedule()" class="h-[42px] px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold shadow-md shadow-amber-500/20 transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> สร้างงวดงาน
+                            </button>
+                            <button type="button" onclick="clearInstallmentSchedule()" class="h-[42px] px-4 rounded-lg bg-white hover:bg-slate-50 text-slate-600 text-sm font-bold border border-slate-300 transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-eraser"></i> ล้าง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="installment-preview" class="px-6 py-4 bg-white border-b border-slate-200"></div>
+                <div class="px-6 py-3 bg-amber-50 border-b border-amber-100 text-sm text-amber-800 flex items-start gap-2">
+                    <i class="fa-solid fa-circle-info mt-0.5"></i>
+                    <div>ใส่ % ในแต่ละงวดให้ผลรวมเท่ากับ 100% ต่อหนึ่งงาน ระบบจะคำนวณช่วงวันที่ที่เหมาะสมจากงวดแรกถึงงวดสุดท้ายที่มี % และแนะนำวันเริ่มให้เลือก</div>
+                </div>
                 <div class="overflow-auto custom-scrollbar">
                     <div id="duration-plan-table" class="w-full min-w-max"></div>
                 </div>
@@ -1132,14 +1123,14 @@
   <script src="assets/js/services/account-cloud-ui.js?v=phase27"></script>
   <script src="assets/js/services/app-shell.js?v=phase31"></script>
   <script src="assets/js/services/ct-saas-mock-app.js?v=phase38"></script>
-<script src="assets/js/modules/01-core-state.js?v=phase29"></script>
-  <script src="assets/js/modules/02-storage.js?v=phase29"></script>
+<script src="assets/js/modules/01-core-state.js?v=phase31"></script>
+  <script src="assets/js/modules/02-storage.js?v=phase31"></script>
   <script src="assets/js/modules/03-ui-controls-print.js"></script>
   <script src="assets/js/modules/04-duration-installments.js"></script>
-  <script src="assets/js/modules/05-gantt-rendering.js?v=phase29"></script>
-  <script src="assets/js/modules/06-actual-dashboard.js?v=phase29"></script>
+  <script src="assets/js/modules/05-gantt-rendering.js?v=phase31"></script>
+  <script src="assets/js/modules/06-actual-dashboard.js?v=phase31"></script>
   <script src="assets/js/modules/07-cost-scurve.js"></script>
-  <script src="assets/js/modules/08-task-editing-bootstrap.js?v=phase29"></script>
+  <script src="assets/js/modules/08-task-editing-bootstrap.js?v=phase31"></script>
   <script src="assets/js/modules/09-public-api.js"></script>
 </body>
 </html>

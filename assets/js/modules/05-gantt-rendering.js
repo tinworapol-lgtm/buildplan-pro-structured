@@ -278,9 +278,10 @@
                         { label: `22-${daysInMonth}`, start: 22, end: daysInMonth }
                     ];
 
-                    ranges.forEach((r) => {
-                        let rStartPx = leftPx + ((r.start - 1) / daysInMonth) * mWidth;
-                        let rWidth = ((r.end - r.start + 1) / daysInMonth) * mWidth;
+                    const monthSlotWidth = mWidth / ranges.length;
+                    ranges.forEach((r, rangeIndex) => {
+                        let rStartPx = leftPx + (rangeIndex * monthSlotWidth);
+                        let rWidth = monthSlotWidth;
                         
                         let bCell = document.createElement('div');
                         bCell.className = "absolute h-full flex items-center justify-center text-[10px] border-r border-slate-200 bg-white overflow-hidden text-slate-500 font-bold";
