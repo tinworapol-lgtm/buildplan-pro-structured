@@ -135,7 +135,7 @@ check('phase46-actual-table-markers', readText('assets/js/modules/06-actual-dash
 check('phase46-gantt-actual-markers', readText('assets/js/modules/05-gantt-rendering.js').includes('actual-gantt-bar') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-progress-popover'));
 check('phase46-project-popup-shell', readText('assets/js/services/app-shell.js').includes('openProjectStartPopup') && readText('assets/js/services/app-shell.js').includes('applyProjectStartForm'));
 check('plan-only-pricing', html.includes('ct-plan-price-row') && html.includes('data-plan="199"') && html.includes('data-plan="599"') && !html.includes('value="Enterprise"'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase27'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase28'));
 check('cache-busted-app-shell-js', html.includes('assets/js/services/app-shell.js?v=phase31'));
 check('public-beta-saas-mode', readText('assets/js/config/app-config.js').includes("mode: 'public-beta'"));
 check('public-beta-startup-api', readText('assets/js/config/app-config.js').includes("session: '/api/session'") && readText('assets/js/config/app-config.js').includes("readiness: '/api/system/readiness'"));

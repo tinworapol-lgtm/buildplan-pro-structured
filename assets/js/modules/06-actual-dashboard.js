@@ -83,6 +83,34 @@
             return { dateKey, date: new Date(dateKey + 'T00:00:00'), percent: clampNumber(actualEntries[dateKey][String(taskId)], 0, 100) };
         }
 
+        function getTaskActualStartRecord(taskId, targetDateKey = null) {
+            const keys = Object.keys(actualEntries || {})
+                .filter(key => (!targetDateKey || key <= targetDateKey) && clampNumber(actualEntries[key]?.[String(taskId)], 0, 100) > 0)
+                .sort();
+            if (!keys.length) return null;
+            const dateKey = keys[0];
+            return { dateKey, date: new Date(dateKey + 'T00:00:00'), percent: clampNumber(actualEntries[dateKey][String(taskId)], 0, 100) };
+        }
+
+        function getTaskActualDateRangeRecord(taskId, targetDateKey = null) {
+            const startRecord = getTaskActualStartRecord(taskId, targetDateKey);
+            if (!startRecord) return null;
+            const completeRecord = getTaskCompletionRecord(taskId, targetDateKey);
+            const keys = Object.keys(actualEntries || {})
+                .filter(key => (!targetDateKey || key <= targetDateKey) && actualEntries[key]?.[String(taskId)] !== undefined)
+                .sort();
+            const latestKey = keys.length ? keys[keys.length - 1] : startRecord.dateKey;
+            const endDateKey = completeRecord?.dateKey || latestKey;
+            return {
+                startDateKey: startRecord.dateKey,
+                startDate: startRecord.date,
+                endDateKey,
+                endDate: new Date(endDateKey + 'T00:00:00'),
+                percent: completeRecord ? 100 : clampNumber(actualEntries[endDateKey]?.[String(taskId)], 0, 100),
+                completeRecord
+            };
+        }
+
         function getTaskCompletionRecord(taskId, targetDateKey = null) {
             const keys = Object.keys(actualEntries || {})
                 .filter(key => (!targetDateKey || key <= targetDateKey) && clampNumber(actualEntries[key]?.[String(taskId)], 0, 100) >= 100)
@@ -144,11 +172,14 @@
                     const plannedPct = getTaskPlannedPercentAtDate(task, selectedDate);
                     const value = getEffectiveActualPercentForTask(task.id, dateKey);
                     const completeRecord = getTaskCompletionRecord(task.id, dateKey);
+                    const startRecord = getTaskActualStartRecord(task.id, dateKey);
                     const isCompleteBeforeSelectedDate = !!completeRecord && completeRecord.dateKey < dateKey;
                     const complete = !!completeRecord;
                     const actualControl = isCompleteBeforeSelectedDate ? `
-                                <div class="actual-complete-badge">Complete วันที่ ${formatDateDisplay(completeRecord.date)}</div>` : `
+                                <div class="actual-locked-value">${value.toFixed(2)}%</div>` : `
                                 <input type="number" min="0" max="100" step="0.01" value="${value || ''}" onchange="updateActualTaskProgress(${task.id}, this.value)" class="actual-input">`;
+                    const startDateText = startRecord ? formatDateDisplay(startRecord.date) : '-';
+                    const completeDateText = completeRecord ? formatDateDisplay(completeRecord.date) : '-';
                     return `
                         <div class="actual-row ${complete ? 'actual-complete-row' : ''}">
                             <div class="actual-cell actual-wbs">${escapeTooltipHtml(task.wbs || '')}</div>
@@ -157,9 +188,20 @@
                             <div class="actual-cell actual-input-col ${complete ? 'actual-complete-cell' : ''}">
 ${actualControl}
                             </div>
+                            <div class="actual-cell actual-start-date ${startRecord ? 'actual-date-active' : ''}">${startDateText}</div>
+                            <div class="actual-cell actual-complete-date ${completeRecord ? 'actual-date-complete' : ''}">${completeDateText}</div>
                         </div>`;
                 }).join('');
-                table.innerHTML = rows ? header + rows + '</div>' : `<div class="px-6 py-8 text-center text-slate-400 text-sm">ยังไม่มีรายการงานสำหรับบันทึก Actual</div>`;
+                const tableHeader = `
+                        <div class="actual-row actual-header">
+                            <div class="actual-cell actual-wbs">WBS</div>
+                            <div class="actual-cell actual-task-name-col actual-task-name-header">รายการงาน</div>
+                            <div class="actual-cell actual-planned">Plan %</div>
+                            <div class="actual-cell actual-input-col">Actual %</div>
+                            <div class="actual-cell actual-start-date">วันที่เริ่มงาน</div>
+                            <div class="actual-cell actual-complete-date">วันที่ Complete</div>
+                        </div>`;
+                table.innerHTML = rows ? header + tableHeader + rows + '</div>' : `<div class="px-6 py-8 text-center text-slate-400 text-sm">ยังไม่มีรายการงานสำหรับบันทึก Actual</div>`;
                 setupActualTaskNameResizer();
             }
             syncTaskProgressFromActual(dateKey);

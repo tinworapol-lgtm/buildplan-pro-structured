@@ -796,22 +796,23 @@
                 container.appendChild(bar);
 
                 if (!task.isGroup) {
-                    const actualRecord = typeof getLatestActualRecordForTask === 'function' ? getLatestActualRecordForTask(task.id) : null;
+                    const actualRecord = typeof getTaskActualDateRangeRecord === 'function'
+                        ? getTaskActualDateRangeRecord(task.id)
+                        : (typeof getLatestActualRecordForTask === 'function' ? getLatestActualRecordForTask(task.id) : null);
                     if (actualRecord && actualRecord.percent > 0) {
                         const actualBar = document.createElement('div');
-                        const actualEndByPercent = new Date(task.startDateObj);
-                        const actualDays = Math.max(1, Math.round((task.duration || 1) * (actualRecord.percent / 100)));
-                        actualEndByPercent.setDate(actualEndByPercent.getDate() + actualDays);
-                        let actualEndDate = actualRecord.date && actualRecord.date > task.startDateObj ? new Date(actualRecord.date) : actualEndByPercent;
+                        const actualStartDate = new Date(actualRecord.startDate || actualRecord.date || task.startDateObj);
+                        let actualEndDate = new Date(actualRecord.endDate || actualRecord.date || actualStartDate);
                         actualEndDate.setDate(actualEndDate.getDate() + 1);
-                        const actualRightPx = Math.max(leftPx + 4, getDateOffsetPx(actualEndDate));
+                        const actualLeftPx = Math.max(0, getDateOffsetPx(actualStartDate));
+                        const actualRightPx = Math.max(actualLeftPx + 4, getDateOffsetPx(actualEndDate));
                         actualBar.className = 'actual-gantt-bar';
                         if (isClassic) actualBar.classList.add('actual-gantt-bar-classic');
-                        actualBar.style.left = `${leftPx}px`;
+                        actualBar.style.left = `${actualLeftPx}px`;
                         actualBar.style.top = `${(index * 36) + 17}px`;
-                        actualBar.style.width = `${Math.max(actualRightPx - leftPx, 4)}px`;
-                        actualBar.title = `${actualRecord.percent.toFixed(2)}%\n${formatDateDisplay(actualRecord.date)}`;
-                        if (showBarLabels && actualRightPx - leftPx > 34) actualBar.textContent = `${actualRecord.percent.toFixed(0)}%`;
+                        actualBar.style.width = `${Math.max(actualRightPx - actualLeftPx, 4)}px`;
+                        actualBar.title = `${actualRecord.percent.toFixed(2)}%\n${formatDateDisplay(actualStartDate)} - ${formatDateDisplay(actualEndDate)}`;
+                        if (showBarLabels && actualRightPx - actualLeftPx > 34) actualBar.textContent = `${actualRecord.percent.toFixed(0)}%`;
                         container.appendChild(actualBar);
                     }
                 }

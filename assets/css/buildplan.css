@@ -518,7 +518,7 @@ textarea,
 .project-start-primary { background: #075ee5; color: #fff; }
 .project-start-secondary { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
 .actual-table-shell { width: 100%; min-width: 0; max-width: 100%; border-top: 1px solid #dbe7f6; overflow: hidden; }
-.actual-row { display: grid; grid-template-columns: 56px minmax(160px, var(--actual-task-name-col-width, 300px)) 92px minmax(130px, .85fr); min-height: 36px; border-bottom: 1px solid #dbe7f6; background: #fff; }
+.actual-row { display: grid; grid-template-columns: 56px minmax(160px, var(--actual-task-name-col-width, 300px)) 78px 102px 118px 126px; min-height: 36px; border-bottom: 1px solid #dbe7f6; background: #fff; }
 .actual-row:hover { background: #f8fbff; }
 .actual-header { position: sticky; top: 0; z-index: 5; min-height: 40px; background: #f8fafc; font-weight: 900; color: #0f2342; border-bottom: 1px solid #b8cbe4; }
 .actual-cell { display: flex; align-items: center; padding: 5px 8px; min-width: 0; border-right: 1px solid #dbe7f6; overflow: hidden; }
@@ -529,22 +529,26 @@ textarea,
 .actual-task-name-resizer { position: absolute; top: 0; right: -4px; width: 9px; height: 100%; cursor: col-resize; z-index: 8; }
 .actual-task-name-resizer::after { content: ""; position: absolute; top: 8px; bottom: 8px; left: 4px; width: 2px; border-radius: 99px; background: #94a3b8; }
 .actual-task-name-resizer:hover::after, body.resizing-actual-task-name .actual-task-name-resizer::after { background: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, .15); }
-.actual-planned, .actual-input-col { justify-content: center; font-size: 12px; font-weight: 900; text-align: center; }
+.actual-planned, .actual-input-col, .actual-start-date, .actual-complete-date { justify-content: center; font-size: 12px; font-weight: 900; text-align: center; }
 .actual-planned { color: #b91c1c; }
 .actual-input-col { color: #0f172a; padding: 4px 6px; }
 .actual-input { width: 100%; max-width: 112px; height: 28px; text-align: center; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 900; }
+.actual-locked-value { min-width: 74px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 7px; background: #dcfce7; border: 1px solid #86efac; color: #047857; font-weight: 900; }
+.actual-start-date, .actual-complete-date { color: #475569; white-space: nowrap; }
+.actual-date-active { color: #075985; background: #f0f9ff; }
+.actual-date-complete { color: #047857; background: #ecfdf5; }
 .actual-complete-row { color: #047857; }
 .actual-complete-cell { background: #dcfce7; color: #047857; }
 .actual-complete-badge { width: 100%; min-height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #dcfce7; color: #047857; border: 1px solid #86efac; font-size: 11px; font-weight: 900; white-space: normal; line-height: 1.15; }
 .actual-input.actual-input-complete { color: #047857; background: #dcfce7; border-color: #86efac; }
 .actual-gantt-bar { position: absolute; height: 13px; border-radius: 4px; background: linear-gradient(90deg, #ef4444, #dc2626); box-shadow: 0 1px 4px rgba(185, 28, 28, .32); z-index: 32; color: #fff; font-size: 8px; line-height: 13px; padding-left: 4px; overflow: hidden; white-space: nowrap; pointer-events: auto; }
-.today-progress-popover { position: absolute; min-width: 178px; padding: 10px 12px; border-radius: 12px; background: rgba(15, 23, 42, .96); color: #fff; border: 1px solid rgba(255,255,255,.18); box-shadow: 0 18px 40px rgba(2, 8, 23, .32); z-index: 220; cursor: pointer; pointer-events: auto; user-select: none; font-size: 11px; font-weight: 900; line-height: 1.45; }
+.today-progress-popover { position: absolute; min-width: max-content; width: max-content; max-width: none; padding: 10px 12px; border-radius: 12px; background: rgba(15, 23, 42, .96); color: #fff; border: 1px solid rgba(255,255,255,.18); box-shadow: 0 18px 40px rgba(2, 8, 23, .32); z-index: 220; cursor: pointer; pointer-events: auto; user-select: none; font-size: 11px; font-weight: 900; line-height: 1.45; white-space: nowrap; }
 .today-progress-popover::before { content: ""; position: absolute; top: 18px; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
 .today-progress-popover.today-popover-right::before { left: -7px; border-right: 7px solid rgba(15, 23, 42, .96); }
 .today-progress-popover.today-popover-left::before { right: -7px; border-left: 7px solid rgba(15, 23, 42, .96); }
 .today-popover-title { margin-bottom: 6px; font-size: 11px; font-weight: 900; color: #bfdbfe; line-height: 1.45; }
 .today-popover-title small { font-size: 11px; font-weight: 900; color: #bfdbfe; }
-.today-progress-popover div:not(.today-popover-title) { display: grid; grid-template-columns: 1fr auto; gap: 10px; font-size: 11px; line-height: 1.45; }
+.today-progress-popover div:not(.today-popover-title) { display: grid; grid-template-columns: max-content max-content; gap: 12px; font-size: 11px; line-height: 1.45; }
 .today-progress-popover span { color: #cbd5e1; font-weight: 900; font-size: 11px; }
 .today-progress-popover b { font-weight: 900; font-size: 11px; }
 @media (max-width: 760px) { .project-start-form { grid-template-columns: 1fr; } .project-start-card { padding: 18px; } }
@@ -553,7 +557,7 @@ textarea,
 /* Phase 47: compact actual table, clean plan bars, always-visible today status */
 .progress-cell-text { height: 16px; line-height: 16px; text-align: center; font-size: 10px; font-weight: 900; color: #0f766e; }
 @media (max-width: 760px) {
-  .actual-row { grid-template-columns: 48px minmax(130px, 1fr) 76px minmax(112px, .8fr); }
+  .actual-row { grid-template-columns: 48px minmax(130px, 1fr) 70px 92px 108px 116px; min-width: 564px; }
   .actual-cell { padding: 4px 6px; }
   .actual-task-name-col { font-size: 12px; }
 }
