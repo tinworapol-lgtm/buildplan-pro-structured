@@ -17,6 +17,7 @@ const config = readText('assets/js/config/app-config.js');
 const mockApp = readText('assets/js/services/ct-saas-mock-app.js');
 const html = readText('index.html');
 const readiness = readText('api/system/readiness.js');
+const supportDoc = readText('docs/COFFEE_SUPPORT_PAYMENTS_TH.md');
 
 const checks = [];
 function check(id, ok, detail = '') {
@@ -37,6 +38,7 @@ check('support-config-endpoints', config.includes("checkout: '/api/support'") &&
 check('support-frontend-fetch', mockApp.includes('/api/support') && mockApp.includes('payload.checkoutUrl'));
 check('support-cache-bust', html.includes('ct-saas-mock-app.js?v=phase41'));
 check('support-status-ui', html.includes('data-ct-support-status') && mockApp.includes('refreshSupportStatus') && mockApp.includes('handleSupportReturn'));
+check('support-payout-bank-warning', html.includes('Payout bank account is configured only in Stripe Dashboard') && supportDoc.includes('Stripe Dashboard -> Settings'));
 check('support-readiness-group', readiness.includes('supportPayments') && readiness.includes('Coffee Support Payments') === false);
 
 const report = {

@@ -30,6 +30,16 @@ STRIPE_WEBHOOK_SECRET=...
 https://buildplan-pro-structured.vercel.app/api/webhooks/stripe
 ```
 
+## บัญชีรับเงิน
+
+บัญชีธนาคารสำหรับรับเงินต้องตั้งค่าใน Stripe Dashboard เท่านั้น:
+
+```text
+Stripe Dashboard -> Settings -> Business / Payout settings -> Bank accounts
+```
+
+ห้ามใส่เลขบัญชีธนาคารใน BuildPlan Pro, GitHub, source code, หรือ Vercel environment variables
+
 ## Database
 
 ให้รัน `supabase/schema.sql` ใน Supabase SQL Editor อีกครั้ง เพื่อเพิ่ม:
