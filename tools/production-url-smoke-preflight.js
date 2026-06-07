@@ -35,7 +35,7 @@ for (const marker of [
   'account-cloud-ui.js',
   'structured-phase-24',
   'has-ct-saas-landing',
-  'ct-saas-mock-app.js?v=phase40',
+  'ct-saas-mock-app.js?v=phase41',
   'has-public-free-support-landing',
   'ct-mock-app-has-support-modal',
   'app-shell.js?v=phase31',

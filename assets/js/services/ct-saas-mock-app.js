@@ -73,6 +73,11 @@
     plan: '599',
     selectedModule: 'construction-control',
     billingCycle: 'monthly',
+    support: {
+      configured: false,
+      totalAmount: 0,
+      tier: null,
+    },
     subscription: {
       scenario: 'active',
       cycle: 'monthly',
@@ -317,6 +322,7 @@
     renderModules();
     renderAdminPermissions();
     renderBilling();
+    renderSupportStatus();
     applyWorkspaceFeatureLocks();
   }
 
@@ -427,6 +433,72 @@
       }
     }
   }
+
+  function renderSupportStatus() {
+    const status = qs('[data-ct-support-status]');
+    if (!status) return;
+    const level = state.support?.tier || state.support?.supporterLevel || '';
+    status.hidden = !level;
+    const levelNode = qs('[data-ct-support-level]', status);
+    if (levelNode) {
+      const total = Number(state.support?.totalAmount || 0);
+      levelNode.textContent = total ? `${level} · ${total.toLocaleString('th-TH')} THB` : level;
+    }
+  }
+
+  async function refreshSupportStatus() {
+    const token = getAuthToken();
+    if (!token) {
+      renderSupportStatus();
+      return;
+    }
+    const statusEndpoint = global.BuildPlanConfig?.support?.endpoints?.status || '/api/support';
+    try {
+      const response = await fetch(statusEndpoint, {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (response.ok) {
+        state.support = {
+          configured: !!payload.configured,
+          totalAmount: Number(payload.totalAmount || 0),
+          tier: payload.tier || payload.supporterLevel || null,
+        };
+        renderSupportStatus();
+      }
+    } catch (_error) {}
+  }
+
+  function handleSupportReturn() {
+    let search;
+    try {
+      search = new URLSearchParams(global.location?.search || '');
+    } catch (_error) {
+      return;
+    }
+    const supportStatus = search.get('support');
+    if (!supportStatus) return;
+    const tier = search.get('tier') || 'Supporter';
+    if (global.Swal?.fire) {
+      if (supportStatus === 'success') {
+        global.Swal.fire({
+          icon: 'success',
+          title: 'Thank you for supporting BuildPlan Pro',
+          text: `${tier} Supporter status will be updated after payment confirmation.`,
+          confirmButtonText: 'OK',
+        });
+      } else if (supportStatus === 'cancelled') {
+        global.Swal.fire({
+          icon: 'info',
+          title: 'Support payment cancelled',
+          text: 'You can continue using BuildPlan Pro for free.',
+          confirmButtonText: 'OK',
+        });
+      }
+    }
+    refreshSupportStatus();
+  }
+
   function setBillingCycle(cycle) {
     state.billingCycle = cycle === 'yearly' ? 'yearly' : 'monthly';
     persist();
@@ -559,6 +631,8 @@
     restore();
     renderAll();
     bind();
+    handleSupportReturn();
+    refreshSupportStatus();
     try {
       const search = new URLSearchParams(global.location?.search || '');
       const hashText = String(global.location?.hash || '');

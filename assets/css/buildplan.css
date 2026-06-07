@@ -919,6 +919,45 @@ textarea,
   margin-top: 2px;
 }
 
+.ct-reference-landing .ct-support-status {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(251, 146, 60, 0.42);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.95));
+  color: #0f2a4f;
+  box-shadow: 0 10px 24px rgba(251, 146, 60, 0.14);
+}
+
+.ct-reference-landing .ct-support-status[hidden] {
+  display: none;
+}
+
+.ct-reference-landing .ct-support-status i {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #ff7a1a;
+  color: #fff;
+}
+
+.ct-reference-landing .ct-support-status span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.ct-reference-landing .ct-support-status b {
+  font-size: 0.95rem;
+  color: #003f88;
+}
+
 body.ct-support-open {
   overflow: hidden;
 }

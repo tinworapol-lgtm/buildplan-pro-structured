@@ -35,7 +35,8 @@ check('support-status-api', supportApi.includes('support_payments') && supportAp
 check('stripe-webhook-support', webhook.includes("event.type === 'checkout.session.completed'") && webhook.includes('coffee_support'));
 check('support-config-endpoints', config.includes("checkout: '/api/support'") && config.includes("status: '/api/support'"));
 check('support-frontend-fetch', mockApp.includes('/api/support') && mockApp.includes('payload.checkoutUrl'));
-check('support-cache-bust', html.includes('ct-saas-mock-app.js?v=phase40'));
+check('support-cache-bust', html.includes('ct-saas-mock-app.js?v=phase41'));
+check('support-status-ui', html.includes('data-ct-support-status') && mockApp.includes('refreshSupportStatus') && mockApp.includes('handleSupportReturn'));
 check('support-readiness-group', readiness.includes('supportPayments') && readiness.includes('Coffee Support Payments') === false);
 
 const report = {
