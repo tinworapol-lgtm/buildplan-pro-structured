@@ -1,0 +1,51 @@
+const fs = require('fs');
+const path = require('path');
+
+const projectDir = path.resolve(__dirname, '..');
+const reportDir = path.join(projectDir, 'reports');
+const reportPath = path.join(reportDir, 'support-payments-preflight-phase-40.json');
+
+function readText(relativePath) {
+  return fs.readFileSync(path.join(projectDir, relativePath), 'utf8').replace(/^\uFEFF/, '');
+}
+
+const schema = readText('supabase/schema.sql');
+const shared = readText('api/_shared.js');
+const checkout = readText('api/support/checkout.js');
+const status = readText('api/support/status.js');
+const webhook = readText('api/webhooks/stripe.js');
+const config = readText('assets/js/config/app-config.js');
+const mockApp = readText('assets/js/services/ct-saas-mock-app.js');
+const html = readText('index.html');
+const readiness = readText('api/system/readiness.js');
+
+const checks = [];
+function check(id, ok, detail = '') {
+  checks.push({ id, ok: !!ok, detail });
+  if (!ok) throw new Error(id + (detail ? ': ' + detail : ''));
+}
+
+check('support-table-schema', schema.includes('create table if not exists public.support_payments'));
+check('support-table-rls', schema.includes('alter table public.support_payments enable row level security'));
+check('support-select-own-policy', schema.includes('support_payments_select_own'));
+check('profile-supporter-fields', schema.includes('supporter_level') && schema.includes('supporter_total'));
+check('support-tier-helper', shared.includes('SUPPORT_TIERS') && shared.includes('normalizeSupportAmount'));
+check('support-checkout-api', checkout.includes('mode') && checkout.includes('payment') && checkout.includes('coffee_support'));
+check('support-checkout-env-guard', checkout.includes('Coffee Support Payments') && checkout.includes('STRIPE_SECRET_KEY'));
+check('support-status-api', status.includes('support_payments') && status.includes('supporterLevel'));
+check('stripe-webhook-support', webhook.includes("event.type === 'checkout.session.completed'") && webhook.includes('coffee_support'));
+check('support-config-endpoints', config.includes("checkout: '/api/support/checkout'") && config.includes("status: '/api/support/status'"));
+check('support-frontend-fetch', mockApp.includes('/api/support/checkout') && mockApp.includes('payload.checkoutUrl'));
+check('support-cache-bust', html.includes('ct-saas-mock-app.js?v=phase40'));
+check('support-readiness-group', readiness.includes('supportPayments') && readiness.includes('Coffee Support Payments') === false);
+
+const report = {
+  ok: checks.every((item) => item.ok),
+  checkedAt: new Date().toISOString(),
+  checks,
+};
+
+fs.mkdirSync(reportDir, { recursive: true });
+fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+for (const item of checks) console.log(item.ok ? 'PASS' : 'FAIL', item.id);
+console.log('report:', path.relative(projectDir, reportPath));

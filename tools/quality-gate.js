@@ -170,6 +170,12 @@ const steps = [
     required: true,
   },
   {
+    id: 'support-payments',
+    command: process.execPath,
+    args: ['tools/support-payments-preflight.js'],
+    required: true,
+  },
+  {
     id: 'beta-activation',
     command: process.execPath,
     args: ['tools/beta-activation-preflight.js'],

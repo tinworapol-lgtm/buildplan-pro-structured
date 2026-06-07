@@ -74,6 +74,23 @@ create table if not exists public.error_events (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.support_payments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  email text,
+  amount integer not null check (amount > 0),
+  currency text not null default 'THB',
+  tier text not null,
+  provider text not null default 'stripe',
+  provider_payment_id text unique,
+  checkout_url text,
+  status text not null default 'pending',
+  paid_at timestamptz,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 alter table public.subscriptions add column if not exists package_code text;
 alter table public.subscriptions add column if not exists billing_cycle text;
 alter table public.subscriptions add column if not exists trial_started_at timestamptz;
@@ -86,6 +103,10 @@ alter table public.profiles add column if not exists role text;
 alter table public.profiles add column if not exists member_status text not null default 'beta';
 alter table public.profiles add column if not exists beta_source text;
 alter table public.profiles add column if not exists last_seen_at timestamptz;
+alter table public.profiles add column if not exists supporter_level text;
+alter table public.profiles add column if not exists supporter_total integer not null default 0;
+alter table public.profiles add column if not exists supporter_updated_at timestamptz;
+alter table public.support_payments add column if not exists checkout_url text;
 
 create index if not exists subscriptions_user_id_idx on public.subscriptions(user_id);
 create index if not exists profiles_member_status_created_at_idx on public.profiles(member_status, created_at desc);
@@ -93,6 +114,9 @@ create index if not exists projects_user_id_updated_at_idx on public.projects(us
 create index if not exists feedback_user_id_created_at_idx on public.feedback(user_id, created_at desc);
 create index if not exists audit_logs_user_id_created_at_idx on public.audit_logs(user_id, created_at desc);
 create index if not exists error_events_user_id_created_at_idx on public.error_events(user_id, created_at desc);
+create index if not exists support_payments_user_id_created_at_idx on public.support_payments(user_id, created_at desc);
+create index if not exists support_payments_email_created_at_idx on public.support_payments(lower(email), created_at desc);
+create index if not exists support_payments_status_paid_at_idx on public.support_payments(status, paid_at desc);
 
 alter table public.profiles enable row level security;
 alter table public.subscriptions enable row level security;
@@ -100,6 +124,7 @@ alter table public.projects enable row level security;
 alter table public.feedback enable row level security;
 alter table public.audit_logs enable row level security;
 alter table public.error_events enable row level security;
+alter table public.support_payments enable row level security;
 
 grant usage on schema public to authenticated;
 grant select, update on public.profiles to authenticated;
@@ -108,6 +133,7 @@ grant select, insert, update, delete on public.projects to authenticated;
 grant select, insert on public.feedback to authenticated;
 grant select on public.audit_logs to authenticated;
 grant select, insert on public.error_events to authenticated;
+grant select on public.support_payments to authenticated;
 
 drop policy if exists profiles_select_own on public.profiles;
 create policy profiles_select_own on public.profiles for select using (auth.uid() = id);
@@ -144,3 +170,6 @@ create policy error_events_insert_own on public.error_events for insert with che
 
 drop policy if exists error_events_select_own on public.error_events;
 create policy error_events_select_own on public.error_events for select using (auth.uid() = user_id);
+
+drop policy if exists support_payments_select_own on public.support_payments;
+create policy support_payments_select_own on public.support_payments for select using (auth.uid() = user_id);

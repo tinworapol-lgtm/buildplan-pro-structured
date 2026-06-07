@@ -41,7 +41,26 @@
         checkout: '/api/checkout',
       },
     },
-    cloud: {
+    support: {
+      enabled: true,
+      mode: 'voluntary',
+      currency: 'THB',
+      tiers: [
+        { tier: 'Bronze', amount: 59 },
+        { tier: 'Silver', amount: 99 },
+        { tier: 'Gold', amount: 159 },
+        { tier: 'Platinum', amount: 299 },
+        { tier: 'Diamond', amount: 599 },
+      ],
+      endpoints: {
+        checkout: '/api/support/checkout',
+        status: '/api/support/status',
+      },
+    },
+
+
+
+    cloud: {
       provider: 'supabase',
       endpoints: {
         projects: '/api/projects',

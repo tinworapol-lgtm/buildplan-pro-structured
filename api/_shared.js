@@ -43,6 +43,14 @@ function hasSupabaseEnv() {
 }
 
 const BETA_TRIAL_DAYS = Number(process.env.BETA_TRIAL_DAYS || 90);
+const SUPPORT_TIERS = [
+  { tier: 'Bronze', amount: 59 },
+  { tier: 'Silver', amount: 99 },
+  { tier: 'Gold', amount: 159 },
+  { tier: 'Platinum', amount: 299 },
+  { tier: 'Diamond', amount: 599 },
+  { tier: 'Founder', amount: 1500 },
+];
 
 function cleanText(value, maxLength = 160) {
   return String(value || '').trim().slice(0, maxLength);
@@ -244,6 +252,31 @@ function envGuardPayload(area, names, setupAction) {
   };
 }
 
+function getSupportTierForAmount(amount) {
+  const value = Number(amount) || 0;
+  let selected = SUPPORT_TIERS[0];
+  for (const tier of SUPPORT_TIERS) {
+    if (value >= tier.amount) selected = tier;
+  }
+  return selected;
+}
+
+function normalizeSupportAmount(value) {
+  const amount = Number(value);
+  const allowed = SUPPORT_TIERS.slice(0, 5).map((tier) => tier.amount);
+  return allowed.includes(amount) ? amount : 0;
+}
+
+function getPaymentProvider() {
+  return String(process.env.PAYMENT_PROVIDER || 'stripe').trim().toLowerCase();
+}
+
+function hasSupportPaymentEnv() {
+  const provider = getPaymentProvider();
+  if (provider !== 'stripe') return false;
+  return !!String(process.env.STRIPE_SECRET_KEY || '').trim();
+}
+
 async function getSupabaseUser(accessToken) {
   const env = getSupabaseEnv();
   if (!env.url || !env.anonKey) {
@@ -311,5 +344,10 @@ module.exports = {
   normalizeMemberProfile,
   upsertMemberProfile,
   getMemberProfile,
+  SUPPORT_TIERS,
+  getSupportTierForAmount,
+  normalizeSupportAmount,
+  getPaymentProvider,
+  hasSupportPaymentEnv,
   supabaseRest,
 };

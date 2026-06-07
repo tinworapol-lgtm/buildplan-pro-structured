@@ -8,6 +8,7 @@ const envGroups = {
   app: ['APP_BASE_URL', 'BETA_ADMIN_TOKEN'],
   supabase: ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
   stripe: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_199_MONTHLY', 'STRIPE_PRICE_199_YEARLY', 'STRIPE_PRICE_599_MONTHLY', 'STRIPE_PRICE_599_YEARLY'],
+  supportPayments: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
 };
 
 function getGroupStatus(values) {
@@ -37,6 +38,12 @@ function getReadiness() {
     price599Monthly: hasValue('STRIPE_PRICE_599_MONTHLY'),
     price599Yearly: hasValue('STRIPE_PRICE_599_YEARLY'),
   };
+  const supportPayments = {
+    stripeSecretKey: hasValue('STRIPE_SECRET_KEY'),
+    stripeWebhookSecret: hasValue('STRIPE_WEBHOOK_SECRET'),
+    supabaseUrl: hasValue('SUPABASE_URL'),
+    supabaseServiceRoleKey: hasValue('SUPABASE_SERVICE_ROLE_KEY'),
+  };
   const app = {
     baseUrl: hasValue('APP_BASE_URL'),
     betaAdminToken: hasValue('BETA_ADMIN_TOKEN'),
@@ -59,6 +66,12 @@ function getReadiness() {
       STRIPE_PRICE_599_MONTHLY: stripe.price599Monthly,
       STRIPE_PRICE_599_YEARLY: stripe.price599Yearly,
     }),
+    supportPayments: getGroupStatus({
+      STRIPE_SECRET_KEY: supportPayments.stripeSecretKey,
+      STRIPE_WEBHOOK_SECRET: supportPayments.stripeWebhookSecret,
+      SUPABASE_URL: supportPayments.supabaseUrl,
+      SUPABASE_SERVICE_ROLE_KEY: supportPayments.supabaseServiceRoleKey,
+    }),
   };
   const betaMissing = [
     ...envStatus.app.missing,
@@ -77,6 +90,7 @@ function getReadiness() {
     mode: paidConfigured ? 'paid-production-ready-env' : betaConfigured ? 'public-beta-ready-env' : 'scaffold-env-missing',
     supabase,
     stripe,
+    supportPayments,
     app,
     envGroups,
     envStatus,

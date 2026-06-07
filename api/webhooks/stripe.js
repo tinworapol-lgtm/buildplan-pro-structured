@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { sendJson, readJsonBody, supabaseRest } = require('../_shared');
+const { sendJson, supabaseRest, getSupportTierForAmount } = require('../_shared');
 
 function verifyStripeSignature(payload, signatureHeader, secret) {
   if (!secret || !signatureHeader) return false;
@@ -29,6 +29,46 @@ module.exports = async function handler(request, response) {
     const event = JSON.parse(rawBody);
     const subscription = event.data?.object;
     const userId = subscription?.metadata?.user_id || subscription?.client_reference_id;
+    if (event.type === 'checkout.session.completed' && subscription?.metadata?.type === 'coffee_support') {
+      const supportPaymentId = subscription.metadata?.support_payment_id || subscription.client_reference_id;
+      const supportUserId = subscription.metadata?.user_id || null;
+      const paidAt = new Date().toISOString();
+      if (supportPaymentId) {
+        await supabaseRest('support_payments?id=eq.' + encodeURIComponent(supportPaymentId), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify({
+            provider_payment_id: subscription.id,
+            status: 'paid',
+            paid_at: paidAt,
+            updated_at: paidAt,
+          }),
+        });
+      }
+      if (supportUserId) {
+        const rows = await supabaseRest(
+          'support_payments?user_id=eq.' + encodeURIComponent(supportUserId) + '&status=eq.paid&select=amount'
+        );
+        const total = (Array.isArray(rows) ? rows : []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+        const supporterLevel = total > 0 ? getSupportTierForAmount(total).tier : null;
+        await supabaseRest('profiles?id=eq.' + encodeURIComponent(supportUserId), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify({
+            supporter_total: total,
+            supporter_level: supporterLevel,
+            supporter_updated_at: paidAt,
+            updated_at: paidAt,
+          }),
+        });
+      }
+    }
     if (event.type?.startsWith('customer.subscription') && userId) {
       await supabaseRest('subscriptions?on_conflict=stripe_subscription_id', {
         method: 'POST',
