@@ -9,6 +9,8 @@ const {
   SUPPORT_TIERS,
   normalizeSupportAmount,
   getSupportTierForAmount,
+  getStripeKeyMode,
+  isLivePaymentAllowed,
 } = require('./_shared');
 
 function cleanEmail(value) {
@@ -72,6 +74,16 @@ async function handleCheckout(request, response) {
       ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
       'Set Stripe and Supabase env vars in Vercel, run supabase/schema.sql, then redeploy production.'
     ));
+  }
+  const stripeKeyMode = getStripeKeyMode();
+  if (stripeKeyMode === 'live' && !isLivePaymentAllowed()) {
+    return sendJson(response, 403, {
+      configured: false,
+      area: 'Coffee Support Payments',
+      message: 'Live Stripe key is blocked for safety. Use sk_test_... during test mode or set PAYMENT_ALLOW_LIVE=true for launch.',
+      paymentMode: stripeKeyMode,
+      setupAction: 'Replace STRIPE_SECRET_KEY with a Stripe test mode key for this validation run.',
+    });
   }
 
   let user = null;
@@ -174,6 +186,7 @@ async function handleCheckout(request, response) {
   return sendJson(response, 200, {
     configured: true,
     provider: 'stripe',
+    paymentMode: stripeKeyMode,
     checkoutUrl: payload.url,
     supportPaymentId: supportPayment.id,
     amount,

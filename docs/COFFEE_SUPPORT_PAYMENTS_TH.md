@@ -24,6 +24,15 @@ STRIPE_SECRET_KEY=...
 STRIPE_WEBHOOK_SECRET=...
 ```
 
+สำหรับการทดสอบรอบแรกให้ใช้ Stripe test mode เท่านั้น:
+
+```env
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...   # จาก webhook endpoint ใน test mode
+```
+
+ถ้าเผลอใส่ `sk_live_...` ระบบจะบล็อก checkout จนกว่าจะตั้ง `PAYMENT_ALLOW_LIVE=true` ชัดเจน ซึ่งควรทำเฉพาะตอนเปิดรับเงินจริงแล้ว
+
 ใช้ webhook endpoint:
 
 ```text

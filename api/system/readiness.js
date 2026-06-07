@@ -1,4 +1,4 @@
-const { sendJson } = require('../_shared');
+const { sendJson, getStripeKeyMode } = require('../_shared');
 
 function hasValue(name) {
   return !!String(process.env[name] || '').trim();
@@ -43,6 +43,8 @@ function getReadiness() {
     stripeWebhookSecret: hasValue('STRIPE_WEBHOOK_SECRET'),
     supabaseUrl: hasValue('SUPABASE_URL'),
     supabaseServiceRoleKey: hasValue('SUPABASE_SERVICE_ROLE_KEY'),
+    paymentMode: getStripeKeyMode(),
+    liveAllowed: String(process.env.PAYMENT_ALLOW_LIVE || '').trim().toLowerCase() === 'true',
   };
   const app = {
     baseUrl: hasValue('APP_BASE_URL'),

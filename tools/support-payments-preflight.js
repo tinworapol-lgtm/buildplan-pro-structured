@@ -32,6 +32,7 @@ check('profile-supporter-fields', schema.includes('supporter_level') && schema.i
 check('support-tier-helper', shared.includes('SUPPORT_TIERS') && shared.includes('normalizeSupportAmount'));
 check('support-checkout-api', supportApi.includes('mode') && supportApi.includes('payment') && supportApi.includes('coffee_support'));
 check('support-checkout-env-guard', supportApi.includes('Coffee Support Payments') && supportApi.includes('STRIPE_SECRET_KEY'));
+check('support-test-mode-guard', shared.includes('getStripeKeyMode') && supportApi.includes('PAYMENT_ALLOW_LIVE') && supportApi.includes('sk_test_'));
 check('support-status-api', supportApi.includes('support_payments') && supportApi.includes('supporterLevel'));
 check('stripe-webhook-support', webhook.includes("event.type === 'checkout.session.completed'") && webhook.includes('coffee_support'));
 check('support-config-endpoints', config.includes("checkout: '/api/support'") && config.includes("status: '/api/support'"));

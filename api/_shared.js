@@ -277,6 +277,18 @@ function hasSupportPaymentEnv() {
   return !!String(process.env.STRIPE_SECRET_KEY || '').trim();
 }
 
+function getStripeKeyMode(secretKey = process.env.STRIPE_SECRET_KEY || '') {
+  const key = String(secretKey || '').trim();
+  if (key.startsWith('sk_test_')) return 'test';
+  if (key.startsWith('sk_live_')) return 'live';
+  if (key) return 'unknown';
+  return 'missing';
+}
+
+function isLivePaymentAllowed() {
+  return String(process.env.PAYMENT_ALLOW_LIVE || '').trim().toLowerCase() === 'true';
+}
+
 async function getSupabaseUser(accessToken) {
   const env = getSupabaseEnv();
   if (!env.url || !env.anonKey) {
@@ -349,5 +361,7 @@ module.exports = {
   normalizeSupportAmount,
   getPaymentProvider,
   hasSupportPaymentEnv,
+  getStripeKeyMode,
+  isLivePaymentAllowed,
   supabaseRest,
 };
