@@ -36,7 +36,7 @@ function requireJson(relativePath) {
 const requiredFiles = [
   '.env.example',
   'api/session.js',
-  'api/license/status.js',
+  'vercel.json',
   'api/checkout.js',
   'api/projects/index.js',
   'api/webhooks/stripe.js',

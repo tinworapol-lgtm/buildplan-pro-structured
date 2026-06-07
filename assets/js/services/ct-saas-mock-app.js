@@ -379,7 +379,7 @@
     const amount = button?.dataset?.ctSupportAmount || '';
     const tier = button?.dataset?.ctSupportTier || 'Supporter';
     closeSupport();
-    const checkoutEndpoint = global.BuildPlanConfig?.support?.endpoints?.checkout || '/api/support/checkout';
+    const checkoutEndpoint = global.BuildPlanConfig?.support?.endpoints?.checkout || '/api/support';
     const headers = { 'Content-Type': 'application/json' };
     const token = getAuthToken();
     if (token) headers.Authorization = 'Bearer ' + token;

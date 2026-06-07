@@ -6,7 +6,7 @@
 
 1. ผู้ใช้กด “สนับสนุนค่ากาแฟ”
 2. เลือกระดับ Bronze / Silver / Gold / Platinum / Diamond
-3. Frontend เรียก `POST /api/support/checkout`
+3. Frontend เรียก `POST /api/support`
 4. ถ้า env พร้อม ระบบสร้าง pending row ใน `support_payments`
 5. ระบบ redirect ไป Stripe Checkout
 6. Stripe ส่ง webhook กลับ `/api/webhooks/stripe`

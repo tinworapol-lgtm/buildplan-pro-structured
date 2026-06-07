@@ -31,7 +31,7 @@ const requiredFiles = [
   '.env.example',
   'api/system/readiness.js',
   'api/session.js',
-  'api/license/status.js',
+  'vercel.json',
   'api/checkout.js',
   'api/projects/index.js',
   'api/webhooks/stripe.js',

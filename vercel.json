@@ -6,6 +6,10 @@
     {
       "source": "/api/profile",
       "destination": "/api/session"
+    },
+    {
+      "source": "/api/license/status",
+      "destination": "/api/session"
     }
   ],
   "headers": [

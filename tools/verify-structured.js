@@ -69,7 +69,7 @@ const requiredRootFiles = [
   '.env.example',
   'supabase/schema.sql',
   'api/session.js',
-  'api/license/status.js',
+  'vercel.json',
   'api/checkout.js',
   'api/projects/index.js',
   'api/webhooks/stripe.js',

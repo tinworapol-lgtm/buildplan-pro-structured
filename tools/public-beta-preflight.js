@@ -22,7 +22,7 @@ const config = read('assets/js/config/app-config.js');
 const shared = read('api/_shared.js');
 const verify = read('api/auth/verify.js');
 const session = read('api/session.js');
-const license = read('api/license/status.js');
+const vercelConfig = read('vercel.json');
 const projects = read('api/projects/index.js');
 const cloud = read('assets/js/services/cloud-save-adapter.js');
 const accountUi = read('assets/js/services/account-cloud-ui.js');
@@ -69,7 +69,7 @@ for (const marker of [
 for (const [label, source, markers] of [
   ['auth verify ensures beta trial', verify, ['ensureBetaTrial', 'trial']],
   ['session returns subscription', session, ['subscription', 'trialEndsAt', 'daysLeft']],
-  ['license returns trialing package 599', license, ['trialing', 'packageCode', 'trialEndsAt']],
+  ['license status rewrites to session', vercelConfig, ['/api/license/status', '/api/session']],
   ['projects enforce quota', projects, ['BETA_PROJECT_LIMIT', 'BETA_PROJECT_PAYLOAD_BYTES', 'DELETE', 'archived_at']],
   ['cloud delete adapter', cloud, ['deleteProject', "method: 'DELETE'"]],
   ['account UI feedback and delete actions', accountUi, ['account-cloud-feedback', 'submitFeedback', 'deleteCloudProject']],

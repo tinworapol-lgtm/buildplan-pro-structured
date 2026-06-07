@@ -53,8 +53,8 @@
         { tier: 'Diamond', amount: 599 },
       ],
       endpoints: {
-        checkout: '/api/support/checkout',
-        status: '/api/support/status',
+        checkout: '/api/support',
+        status: '/api/support',
       },
     },
 

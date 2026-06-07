@@ -133,7 +133,7 @@
     "licenseAdapter": "assets/js/services/license-adapter.js",
     "apiRoutes": [
       "api/session.js",
-      "api/license/status.js",
+      "vercel.json",
       "api/checkout.js",
       "api/webhooks/stripe.js"
     ],

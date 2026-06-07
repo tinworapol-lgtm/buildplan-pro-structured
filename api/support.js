@@ -6,12 +6,24 @@ const {
   getSupabaseUser,
   hasSupabaseEnv,
   supabaseRest,
+  SUPPORT_TIERS,
   normalizeSupportAmount,
   getSupportTierForAmount,
-} = require('../_shared');
+} = require('./_shared');
 
 function cleanEmail(value) {
   return String(value || '').trim().toLowerCase().slice(0, 254);
+}
+
+function emptyStatus(configured) {
+  return {
+    configured,
+    totalAmount: 0,
+    tier: null,
+    supporterLevel: null,
+    payments: [],
+    tiers: SUPPORT_TIERS,
+  };
 }
 
 async function getOptionalUser(request) {
@@ -27,9 +39,33 @@ async function getOptionalUser(request) {
   return session.user;
 }
 
-module.exports = async function handler(request, response) {
-  if (request.method !== 'POST') return sendJson(response, 405, { message: 'Method not allowed' });
+async function handleStatus(request, response) {
+  if (!hasSupabaseEnv()) return sendJson(response, 200, emptyStatus(false));
 
+  const token = getBearerToken(request);
+  if (!token) return sendJson(response, 200, emptyStatus(true));
+
+  const session = await getSupabaseUser(token);
+  if (!session.ok) return sendJson(response, session.status, session.payload);
+
+  const rows = await supabaseRest(
+    'support_payments?user_id=eq.' + encodeURIComponent(session.user.id) + '&status=eq.paid&select=id,amount,currency,tier,status,paid_at,created_at&order=paid_at.desc'
+  );
+  const payments = Array.isArray(rows) ? rows : [];
+  const totalAmount = payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+  const tier = totalAmount > 0 ? getSupportTierForAmount(totalAmount).tier : null;
+
+  return sendJson(response, 200, {
+    configured: true,
+    totalAmount,
+    tier,
+    supporterLevel: tier,
+    payments,
+    tiers: SUPPORT_TIERS,
+  });
+}
+
+async function handleCheckout(request, response) {
   if (!process.env.STRIPE_SECRET_KEY || !hasSupabaseEnv()) {
     return sendJson(response, 501, envGuardPayload(
       'Coffee Support Payments',
@@ -143,4 +179,10 @@ module.exports = async function handler(request, response) {
     amount,
     tier: tier.tier,
   });
+}
+
+module.exports = async function handler(request, response) {
+  if (request.method === 'GET') return handleStatus(request, response);
+  if (request.method === 'POST') return handleCheckout(request, response);
+  return sendJson(response, 405, { message: 'Method not allowed' });
 };

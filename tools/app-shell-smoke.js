@@ -136,8 +136,8 @@ check('phase46-gantt-actual-markers', readText('assets/js/modules/05-gantt-rende
 check('phase46-project-popup-shell', readText('assets/js/services/app-shell.js').includes('openProjectStartPopup') && readText('assets/js/services/app-shell.js').includes('applyProjectStartForm'));
 check('public-free-support-landing', html.includes('ct-free-access-row') && html.includes('id="ct-support-modal"') && html.includes('data-ct-open-support') && !html.includes('ct-plan-price-row'));
 check('supporter-modal-js', readText('assets/js/services/ct-saas-mock-app.js').includes('openSupport') && readText('assets/js/services/ct-saas-mock-app.js').includes('chooseSupportTier'));
-check('supporter-payment-api-markers', readText('api/support/checkout.js').includes('coffee_support') && readText('api/support/status.js').includes('supporterLevel'));
-check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support/checkout'"));
+check('supporter-payment-api-markers', readText('api/support.js').includes('coffee_support') && readText('api/support.js').includes('supporterLevel'));
+check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase33'));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
