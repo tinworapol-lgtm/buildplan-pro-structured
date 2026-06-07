@@ -366,22 +366,67 @@
     global.document?.body?.classList?.remove('ct-support-open');
   }
 
-  function chooseSupportTier(button) {
-    const amount = button?.dataset?.ctSupportAmount || '';
-    const tier = button?.dataset?.ctSupportTier || 'Supporter';
-    closeSupport();
-    if (global.Swal?.fire) {
-      global.Swal.fire({
-        icon: 'info',
-        title: `ขอบคุณสำหรับ ${tier} Supporter`,
-        text: amount ? `รอบนี้เป็นตัวอย่าง ยังไม่ตัดเงินจริง ยอดสนับสนุน ${Number(amount).toLocaleString('th-TH')} บาทจะพร้อมใช้งานเมื่อเชื่อมระบบชำระเงินจริง` : 'รอบนี้เป็นตัวอย่าง ยังไม่ตัดเงินจริง',
-        confirmButtonText: 'รับทราบ',
-      });
-    } else {
-      global.alert?.('Supporter demo: ' + tier + (amount ? ' ' + amount + ' บาท' : ''));
+  function getAuthToken() {
+    const key = global.BuildPlanConfig?.auth?.tokenStorageKey || 'buildplan_auth_token';
+    try {
+      return global.localStorage?.getItem(key) || '';
+    } catch (_error) {
+      return '';
     }
   }
 
+  async function chooseSupportTier(button) {
+    const amount = button?.dataset?.ctSupportAmount || '';
+    const tier = button?.dataset?.ctSupportTier || 'Supporter';
+    closeSupport();
+    const checkoutEndpoint = global.BuildPlanConfig?.support?.endpoints?.checkout || '/api/support/checkout';
+    const headers = { 'Content-Type': 'application/json' };
+    const token = getAuthToken();
+    if (token) headers.Authorization = 'Bearer ' + token;
+    try {
+      if (global.Swal?.fire) {
+        global.Swal.fire({
+          title: 'Preparing payment page',
+          text: tier + ' Supporter ' + Number(amount).toLocaleString('th-TH') + ' THB',
+          allowOutsideClick: false,
+          didOpen: () => global.Swal.showLoading(),
+        });
+      }
+      const response = await fetch(checkoutEndpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ amount: Number(amount), tier }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (payload.checkoutUrl) {
+        global.location.href = payload.checkoutUrl;
+        return;
+      }
+      const missing = Array.isArray(payload.missing) && payload.missing.length ? '\n\nMissing: ' + payload.missing.join(', ') : '';
+      const message = payload.message || 'Coffee support payment is not configured yet';
+      if (global.Swal?.fire) {
+        global.Swal.fire({
+          icon: response.status === 501 ? 'info' : 'warning',
+          title: response.status === 501 ? 'Payment not enabled yet' : 'Cannot start payment',
+          text: message + missing,
+          confirmButtonText: 'OK',
+        });
+      } else {
+        global.alert?.(message + missing);
+      }
+    } catch (error) {
+      if (global.Swal?.fire) {
+        global.Swal.fire({
+          icon: 'warning',
+          title: 'Payment connection failed',
+          text: error.message || 'Please try again',
+          confirmButtonText: 'OK',
+        });
+      } else {
+        global.alert?.(error.message || 'Payment connection failed');
+      }
+    }
+  }
   function setBillingCycle(cycle) {
     state.billingCycle = cycle === 'yearly' ? 'yearly' : 'monthly';
     persist();

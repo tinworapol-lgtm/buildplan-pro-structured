@@ -27,6 +27,7 @@
     "beta:cloud-smoke": "node tools/live-beta-cloud-flow-smoke.js",
     "beta:supabase-preflight": "node tools/supabase-rls-grants-preflight.js",
     "beta:member-preflight": "node tools/member-signup-preflight.js",
+    "support:preflight": "node tools/support-payments-preflight.js",
     "beta:activation-plan": "node tools/beta-activation-plan.js",
     "beta:env:init": "node tools/create-beta-env-template.js",
     "beta:supabase-activation": "node tools/supabase-beta-activation.js",
