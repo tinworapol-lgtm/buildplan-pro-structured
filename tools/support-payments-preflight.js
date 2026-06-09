@@ -34,11 +34,14 @@ check('support-checkout-api', supportApi.includes('mode') && supportApi.includes
 check('support-checkout-env-guard', supportApi.includes('Coffee Support Payments') && supportApi.includes('STRIPE_SECRET_KEY'));
 check('support-test-mode-guard', shared.includes('getStripeKeyMode') && supportApi.includes('PAYMENT_ALLOW_LIVE') && supportApi.includes('sk_test_'));
 check('support-status-api', supportApi.includes('support_payments') && supportApi.includes('supporterLevel'));
+check('support-public-summary-api', supportApi.includes("summary') === 'public'") && supportApi.includes('publicSummary') && supportApi.includes('summarizePayments'));
+check('support-admin-summary-api', readText('api/admin/beta-summary.js').includes('supportPayments') && readText('api/admin/beta-summary.js').includes('summarizeSupportPayments'));
 check('stripe-webhook-support', webhook.includes("event.type === 'checkout.session.completed'") && webhook.includes('coffee_support'));
 check('support-config-endpoints', config.includes("checkout: '/api/support'") && config.includes("status: '/api/support'"));
 check('support-frontend-fetch', mockApp.includes('/api/support') && mockApp.includes('payload.checkoutUrl'));
 check('support-cache-bust', html.includes('ct-saas-mock-app.js?v=phase41'));
 check('support-status-ui', html.includes('data-ct-support-status') && mockApp.includes('refreshSupportStatus') && mockApp.includes('handleSupportReturn'));
+check('support-public-summary-ui', html.includes('data-ct-support-public-summary') && mockApp.includes('refreshPublicSupportSummary') && mockApp.includes('?summary=public'));
 check('support-payout-bank-warning', html.includes('Payout bank account is configured only in Stripe Dashboard') && supportDoc.includes('Stripe Dashboard -> Settings'));
 check('support-readiness-group', readiness.includes('supportPayments') && readiness.includes('Coffee Support Payments') === false);
 

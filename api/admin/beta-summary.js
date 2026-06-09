@@ -15,6 +15,23 @@ async function count(path) {
   return Array.isArray(rows) ? rows.length : 0;
 }
 
+function summarizeSupportPayments(rows) {
+  const paid = Array.isArray(rows) ? rows.filter((item) => item.status === 'paid') : [];
+  return {
+    totalAmount: paid.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+    paidCount: paid.length,
+    latest: paid.slice(0, 10).map((item) => ({
+      id: item.id,
+      email: item.email || '',
+      amount: Number(item.amount || 0),
+      currency: item.currency || 'THB',
+      tier: item.tier || '',
+      paid_at: item.paid_at || null,
+      created_at: item.created_at || null,
+    })),
+  };
+}
+
 module.exports = async function handler(request, response) {
   if (request.method !== 'GET') return sendJson(response, 405, { message: 'Method not allowed' });
   if (!hasSupabaseEnv()) {
@@ -27,7 +44,7 @@ module.exports = async function handler(request, response) {
   sinceToday.setUTCHours(0, 0, 0, 0);
   const sinceWeek = new Date(Date.now() - 7 * 86400000);
 
-  const [profiles, membersToday, membersThisWeek, latestMembers, subscriptions, projects, feedback, audit, errors] = await Promise.all([
+  const [profiles, membersToday, membersThisWeek, latestMembers, subscriptions, projects, feedback, audit, errors, supportPayments] = await Promise.all([
     count('profiles?select=id'),
     count('profiles?created_at=gte.' + encodeURIComponent(sinceToday.toISOString()) + '&select=id'),
     count('profiles?created_at=gte.' + encodeURIComponent(sinceWeek.toISOString()) + '&select=id'),
@@ -37,6 +54,7 @@ module.exports = async function handler(request, response) {
     supabaseRest('feedback?select=id,rating,message,feature_request,created_at&order=created_at.desc&limit=20'),
     supabaseRest('audit_logs?select=id,action,metadata,created_at&order=created_at.desc&limit=20'),
     supabaseRest('error_events?select=id,message,source,route,created_at&order=created_at.desc&limit=20'),
+    supabaseRest('support_payments?select=id,email,amount,currency,tier,status,paid_at,created_at&order=created_at.desc&limit=1000'),
   ]);
 
   const activeUsers = (subscriptions || []).filter((item) => ['trialing', 'active'].includes(item.status)).length;
@@ -61,5 +79,6 @@ module.exports = async function handler(request, response) {
     feedback: feedback || [],
     audit: audit || [],
     errors: errors || [],
+    supportPayments: summarizeSupportPayments(supportPayments),
   });
 };

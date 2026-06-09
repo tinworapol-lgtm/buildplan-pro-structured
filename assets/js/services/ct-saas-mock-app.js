@@ -446,6 +446,31 @@
     }
   }
 
+  function renderPublicSupportSummary(summary = {}, configured = false) {
+    const root = qs('[data-ct-support-public-summary]');
+    if (!root) return;
+    const totalAmount = Number(summary.totalAmount || 0);
+    const paidCount = Number(summary.paidCount || 0);
+    const latestTier = summary.latestTier || '-';
+    const countNode = qs('[data-ct-support-paid-count]', root);
+    const amountNode = qs('[data-ct-support-total-amount]', root);
+    const tierNode = qs('[data-ct-support-latest-tier]', root);
+    const statusNode = qs('[data-ct-support-summary-status]', root);
+    if (countNode) countNode.textContent = paidCount.toLocaleString('th-TH');
+    if (amountNode) amountNode.textContent = totalAmount.toLocaleString('th-TH');
+    if (tierNode) tierNode.textContent = latestTier;
+    if (statusNode) statusNode.textContent = configured ? 'เชื่อมต่อแล้ว' : 'ยังไม่เปิดใช้งาน';
+  }
+
+  async function refreshPublicSupportSummary() {
+    const statusEndpoint = global.BuildPlanConfig?.support?.endpoints?.status || '/api/support';
+    try {
+      const response = await fetch(statusEndpoint + '?summary=public');
+      const payload = await response.json().catch(() => ({}));
+      if (response.ok) renderPublicSupportSummary(payload.publicSummary || {}, !!payload.configured);
+    } catch (_error) {}
+  }
+
   async function refreshSupportStatus() {
     const token = getAuthToken();
     if (!token) {
@@ -497,6 +522,7 @@
       }
     }
     refreshSupportStatus();
+    refreshPublicSupportSummary();
   }
 
   function setBillingCycle(cycle) {
@@ -633,6 +659,7 @@
     bind();
     handleSupportReturn();
     refreshSupportStatus();
+    refreshPublicSupportSummary();
     try {
       const search = new URLSearchParams(global.location?.search || '');
       const hashText = String(global.location?.hash || '');

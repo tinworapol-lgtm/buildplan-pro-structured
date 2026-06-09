@@ -28,6 +28,23 @@ function emptyStatus(configured) {
   };
 }
 
+function summarizePayments(payments) {
+  const paid = Array.isArray(payments) ? payments.filter((payment) => payment.status === 'paid') : [];
+  const totalAmount = paid.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+  const latest = paid.slice(0, 5).map((payment) => ({
+    amount: Number(payment.amount || 0),
+    currency: payment.currency || 'THB',
+    tier: payment.tier || getSupportTierForAmount(payment.amount).tier,
+    paidAt: payment.paid_at || payment.created_at || null,
+  }));
+  return {
+    totalAmount,
+    paidCount: paid.length,
+    latestTier: latest[0]?.tier || null,
+    latest,
+  };
+}
+
 async function getOptionalUser(request) {
   const token = getBearerToken(request);
   if (!token) return null;
@@ -39,6 +56,25 @@ async function getOptionalUser(request) {
     throw error;
   }
   return session.user;
+}
+
+async function handlePublicSummary(_request, response) {
+  if (!hasSupabaseEnv()) {
+    return sendJson(response, 200, {
+      configured: false,
+      publicSummary: summarizePayments([]),
+      tiers: SUPPORT_TIERS,
+    });
+  }
+
+  const rows = await supabaseRest(
+    'support_payments?status=eq.paid&select=amount,currency,tier,status,paid_at,created_at&order=paid_at.desc&limit=1000'
+  );
+  return sendJson(response, 200, {
+    configured: true,
+    publicSummary: summarizePayments(rows),
+    tiers: SUPPORT_TIERS,
+  });
 }
 
 async function handleStatus(request, response) {
@@ -195,7 +231,11 @@ async function handleCheckout(request, response) {
 }
 
 module.exports = async function handler(request, response) {
-  if (request.method === 'GET') return handleStatus(request, response);
+  if (request.method === 'GET') {
+    const url = new URL(request.url || '/', 'http://localhost');
+    if (url.searchParams.get('summary') === 'public') return handlePublicSummary(request, response);
+    return handleStatus(request, response);
+  }
   if (request.method === 'POST') return handleCheckout(request, response);
   return sendJson(response, 405, { message: 'Method not allowed' });
 };

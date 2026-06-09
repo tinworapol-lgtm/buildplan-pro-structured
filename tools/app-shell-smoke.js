@@ -139,6 +139,7 @@ check('supporter-modal-js', readText('assets/js/services/ct-saas-mock-app.js').i
 check('supporter-payment-api-markers', readText('api/support.js').includes('coffee_support') && readText('api/support.js').includes('supporterLevel'));
 check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('supporter-status-ui-markers', html.includes('data-ct-support-status') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshSupportStatus') && readText('assets/js/services/ct-saas-mock-app.js').includes('handleSupportReturn'));
+check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
 check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase33'));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
