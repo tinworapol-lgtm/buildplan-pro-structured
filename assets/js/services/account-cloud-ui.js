@@ -44,7 +44,7 @@
       '<button type="button" id="account-cloud-send" class="h-10 px-4 rounded-lg bg-narit-blue text-white text-sm font-bold">Send code</button>',
       '</div>',
       '<div class="grid md:grid-cols-[1fr_auto] gap-3 items-end">',
-      '<label class="grid gap-1 text-sm font-bold text-slate-700">Login code<input id="account-cloud-code" type="text" inputmode="numeric" class="modern-input rounded-lg border border-slate-300 px-3 py-2" placeholder="6-digit code"></label>',
+      '<label class="grid gap-1 text-sm font-bold text-slate-700">Login code<input id="account-cloud-code" type="text" inputmode="numeric" autocomplete="one-time-code" class="modern-input rounded-lg border border-slate-300 px-3 py-2" placeholder="รหัสยืนยันจากอีเมล"></label>',
       '<button type="button" id="account-cloud-verify" class="h-10 px-4 rounded-lg bg-emerald-600 text-white text-sm font-bold">Verify</button>',
       '</div>',
       '<div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">',
@@ -162,7 +162,8 @@
     setOutput('Verifying code...');
     const session = await global.BuildPlanAuth?.verifyEmailOtp?.(email, code);
     setOutput(session?.authenticated ? 'Signed in as ' + getText(session.user?.email, email) : 'Verification completed');
-    await refreshStatus();
+    const refreshed = await refreshStatus();
+    if (session?.authenticated || refreshed?.authenticated) await loadCloudList();
   }
 
   async function saveCloud() {

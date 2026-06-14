@@ -86,6 +86,7 @@ function createFakeDocument() {
 
 const html = readText('index.html');
 const service = readText('assets/js/services/account-cloud-ui.js');
+let projectListCalls = 0;
 
 const checks = [];
 function check(id, ok, detail = '') {
@@ -102,6 +103,7 @@ const fakeWindow = {
   document: fakeDocument,
   BuildPlanAuth: {
     refreshSession: async () => ({ authenticated: false, configured: false, user: null }),
+    verifyEmailOtp: async (email) => ({ authenticated: true, user: { email } }),
   },
   BuildPlanLicense: {
     refreshLicenseStatus: async () => ({ status: 'active' }),
@@ -111,15 +113,18 @@ const fakeWindow = {
   },
   BuildPlanCloud: {
     saveProject: async () => ({ configured: false, message: 'Cloud project endpoint is not configured' }),
-    listProjects: async () => ({
-      projects: [
-        {
-          id: 'project-123',
-          name: 'อาคารสำนักงาน ABC',
-          updatedAt: '2026-06-14T08:30:00.000Z',
-        },
-      ],
-    }),
+    listProjects: async () => {
+      projectListCalls += 1;
+      return {
+        projects: [
+          {
+            id: 'project-123',
+            name: 'อาคารสำนักงาน ABC',
+            updatedAt: '2026-06-14T08:30:00.000Z',
+          },
+        ],
+      };
+    },
     applyCloudProject: async (projectId) => ({
       project: { id: projectId, name: 'อาคารสำนักงาน ABC', payload: { tasks: [] } },
     }),
@@ -158,6 +163,7 @@ check('list-button-created', !!fakeDocument.getElementById('account-cloud-list')
 check('project-list-created', !!fakeDocument.getElementById('account-cloud-projects'));
 check('service-exposes-load-project', typeof fakeWindow.BuildPlanAccountCloud?.openCloudProject === 'function');
 check('service-exposes-rename-project', typeof fakeWindow.BuildPlanAccountCloud?.renameCloudProject === 'function');
+check('login-code-does-not-assume-six-digits', !service.includes('placeholder="6-digit code"'));
 
 Promise.resolve()
   .then(() => fakeWindow.BuildPlanAccountCloud.loadCloudList())
@@ -166,6 +172,14 @@ Promise.resolve()
     check('project-card-rendered', projectList.innerHTML.includes('อาคารสำนักงาน ABC'));
     check('project-open-action-rendered', projectList.innerHTML.includes('data-cloud-open="project-123"'));
     check('project-rename-action-rendered', projectList.innerHTML.includes('data-cloud-rename="project-123"'));
+    const callsBeforeVerify = projectListCalls;
+    fakeDocument.getElementById('account-cloud-email').value = 'tin.worapol@gmail.com';
+    fakeDocument.getElementById('account-cloud-code').value = '85267594';
+    return fakeWindow.BuildPlanAccountCloud.verifyOtp().then(() => {
+      check('verify-loads-project-list', projectListCalls === callsBeforeVerify + 1, String(projectListCalls));
+    });
+  })
+  .then(() => {
 
     const report = {
       ok: checks.every((item) => item.ok),
