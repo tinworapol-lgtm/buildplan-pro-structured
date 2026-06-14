@@ -27,7 +27,7 @@ async function main() {
   });
   const configJs = await configResponse.text();
 
-  const appShellResponse = await fetch(baseUrl + '/assets/js/services/app-shell.js?v=phase31', {
+  const appShellResponse = await fetch(baseUrl + '/assets/js/services/app-shell.js?v=phase42', {
     headers: { Accept: 'application/javascript' },
   });
   const appShellJs = await appShellResponse.text();
@@ -58,7 +58,7 @@ async function main() {
     { id: 'has-ct-subscription-panel', ok: html.includes('id="ct-subscription-panel"') && html.includes('data-ct-subscription-scenario'), detail: 'ct-subscription-panel' },
     { id: 'has-ct-billing-modal', ok: html.includes('id="ct-billing-modal"') && html.includes('data-ct-choose-plan'), detail: 'ct-billing-modal' },
     { id: 'loads-ct-saas-mock-app', ok: html.includes('assets/js/services/ct-saas-mock-app.js?v=phase41'), detail: 'ct-saas-mock-app.js?v=phase41' },
-    { id: 'loads-app-shell', ok: html.includes('assets/js/services/app-shell.js?v=phase31'), detail: 'assets/js/services/app-shell.js?v=phase31' },
+    { id: 'loads-app-shell', ok: html.includes('assets/js/services/app-shell.js?v=phase42'), detail: 'assets/js/services/app-shell.js?v=phase42' },
     { id: 'app-shell-http-200', ok: appShellResponse.status === 200, detail: String(appShellResponse.status) },
     { id: 'app-shell-has-visibility-router', ok: appShellJs.includes('applyRouteVisibility') && appShellJs.includes('workspaceElementIds'), detail: 'applyRouteVisibility' },
     { id: 'app-shell-has-ct-routes', ok: appShellJs.includes("'programs'") && appShellJs.includes("'user-dashboard'") && appShellJs.includes("'admin-dashboard'"), detail: 'ct routes' },

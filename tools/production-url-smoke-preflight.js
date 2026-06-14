@@ -38,7 +38,7 @@ for (const marker of [
   'ct-saas-mock-app.js?v=phase41',
   'has-public-free-support-landing',
   'ct-mock-app-has-support-modal',
-  'app-shell.js?v=phase31',
+  'app-shell.js?v=phase42',
   'public-free-access-config',
   'ct-mock-app-public-unlock',
   'has-ct-subscription-panel',
