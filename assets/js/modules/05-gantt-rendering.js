@@ -1038,6 +1038,7 @@
             if (todayToggle) todayToggle.checked = false;
             applyPlanPageDefaultToggles();
             clearAutoSavedProject();
+            window.BuildPlanCloud?.setCurrentProjectId?.('');
             historyStack = [];
             currentHistoryIndex = -1;
             calculateDates(false);

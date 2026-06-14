@@ -51,6 +51,21 @@
       }
     },
     {
+      "method": "PATCH",
+      "path": "/api/projects/:id",
+      "purpose": "Rename one project owned by the logged-in user.",
+      "request": {
+        "name": "Updated project name"
+      },
+      "response": {
+        "project": {
+          "id": "uuid",
+          "name": "Updated project name",
+          "updatedAt": "2026-06-14T00:00:00.000Z"
+        }
+      }
+    },
+    {
       "method": "DELETE",
       "path": "/api/projects/:id",
       "purpose": "Archive one project owned by the logged-in user.",

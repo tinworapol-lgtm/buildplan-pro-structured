@@ -4,6 +4,7 @@
   const config = global.BuildPlanConfig || {};
   const cloudConfig = config.cloud || {};
   const staticDemoMode = config.licensing?.mode === 'static-demo' || cloudConfig.provider === 'static-demo';
+  const currentProjectStorageKey = cloudConfig.currentProjectStorageKey || 'buildplan_current_cloud_project_id';
 
   function getEndpoint() {
     if (staticDemoMode) return '';
@@ -12,6 +13,22 @@
 
   function isCloudConfigured() {
     return !!getEndpoint();
+  }
+
+  function getCurrentProjectId() {
+    try {
+      return global.localStorage?.getItem(currentProjectStorageKey) || '';
+    } catch (_error) {
+      return '';
+    }
+  }
+
+  function setCurrentProjectId(projectId) {
+    try {
+      if (projectId) global.localStorage?.setItem(currentProjectStorageKey, projectId);
+      else global.localStorage?.removeItem(currentProjectStorageKey);
+    } catch (_error) {}
+    return projectId || '';
   }
 
   async function requestJson(url, options = {}) {
@@ -44,15 +61,17 @@
     const endpoint = getEndpoint();
     if (!endpoint) return { configured: false, message: 'Cloud project endpoint is not configured' };
     const payload = projectData || global.collectProjectData?.();
-    return requestJson(endpoint, {
+    const result = await requestJson(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        id: options.id || payload?.id,
-        name: options.name || payload?.projectInfo?.name,
+        id: options.id || getCurrentProjectId() || payload?.id,
+        name: options.name || payload?.info?.name || payload?.projectInfo?.name,
         projectData: payload,
       }),
     });
+    if (result.project?.id) setCurrentProjectId(result.project.id);
+    return result;
   }
 
   async function loadProject(projectId) {
@@ -66,7 +85,20 @@
     const result = await loadProject(projectId);
     if (result.project?.payload && typeof global.applyProjectData === 'function') {
       global.applyProjectData(result.project.payload);
+      setCurrentProjectId(result.project.id || projectId);
     }
+    return result;
+  }
+
+  async function renameProject(projectId, name) {
+    const endpoint = getEndpoint();
+    if (!endpoint) return { configured: false, message: 'Cloud project endpoint is not configured' };
+    if (!projectId) throw new Error('projectId is required');
+    const result = await requestJson(endpoint + '?id=' + encodeURIComponent(projectId), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
     return result;
   }
 
@@ -74,9 +106,11 @@
     const endpoint = getEndpoint();
     if (!endpoint) return { configured: false, archived: false };
     if (!projectId) throw new Error('projectId is required');
-    return requestJson(endpoint + '?id=' + encodeURIComponent(projectId), {
+    const result = await requestJson(endpoint + '?id=' + encodeURIComponent(projectId), {
       method: 'DELETE',
     });
+    if (projectId === getCurrentProjectId()) setCurrentProjectId('');
+    return result;
   }
 
   async function exportUserData() {
@@ -89,8 +123,11 @@
     listProjects,
     saveProject,
     loadProject,
+    renameProject,
     deleteProject,
     exportUserData,
     applyCloudProject,
+    getCurrentProjectId,
+    setCurrentProjectId,
   };
 })(window);

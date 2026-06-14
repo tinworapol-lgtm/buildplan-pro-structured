@@ -15,6 +15,8 @@
     "saas:check": "node tools/saas-readiness-check.js",
     "account": "node tools/account-cloud-preflight.js",
     "smoke:account": "node tools/browser-account-cloud-smoke.js",
+    "smoke:cloud-project": "node tools/cloud-current-project-smoke.js",
+    "preflight:cloud-ownership": "node tools/cloud-project-ownership-preflight.js",
     "smoke:prod": "node tools/production-url-smoke.js",
     "smoke:static-first": "node tools/static-first-no-api-smoke.js",
     "ops:function-budget": "node tools/function-budget-audit.js",

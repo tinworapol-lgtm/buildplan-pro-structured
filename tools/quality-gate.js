@@ -55,12 +55,24 @@ const steps = [
     args: ['tools/account-cloud-smoke-preflight.js'],
     required: true,
   },
-  {
-    id: 'account-cloud-smoke',
-    command: process.execPath,
-    args: ['tools/browser-account-cloud-smoke.js'],
-    required: true,
-  },
+  {
+    id: 'account-cloud-smoke',
+    command: process.execPath,
+    args: ['tools/browser-account-cloud-smoke.js'],
+    required: true,
+  },
+  {
+    id: 'cloud-current-project',
+    command: process.execPath,
+    args: ['tools/cloud-current-project-smoke.js'],
+    required: true,
+  },
+  {
+    id: 'cloud-project-ownership',
+    command: process.execPath,
+    args: ['tools/cloud-project-ownership-preflight.js'],
+    required: true,
+  },
   {
     id: 'production-url-smoke-preflight',
     command: process.execPath,

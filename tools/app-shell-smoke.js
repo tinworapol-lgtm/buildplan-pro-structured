@@ -131,6 +131,7 @@ check('ct-mock-app-script', html.includes('assets/js/services/ct-saas-mock-app.j
 check('polished-home-copy', html.includes('BuildPlan Pro') && html.includes('ct-free-access-row') && html.includes('btn-support-coffee'));
 check('plan-entry-login-card-markup', html.includes('ct-login-panel') && html.includes('ct-login-submit') && html.includes('ct-current-package'));
 check('phase46-project-popup-markup', html.includes('id="project-start-popup"') && html.includes('project-popup-name') && html.includes('project-popup-supervisor'));
+check('project-popup-cloud-entry', html.includes('data-project-open-cloud') && shell.includes('BuildPlanAccountCloud?.openPanel'));
 check('phase46-actual-table-markers', readText('assets/js/modules/06-actual-dashboard.js').includes('actual-task-name-resizer') && readText('assets/js/modules/06-actual-dashboard.js').includes('getEffectiveActualPercentForTask'));
 check('phase46-gantt-actual-markers', readText('assets/js/modules/05-gantt-rendering.js').includes('actual-gantt-bar') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-progress-popover'));
 check('phase46-project-popup-shell', readText('assets/js/services/app-shell.js').includes('openProjectStartPopup') && readText('assets/js/services/app-shell.js').includes('applyProjectStartForm'));
@@ -145,7 +146,7 @@ check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
 check('actual-curve-wheel-zoom-removed', !readText('assets/js/modules/06-actual-dashboard.js').includes('bindActualCurveZoom') && !readText('assets/js/modules/06-actual-dashboard.js').includes('Scroll mouse เพื่อซูม S-Curve'));
 check('actual-start-date-column', readText('assets/js/modules/06-actual-dashboard.js').includes('getTaskActualStartRecord') && readText('assets/js/modules/06-actual-dashboard.js').includes('actual-start-date'));
-check('cache-busted-app-shell-js', html.includes('assets/js/services/app-shell.js?v=phase31'));
+check('cache-busted-app-shell-js', html.includes('assets/js/services/app-shell.js?v=phase42'));
 check('public-beta-saas-mode', readText('assets/js/config/app-config.js').includes("mode: 'public-beta'"));
 check('public-beta-startup-api', readText('assets/js/config/app-config.js').includes("session: '/api/session'") && readText('assets/js/config/app-config.js').includes("readiness: '/api/system/readiness'"));
 const appShellCss = readText('assets/css/modules/05-app-shell.css');

@@ -44,30 +44,78 @@ module.exports = async function handler(request, response) {
     if (payloadBytes > BETA_PROJECT_PAYLOAD_BYTES) {
       return sendJson(response, 413, { message: 'Project payload is too large for beta cloud save', limitBytes: BETA_PROJECT_PAYLOAD_BYTES });
     }
-    if (!body.id) {
-      const existingRows = await supabaseRest('projects?user_id=eq.' + encodeURIComponent(session.user.id) + '&archived_at=is.null&select=id');
-      if ((existingRows || []).length >= BETA_PROJECT_LIMIT) {
-        return sendJson(response, 403, { message: 'Beta project limit reached', limit: BETA_PROJECT_LIMIT });
-      }
-    }
     const name = String(body.name || payload.projectInfo?.name || 'Untitled project').slice(0, 160);
-    const row = {
-      id: body.id || undefined,
-      user_id: session.user.id,
-      name,
-      payload,
-      updated_at: new Date().toISOString(),
-    };
-    const rows = await supabaseRest('projects?on_conflict=id', {
+    const updatedAt = new Date().toISOString();
+
+    if (body.id) {
+      const ownedRows = await supabaseRest(
+        'projects?id=eq.' + encodeURIComponent(body.id) +
+        '&user_id=eq.' + encodeURIComponent(session.user.id) +
+        '&archived_at=is.null&select=id&limit=1'
+      );
+      if (!Array.isArray(ownedRows) || !ownedRows[0]) {
+        return sendJson(response, 404, { message: 'Project not found' });
+      }
+      const updatedRows = await supabaseRest(
+        'projects?id=eq.' + encodeURIComponent(body.id) +
+        '&user_id=eq.' + encodeURIComponent(session.user.id) +
+        '&archived_at=is.null',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation',
+          },
+          body: JSON.stringify({ name, payload, updated_at: updatedAt }),
+        }
+      );
+      const project = Array.isArray(updatedRows) ? updatedRows[0] : null;
+      if (!project) return sendJson(response, 404, { message: 'Project not found' });
+      await writeAuditLog(session.user.id, 'project.save', { projectId: project.id, name, payloadBytes });
+      return sendJson(response, 200, { project: summarize(project) });
+    }
+
+    const existingRows = await supabaseRest('projects?user_id=eq.' + encodeURIComponent(session.user.id) + '&archived_at=is.null&select=id');
+    if ((existingRows || []).length >= BETA_PROJECT_LIMIT) {
+      return sendJson(response, 403, { message: 'Beta project limit reached', limit: BETA_PROJECT_LIMIT });
+    }
+    const rows = await supabaseRest('projects', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Prefer: 'resolution=merge-duplicates,return=representation',
+        Prefer: 'return=representation',
       },
-      body: JSON.stringify(row),
+      body: JSON.stringify({
+        user_id: session.user.id,
+        name,
+        payload,
+        updated_at: updatedAt,
+      }),
     });
     const project = Array.isArray(rows) ? rows[0] : rows;
     await writeAuditLog(session.user.id, 'project.save', { projectId: project?.id, name, payloadBytes });
+    return sendJson(response, 200, { project: summarize(project) });
+  }
+
+  if (request.method === 'PATCH') {
+    if (!projectId) return sendJson(response, 400, { message: 'Project id is required' });
+    const body = await readJsonBody(request);
+    const name = String(body.name || '').trim().slice(0, 160);
+    if (!name) return sendJson(response, 400, { message: 'Project name is required' });
+    const rows = await supabaseRest('projects?id=eq.' + encodeURIComponent(projectId) + '&user_id=eq.' + encodeURIComponent(session.user.id) + '&archived_at=is.null', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+      },
+      body: JSON.stringify({
+        name,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+    const project = Array.isArray(rows) ? rows[0] : null;
+    if (!project) return sendJson(response, 404, { message: 'Project not found' });
+    await writeAuditLog(session.user.id, 'project.rename', { projectId, name });
     return sendJson(response, 200, { project: summarize(project) });
   }
 

@@ -250,6 +250,12 @@
     global.document?.body?.classList?.remove('project-start-open');
   }
 
+  function openSavedProjects() {
+    closeProjectStartPopup();
+    navigateTo('workspace');
+    global.BuildPlanAccountCloud?.openPanel?.();
+  }
+
   function showWorkspaceWelcomeAlert() {
     const payload = { icon: 'success', title: 'ยินดีต้อนรับเข้าสู่ BuildPlan Pro', text: '', timer: 1500 };
     if (typeof global.showAppAlert === 'function') {
@@ -544,6 +550,8 @@
     }
     const closeButtons = global.document?.querySelectorAll?.('[data-project-popup-close]') || [];
     closeButtons.forEach((button) => button.addEventListener('click', closeProjectStartPopup));
+    const cloudButtons = global.document?.querySelectorAll?.('[data-project-open-cloud]') || [];
+    cloudButtons.forEach((button) => button.addEventListener('click', openSavedProjects));
     global.addEventListener?.('buildplan:saas-readiness', (event) => applyReadiness(event.detail));
     applyReadiness(global.BuildPlanSaaS?.getReadinessState?.());
     refreshShellReadiness();
@@ -560,6 +568,7 @@
     openProjectStartPopup,
     applyProjectStartForm,
     closeProjectStartPopup,
+    openSavedProjects,
     sendLoginCode,
     verifyLoginCode,
     openSignup,

@@ -111,7 +111,21 @@ const fakeWindow = {
   },
   BuildPlanCloud: {
     saveProject: async () => ({ configured: false, message: 'Cloud project endpoint is not configured' }),
-    listProjects: async () => ({ projects: [] }),
+    listProjects: async () => ({
+      projects: [
+        {
+          id: 'project-123',
+          name: 'อาคารสำนักงาน ABC',
+          updatedAt: '2026-06-14T08:30:00.000Z',
+        },
+      ],
+    }),
+    applyCloudProject: async (projectId) => ({
+      project: { id: projectId, name: 'อาคารสำนักงาน ABC', payload: { tasks: [] } },
+    }),
+    renameProject: async (projectId, name) => ({
+      project: { id: projectId, name, updatedAt: '2026-06-14T09:00:00.000Z' },
+    }),
   },
   addEventListener() {},
   dispatchEvent() {},
@@ -141,16 +155,32 @@ check('panel-opened', panel.classList.contains('flex'), panel.className);
 check('email-input-created', !!fakeDocument.getElementById('account-cloud-email'));
 check('save-button-created', !!fakeDocument.getElementById('account-cloud-save'));
 check('list-button-created', !!fakeDocument.getElementById('account-cloud-list'));
+check('project-list-created', !!fakeDocument.getElementById('account-cloud-projects'));
+check('service-exposes-load-project', typeof fakeWindow.BuildPlanAccountCloud?.openCloudProject === 'function');
+check('service-exposes-rename-project', typeof fakeWindow.BuildPlanAccountCloud?.renameCloudProject === 'function');
 
-const report = {
-  ok: checks.every((item) => item.ok),
-  checkedAt: new Date().toISOString(),
-  checks,
-  mode: 'vm-dom-smoke',
-};
-fs.mkdirSync(reportDir, { recursive: true });
-fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+Promise.resolve()
+  .then(() => fakeWindow.BuildPlanAccountCloud.loadCloudList())
+  .then(() => {
+    const projectList = fakeDocument.getElementById('account-cloud-projects');
+    check('project-card-rendered', projectList.innerHTML.includes('อาคารสำนักงาน ABC'));
+    check('project-open-action-rendered', projectList.innerHTML.includes('data-cloud-open="project-123"'));
+    check('project-rename-action-rendered', projectList.innerHTML.includes('data-cloud-rename="project-123"'));
 
-console.log('account/cloud smoke ok');
-console.log('checks:', checks.length);
-console.log('report:', path.relative(projectDir, reportPath));
+    const report = {
+      ok: checks.every((item) => item.ok),
+      checkedAt: new Date().toISOString(),
+      checks,
+      mode: 'vm-dom-smoke',
+    };
+    fs.mkdirSync(reportDir, { recursive: true });
+    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+
+    console.log('account/cloud smoke ok');
+    console.log('checks:', checks.length);
+    console.log('report:', path.relative(projectDir, reportPath));
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });

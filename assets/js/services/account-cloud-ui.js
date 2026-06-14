@@ -8,6 +8,25 @@
     return value == null || value === '' ? fallback : String(value);
   }
 
+  function escapeHtml(value) {
+    return getText(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatProjectDate(value) {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '-';
+    return date.toLocaleString('th-TH', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+  }
+
   function ensurePanel() {
     if (panelReady || !global.document?.body) return;
     const panel = global.document.createElement('div');
@@ -38,6 +57,10 @@
       '<button type="button" id="account-cloud-signout" class="px-3 py-2 rounded-lg border border-red-200 text-sm font-bold text-red-600">Sign out</button>',
       '</div>',
       '<div id="account-cloud-output" class="min-h-[72px] rounded-lg bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700 whitespace-pre-wrap"></div>',
+      '<section class="grid gap-2 pt-2 border-t border-slate-200">',
+      '<div class="flex items-center justify-between gap-3"><div><div class="font-black text-slate-900">โครงการของฉัน</div><div class="text-xs text-slate-500">เลือกเปิดโครงการที่บันทึกไว้บน Cloud</div></div><button type="button" id="account-cloud-projects-refresh" class="px-3 py-2 rounded-lg border border-slate-300 text-sm font-bold text-slate-700"><i class="fa-solid fa-rotate"></i> โหลดรายการ</button></div>',
+      '<div id="account-cloud-projects" class="grid gap-2 max-h-[280px] overflow-y-auto"><div class="rounded-lg border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">เข้าสู่ระบบแล้วกดโหลดรายการโครงการ</div></div>',
+      '</section>',
       '</div>',
       '</div>',
     ].join('');
@@ -52,6 +75,8 @@
     global.document.getElementById('account-cloud-export')?.addEventListener('click', exportUserData);
     global.document.getElementById('account-cloud-feedback')?.addEventListener('click', submitFeedback);
     global.document.getElementById('account-cloud-signout')?.addEventListener('click', signOut);
+    global.document.getElementById('account-cloud-projects-refresh')?.addEventListener('click', loadCloudList);
+    global.document.getElementById('account-cloud-projects')?.addEventListener('click', handleProjectListClick);
     panelReady = true;
   }
 
@@ -78,7 +103,9 @@
     ensurePanel();
     const panel = global.document?.getElementById('account-cloud-panel');
     if (panel) panel.classList.replace('hidden', 'flex');
-    refreshStatus();
+    refreshStatus().then((auth) => {
+      if (auth?.authenticated) loadCloudList();
+    });
   }
 
   function closePanel() {
@@ -109,6 +136,7 @@
       ...envLines,
       ...nextActions,
     ].filter(Boolean).join('\n'));
+    return auth;
   }
 
   async function requestOtp() {
@@ -139,23 +167,117 @@
 
   async function saveCloud() {
     setOutput('Saving current project to cloud...');
-    const result = await global.BuildPlanCloud?.saveProject?.();
-    setOutput(result?.project ? 'Saved: ' + result.project.name : (result?.message || 'Cloud save request finished'));
+    try {
+      const result = await global.BuildPlanCloud?.saveProject?.();
+      setOutput(result?.project ? 'บันทึกบน Cloud แล้ว: ' + result.project.name : (result?.message || 'Cloud save request finished'));
+      if (result?.project) await loadCloudList();
+    } catch (error) {
+      setOutput(error?.message || 'ไม่สามารถบันทึกโครงการบน Cloud ได้');
+    }
+  }
+
+  function renderCloudProjects(projects) {
+    const list = global.document?.getElementById('account-cloud-projects');
+    if (!list) return;
+    const currentProjectId = global.BuildPlanCloud?.getCurrentProjectId?.() || '';
+    if (!projects.length) {
+      list.innerHTML = '<div class="rounded-lg border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">ยังไม่มีโครงการบน Cloud</div>';
+      return;
+    }
+    list.innerHTML = projects.map((project) => {
+      const active = project.id === currentProjectId;
+      return [
+        '<article class="rounded-lg border ' + (active ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white') + ' p-3 grid gap-2" data-cloud-project="' + escapeHtml(project.id) + '">',
+        '<div class="flex items-start justify-between gap-3">',
+        '<div class="min-w-0"><strong class="block text-sm text-slate-900 truncate">' + escapeHtml(project.name || 'ไม่มีชื่อโครงการ') + '</strong><small class="text-xs text-slate-500">แก้ไขล่าสุด ' + escapeHtml(formatProjectDate(project.updatedAt)) + '</small></div>',
+        active ? '<span class="shrink-0 rounded-full bg-blue-600 px-2 py-1 text-[11px] font-bold text-white">กำลังใช้งาน</span>' : '',
+        '</div>',
+        '<div class="flex flex-wrap gap-2">',
+        '<button type="button" data-cloud-open="' + escapeHtml(project.id) + '" class="px-3 py-1.5 rounded-md bg-narit-blue text-white text-xs font-bold"><i class="fa-solid fa-folder-open"></i> เปิดโครงการ</button>',
+        '<button type="button" data-cloud-rename="' + escapeHtml(project.id) + '" data-cloud-name="' + escapeHtml(project.name || '') + '" class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-700 text-xs font-bold"><i class="fa-solid fa-pen"></i> เปลี่ยนชื่อ</button>',
+        '<button type="button" data-cloud-delete="' + escapeHtml(project.id) + '" class="px-3 py-1.5 rounded-md border border-red-200 text-red-600 text-xs font-bold"><i class="fa-solid fa-box-archive"></i> เก็บถาวร</button>',
+        '</div>',
+        '</article>',
+      ].join('');
+    }).join('');
   }
 
   async function loadCloudList() {
     setOutput('Loading cloud projects...');
-    const result = await global.BuildPlanCloud?.listProjects?.();
-    const projects = result?.projects || [];
-    setOutput(projects.length ? projects.map((project) => project.name + ' | ' + project.updatedAt).join('\n') : (result?.message || 'No cloud projects found'));
+    try {
+      const result = await global.BuildPlanCloud?.listProjects?.();
+      const projects = result?.projects || [];
+      renderCloudProjects(projects);
+      setOutput(projects.length ? 'พบโครงการบน Cloud ' + projects.length + ' โครงการ' : (result?.message || 'ยังไม่มีโครงการบน Cloud'));
+      return result;
+    } catch (error) {
+      renderCloudProjects([]);
+      setOutput(error?.message || 'ไม่สามารถโหลดรายการโครงการได้ กรุณาเข้าสู่ระบบ');
+      return null;
+    }
   }
 
-  async function deleteCloudProject() {
-    const projectId = global.prompt?.('Project ID to archive');
+  async function openCloudProject(projectId) {
     if (!projectId) return;
+    setOutput('กำลังเปิดโครงการ...');
+    try {
+      const result = await global.BuildPlanCloud?.applyCloudProject?.(projectId);
+      const name = result?.project?.name || 'โครงการ';
+      setOutput('เปิดโครงการแล้ว: ' + name);
+      await loadCloudList();
+      closePanel();
+      global.Swal?.fire?.({
+        icon: 'success',
+        title: 'เปิดโครงการแล้ว',
+        text: name,
+        timer: 1000,
+        showConfirmButton: false,
+      });
+      return result;
+    } catch (error) {
+      setOutput(error?.message || 'ไม่สามารถเปิดโครงการได้');
+      return null;
+    }
+  }
+
+  async function renameCloudProject(projectId, currentName = '') {
+    if (!projectId) return;
+    const name = global.prompt?.('ชื่อโครงการใหม่', currentName);
+    if (!name?.trim()) return;
+    setOutput('กำลังเปลี่ยนชื่อโครงการ...');
+    try {
+      const result = await global.BuildPlanCloud?.renameProject?.(projectId, name.trim());
+      setOutput('เปลี่ยนชื่อโครงการแล้ว: ' + (result?.project?.name || name.trim()));
+      await loadCloudList();
+      return result;
+    } catch (error) {
+      setOutput(error?.message || 'ไม่สามารถเปลี่ยนชื่อโครงการได้');
+      return null;
+    }
+  }
+
+  function handleProjectListClick(event) {
+    const target = event.target?.closest?.('button');
+    if (!target) return;
+    if (target.dataset.cloudOpen) openCloudProject(target.dataset.cloudOpen);
+    else if (target.dataset.cloudRename) renameCloudProject(target.dataset.cloudRename, target.dataset.cloudName || '');
+    else if (target.dataset.cloudDelete) deleteCloudProject(target.dataset.cloudDelete);
+  }
+
+  async function deleteCloudProject(selectedProjectId = '') {
+    const projectId = selectedProjectId || global.prompt?.('Project ID to archive');
+    if (!projectId) return;
+    if (selectedProjectId && global.confirm && !global.confirm('เก็บโครงการนี้เป็นรายการถาวรใช่หรือไม่?')) return;
     setOutput('Archiving cloud project...');
-    const result = await global.BuildPlanCloud?.deleteProject?.(projectId.trim());
-    setOutput(result?.archived ? 'Archived project: ' + projectId : (result?.message || 'Archive request finished'));
+    try {
+      const result = await global.BuildPlanCloud?.deleteProject?.(projectId.trim());
+      setOutput(result?.archived ? 'เก็บโครงการถาวรแล้ว' : (result?.message || 'Archive request finished'));
+      if (result?.archived) await loadCloudList();
+      return result;
+    } catch (error) {
+      setOutput(error?.message || 'ไม่สามารถเก็บโครงการถาวรได้');
+      return null;
+    }
   }
 
   async function submitFeedback() {
@@ -198,9 +320,10 @@
   }
 
   function signOut() {
+    global.BuildPlanCloud?.setCurrentProjectId?.('');
     global.BuildPlanAuth?.clearAccessToken?.();
+    setStatus('Signed out');
     setOutput('Signed out.');
-    refreshStatus();
   }
 
   function initializeAccountCloudUi() {
@@ -223,6 +346,8 @@
     verifyOtp,
     saveCloud,
     loadCloudList,
+    openCloudProject,
+    renameCloudProject,
     deleteCloudProject,
     submitFeedback,
     exportUserData,
