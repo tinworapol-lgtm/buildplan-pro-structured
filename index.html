@@ -255,6 +255,48 @@
         </div>
     </div>
 
+    <section id="app-project-hub" class="app-shell-page project-hub-page" hidden aria-hidden="true">
+        <header class="project-hub-header">
+            <div class="project-hub-brand">
+                <span class="project-hub-brand-mark"><i class="fa-solid fa-chart-gantt"></i></span>
+                <div>
+                    <strong>BuildPlan Pro</strong>
+                    <span data-project-hub-email></span>
+                </div>
+            </div>
+            <div class="project-hub-header-actions">
+                <button type="button" class="project-hub-button project-hub-button-light" data-project-hub-home>
+                    <i class="fa-solid fa-house"></i>
+                    <span>หน้าหลัก</span>
+                </button>
+                <button type="button" class="project-hub-button project-hub-button-light" data-project-hub-signout>
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>ออกจากระบบ</span>
+                </button>
+            </div>
+        </header>
+        <main class="project-hub-main">
+            <div class="project-hub-toolbar">
+                <div>
+                    <p class="project-hub-kicker">PROJECT WORKSPACE</p>
+                    <h1>โครงการของฉัน <span data-project-hub-count>0</span></h1>
+                </div>
+                <div class="project-hub-toolbar-actions">
+                    <button type="button" class="project-hub-button project-hub-button-light" data-project-hub-refresh>
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>รีเฟรช</span>
+                    </button>
+                    <button type="button" class="project-hub-button project-hub-button-primary" data-project-hub-new>
+                        <i class="fa-solid fa-plus"></i>
+                        <span>สร้างโครงการใหม่</span>
+                    </button>
+                </div>
+            </div>
+            <div class="project-hub-status" data-project-hub-status aria-live="polite"></div>
+            <div class="project-hub-list" data-project-hub-list></div>
+        </main>
+    </section>
+
     <section id="ct-program-selector" class="app-shell-page ct-app-page ct-program-page" aria-label="แพ็กเกจและฟังก์ชั่นแผนงาน">
         <header class="ct-app-topbar">
             <div class="ct-step-title"><span>2</span> แพ็กเกจและฟังก์ชั่นแผนงาน</div>

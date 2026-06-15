@@ -14,11 +14,13 @@ function createElement(id) {
   const listeners = {};
   return {
     id,
+    hidden: id === 'app-project-hub',
     value: '',
     textContent: '',
     dataset: {},
     style: {},
     listeners,
+    setAttribute(name, value) { this[name] = value; },
     addEventListener: (eventName, handler) => { listeners[eventName] = handler; },
   };
 }
@@ -26,6 +28,7 @@ function createElement(id) {
 const ids = [
   'app-home-page',
   'app-login-page',
+  'app-project-hub',
   'ct-program-selector',
   'ct-user-dashboard',
   'ct-admin-dashboard',
@@ -99,6 +102,9 @@ function check(id, ok, detail = '') {
 check('home-page-markup', html.includes('id="app-home-page"'));
 check('workspace-button-markup', html.includes('id="btn-home-open-workspace"'));
 check('workspace-back-home-markup', html.includes('id="btn-workspace-back-home"'));
+check('project-hub-markup', html.includes('id="app-project-hub"'));
+check('project-hub-route', shell.includes("'projects'") && shell.includes("setDisplay('app-project-hub'"));
+check('project-hub-actions', html.includes('data-project-hub-new') && html.includes('data-project-hub-refresh'));
 check('ct-program-selector-markup', html.includes('id="ct-program-selector"'));
 check('ct-user-dashboard-markup', html.includes('id="ct-user-dashboard"'));
 check('ct-user-dashboard-reference', html.includes('ct-dashboard-ref-page') && html.includes('ct-ref-quick-actions') && html.includes('data-ct-plan-storage'));
@@ -213,6 +219,9 @@ check('user-dashboard-visible', elements.get('ct-user-dashboard').style.display 
 fakeWindow.BuildPlanAppShell.navigateTo('admin-dashboard');
 check('route-admin-dashboard', body.dataset.appRoute === 'admin-dashboard', body.dataset.appRoute);
 check('admin-dashboard-visible', elements.get('ct-admin-dashboard').style.display === 'flex', elements.get('ct-admin-dashboard').style.display);
+fakeWindow.BuildPlanAppShell.navigateTo('projects');
+check('route-projects', body.dataset.appRoute === 'projects', body.dataset.appRoute);
+check('project-hub-visible', elements.get('app-project-hub').style.display === 'flex' && elements.get('app-project-hub').hidden === false);
 fakeWindow.BuildPlanAppShell.navigateWorkspace();
 check('route-workspace', body.dataset.appRoute === 'workspace', body.dataset.appRoute);
 check('home-hidden-on-workspace', elements.get('app-home-page').style.display === 'none', elements.get('app-home-page').style.display);

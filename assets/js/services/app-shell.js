@@ -1,6 +1,6 @@
 // แผนงาน app shell: routes Home and Workspace without changing the planner internals.
 (function bootstrapBuildPlanAppShell(global) {
-  const routes = ['home', 'login', 'programs', 'billing', 'user-dashboard', 'admin-dashboard', 'workspace'];
+  const routes = ['home', 'login', 'projects', 'programs', 'billing', 'user-dashboard', 'admin-dashboard', 'workspace'];
   let currentRoute = 'home';
   let otpCooldownUntil = 0;
 
@@ -160,6 +160,13 @@
   function applyRouteVisibility(route) {
     setDisplay('app-home-page', route === 'home' ? 'flex' : 'none');
     setDisplay('app-login-page', route === 'login' ? 'flex' : 'none');
+    const projectHubVisible = route === 'projects';
+    const projectHub = global.document?.getElementById('app-project-hub');
+    setDisplay('app-project-hub', projectHubVisible ? 'flex' : 'none');
+    if (projectHub) {
+      projectHub.hidden = !projectHubVisible;
+      projectHub.setAttribute?.('aria-hidden', projectHubVisible ? 'false' : 'true');
+    }
     setDisplay('ct-program-selector', ['programs', 'billing'].includes(route) ? 'flex' : 'none');
     setDisplay('ct-user-dashboard', route === 'user-dashboard' ? 'flex' : 'none');
     setDisplay('ct-admin-dashboard', route === 'admin-dashboard' ? 'flex' : 'none');
