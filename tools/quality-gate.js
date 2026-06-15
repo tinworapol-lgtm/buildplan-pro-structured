@@ -104,6 +104,12 @@ const steps = [
     required: true,
   },
   {
+    id: 'project-hub',
+    command: process.execPath,
+    args: ['tools/project-hub-smoke.js'],
+    required: true,
+  },
+  {
     id: 'phase-regression',
     command: process.execPath,
     args: ['tools/phase-regression-preflight.js'],
