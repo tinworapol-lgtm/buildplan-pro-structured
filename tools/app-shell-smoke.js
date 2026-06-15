@@ -105,6 +105,7 @@ check('workspace-back-home-markup', html.includes('id="btn-workspace-back-home"'
 check('project-hub-markup', html.includes('id="app-project-hub"'));
 check('project-hub-route', shell.includes("'projects'") && shell.includes("setDisplay('app-project-hub'"));
 check('project-hub-actions', html.includes('data-project-hub-new') && html.includes('data-project-hub-refresh'));
+check('project-hub-accessible-name', html.includes('aria-labelledby="project-hub-title"') && html.includes('id="project-hub-title"'));
 check('ct-program-selector-markup', html.includes('id="ct-program-selector"'));
 check('ct-user-dashboard-markup', html.includes('id="ct-user-dashboard"'));
 check('ct-user-dashboard-reference', html.includes('ct-dashboard-ref-page') && html.includes('ct-ref-quick-actions') && html.includes('data-ct-plan-storage'));
@@ -224,6 +225,10 @@ check('route-projects', body.dataset.appRoute === 'projects', body.dataset.appRo
 check('project-hub-visible', elements.get('app-project-hub').style.display === 'flex' && elements.get('app-project-hub').hidden === false);
 fakeWindow.BuildPlanAppShell.navigateWorkspace();
 check('route-workspace', body.dataset.appRoute === 'workspace', body.dataset.appRoute);
+check('project-hub-hidden-after-workspace',
+  elements.get('app-project-hub').style.display === 'none'
+    && elements.get('app-project-hub').hidden === true
+    && elements.get('app-project-hub')['aria-hidden'] === 'true');
 check('home-hidden-on-workspace', elements.get('app-home-page').style.display === 'none', elements.get('app-home-page').style.display);
 check('workspace-visible-on-workspace', elements.get('top-ribbon').style.display !== 'none', elements.get('top-ribbon').style.display);
 check('home-button-bound', typeof elements.get('btn-home-open-workspace').listeners.click === 'function');

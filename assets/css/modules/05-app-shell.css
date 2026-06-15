@@ -3762,8 +3762,8 @@ body.ct-billing-open {
   font-size: 20px;
 }
 
-.project-hub-brand strong,
-.project-hub-brand span {
+.project-hub-brand > div > strong,
+.project-hub-brand > div > span {
   display: block;
 }
 
