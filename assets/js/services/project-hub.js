@@ -1,6 +1,7 @@
 // BuildPlan Pro cloud project hub.
 (function bootstrapBuildPlanProjectHub(global) {
   let initialized = false;
+  let loadGeneration = 0;
 
   function getElement(selector) {
     return global.document?.querySelector?.(selector) || null;
@@ -20,7 +21,16 @@
       .replace(/'/g, '&#39;');
   }
 
+  function resetHubState() {
+    setText('[data-project-hub-email]', '');
+    setText('[data-project-hub-count]', '0');
+    setText('[data-project-hub-status]', '');
+    const list = getElement('[data-project-hub-list]');
+    if (list) list.innerHTML = '';
+  }
+
   function renderLoading() {
+    setText('[data-project-hub-count]', '0');
     setText('[data-project-hub-status]', 'กำลังโหลดโครงการ...');
     const list = getElement('[data-project-hub-list]');
     if (list) list.innerHTML = '';
@@ -46,6 +56,11 @@
     }
     list.innerHTML = projects.map((project) => {
       const id = escapeHtml(project?.id);
+      const labelName = project?.name || 'โครงการไม่มีชื่อ';
+      const openLabel = escapeHtml('เปิดโครงการ ' + labelName);
+      const renameLabel = escapeHtml('เปลี่ยนชื่อโครงการ ' + labelName);
+      const duplicateLabel = escapeHtml('ทำสำเนาโครงการ ' + labelName);
+      const archiveLabel = escapeHtml('เก็บโครงการ ' + labelName);
       const name = escapeHtml(project?.name || 'โครงการไม่มีชื่อ');
       const updatedAt = project?.updatedAt
         ? escapeHtml(new Date(project.updatedAt).toLocaleString('th-TH'))
@@ -57,10 +72,10 @@
         '<span>แก้ไขล่าสุด ' + updatedAt + '</span>',
         '</div>',
         '<div class="project-hub-card-actions">',
-        '<button type="button" data-project-hub-open="' + id + '">เปิดโครงการ</button>',
-        '<button type="button" data-project-hub-rename="' + id + '">เปลี่ยนชื่อ</button>',
-        '<button type="button" data-project-hub-duplicate="' + id + '">ทำสำเนา</button>',
-        '<button type="button" data-project-hub-archive="' + id + '">เก็บถาวร</button>',
+        '<button type="button" data-project-hub-open="' + id + '" aria-label="' + openLabel + '">เปิดโครงการ</button>',
+        '<button type="button" data-project-hub-rename="' + id + '" aria-label="' + renameLabel + '">เปลี่ยนชื่อ</button>',
+        '<button type="button" data-project-hub-duplicate="' + id + '" aria-label="' + duplicateLabel + '">ทำสำเนา</button>',
+        '<button type="button" data-project-hub-archive="' + id + '" aria-label="' + archiveLabel + '">เก็บถาวร</button>',
         '</div>',
         '</article>',
       ].join('');
@@ -93,9 +108,28 @@
     return unavailableAction();
   }
 
+  function navigateHome() {
+    if (typeof global.BuildPlanAppShell?.navigateHome === 'function') {
+      global.BuildPlanAppShell.navigateHome();
+    } else {
+      global.BuildPlanAppShell?.navigateTo?.('home');
+    }
+  }
+
+  function signOut() {
+    loadGeneration += 1;
+    global.BuildPlanCloud?.setCurrentProjectId?.('');
+    global.BuildPlanAuth?.clearAccessToken?.();
+    resetHubState();
+    navigateHome();
+  }
+
   async function load() {
+    const generation = ++loadGeneration;
+    resetHubState();
     try {
       const session = await global.BuildPlanAuth?.refreshSession?.();
+      if (generation !== loadGeneration) return { ok: false, stale: true };
       if (!session?.authenticated) {
         global.BuildPlanAppShell?.navigateTo?.('login');
         return { ok: false, authenticated: false };
@@ -104,6 +138,7 @@
       setText('[data-project-hub-email]', session.user?.email || '');
       renderLoading();
       const result = await global.BuildPlanCloud?.listProjects?.();
+      if (generation !== loadGeneration) return { ok: false, stale: true };
       const projects = Array.isArray(result?.projects) ? result.projects : [];
       setText('[data-project-hub-count]', String(projects.length));
       renderProjects(projects);
@@ -114,6 +149,7 @@
       return { ok: true, projects };
     } catch (error) {
       const message = error?.message || 'ไม่สามารถโหลดรายการโครงการได้';
+      setText('[data-project-hub-count]', '0');
       setText('[data-project-hub-status]', message);
       return { ok: false, error, message };
     }
@@ -133,6 +169,8 @@
     initialized = true;
     getElement('[data-project-hub-refresh]')?.addEventListener?.('click', load);
     getElement('[data-project-hub-new]')?.addEventListener?.('click', createProject);
+    getElement('[data-project-hub-home]')?.addEventListener?.('click', navigateHome);
+    getElement('[data-project-hub-signout]')?.addEventListener?.('click', signOut);
     getElement('[data-project-hub-list]')?.addEventListener?.('click', handleListClick);
     global.addEventListener?.('buildplan:app-route', (event) => {
       if (event?.detail?.route === 'projects') load();
