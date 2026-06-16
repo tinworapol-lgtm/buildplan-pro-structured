@@ -93,7 +93,12 @@
   }
 
   function createProject() {
-    return unavailableAction();
+    global.BuildPlanCloud?.setCurrentProjectId?.('');
+    if (typeof global.BuildPlanAppShell?.openProjectStartPopup === 'function') {
+      return global.BuildPlanAppShell.openProjectStartPopup();
+    }
+    global.BuildPlanAppShell?.navigateTo?.('workspace');
+    return global.BuildPlanAppShell?.navigateWorkspace?.();
   }
 
   function renameProject() {

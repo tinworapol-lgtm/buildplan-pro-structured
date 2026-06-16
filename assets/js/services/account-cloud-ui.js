@@ -163,7 +163,10 @@
     const session = await global.BuildPlanAuth?.verifyEmailOtp?.(email, code);
     setOutput(session?.authenticated ? 'Signed in as ' + getText(session.user?.email, email) : 'Verification completed');
     const refreshed = await refreshStatus();
-    if (session?.authenticated || refreshed?.authenticated) await loadCloudList();
+    if (session?.authenticated || refreshed?.authenticated) {
+      closePanel();
+      global.BuildPlanAppShell?.navigateTo?.('projects');
+    }
   }
 
   async function saveCloud() {

@@ -248,6 +248,17 @@ const report = {
 fs.mkdirSync(reportDir, { recursive: true });
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
 
-console.log('app shell smoke ok');
-console.log('checks:', checks.length);
-console.log('report:', path.relative(projectDir, reportPath));
+(async () => {
+  fakeWindow.BuildPlanAuth.refreshSession = async () => {
+    throw new Error('session unavailable');
+  };
+  fakeWindow.BuildPlanAppShell.navigateTo('workspace');
+  await fakeWindow.BuildPlanAppShell.navigateAccountHome();
+  check('account-home-fallbacks-home-on-session-error', body.dataset.appRoute === 'home', body.dataset.appRoute);
+
+  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+
+  console.log('app shell smoke ok');
+  console.log('checks:', checks.length);
+  console.log('report:', path.relative(projectDir, reportPath));
+})();

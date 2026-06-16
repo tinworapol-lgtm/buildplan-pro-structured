@@ -87,6 +87,8 @@ function createFakeDocument() {
 const html = readText('index.html');
 const service = readText('assets/js/services/account-cloud-ui.js');
 let projectListCalls = 0;
+let hubRouteLoads = 0;
+const windowListeners = {};
 
 const checks = [];
 function check(id, ok, detail = '') {
@@ -132,8 +134,24 @@ const fakeWindow = {
       project: { id: projectId, name, updatedAt: '2026-06-14T09:00:00.000Z' },
     }),
   },
-  addEventListener() {},
-  dispatchEvent() {},
+  BuildPlanAppShell: {
+    route: 'workspace',
+    navigateTo(route) {
+      this.route = route;
+      fakeWindow.dispatchEvent(new fakeWindow.CustomEvent('buildplan:app-route', { detail: { route } }));
+      return route;
+    },
+    getRoute() {
+      return this.route;
+    },
+  },
+  addEventListener(eventName, handler) {
+    windowListeners[eventName] = windowListeners[eventName] || [];
+    windowListeners[eventName].push(handler);
+  },
+  dispatchEvent(event) {
+    for (const handler of windowListeners[event.type] || []) handler(event);
+  },
   CustomEvent: class CustomEvent {
     constructor(type, options) {
       this.type = type;
@@ -142,6 +160,9 @@ const fakeWindow = {
   },
 };
 fakeWindow.window = fakeWindow;
+fakeWindow.addEventListener('buildplan:app-route', (event) => {
+  if (event?.detail?.route === 'projects') hubRouteLoads += 1;
+});
 
 vm.runInNewContext(service, {
   window: fakeWindow,
@@ -176,7 +197,9 @@ Promise.resolve()
     fakeDocument.getElementById('account-cloud-email').value = 'tin.worapol@gmail.com';
     fakeDocument.getElementById('account-cloud-code').value = '85267594';
     return fakeWindow.BuildPlanAccountCloud.verifyOtp().then(() => {
-      check('verify-loads-project-list', projectListCalls === callsBeforeVerify + 1, String(projectListCalls));
+      check('verify-routes-to-project-hub', fakeWindow.BuildPlanAppShell.getRoute() === 'projects', fakeWindow.BuildPlanAppShell.getRoute());
+      check('verify-does-not-directly-load-project-list', projectListCalls === callsBeforeVerify, String(projectListCalls));
+      check('verify-triggers-one-project-hub-route-load', hubRouteLoads === 1, String(hubRouteLoads));
     });
   })
   .then(() => {

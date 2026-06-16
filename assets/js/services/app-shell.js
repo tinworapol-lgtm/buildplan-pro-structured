@@ -209,6 +209,15 @@
     return navigateTo('home');
   }
 
+  async function navigateAccountHome() {
+    try {
+      const session = await global.BuildPlanAuth?.refreshSession?.();
+      return navigateTo(session?.authenticated ? 'projects' : 'home');
+    } catch (_error) {
+      return navigateTo('home');
+    }
+  }
+
   function navigateLogin() {
     return navigateTo('login');
   }
@@ -489,8 +498,8 @@
     try {
       const session = await global.BuildPlanAuth?.verifyEmailOtp?.(email, code);
       if (session?.authenticated) {
-        setMessage('Signed in. Opening workspace...');
-        navigateWorkspace();
+        setMessage('Signed in. Opening projects...');
+        navigateTo('projects');
       } else {
         setMessage(session?.message || 'Verification completed.');
       }
@@ -508,8 +517,8 @@
 
   function applyAuthCallbackSession(session) {
     if (session.authenticated) {
-      setMessage('Signed in. Opening workspace...');
-      navigateWorkspace({ skipProjectPopup: true });
+      setMessage('Signed in. Opening projects...');
+      navigateTo('projects');
       return;
     }
     setMessage(session.message || 'Login link could not be verified.');
@@ -541,7 +550,7 @@
     bindButton('btn-home-open-setup', () => toggleSetupPanel(true));
     bindButton('btn-home-close-setup', () => toggleSetupPanel(false));
     bindButton('btn-login-back-home', navigateHome);
-    bindButton('btn-workspace-back-home', navigateHome);
+    bindButton('btn-workspace-back-home', navigateAccountHome);
     bindButton('btn-login-open-workspace', navigateWorkspace);
     bindButton('btn-login-send-code', sendLoginCode);
     bindButton('btn-login-verify-code', verifyLoginCode);
@@ -570,6 +579,7 @@
     getRoute,
     navigateTo,
     navigateHome,
+    navigateAccountHome,
     navigateLogin,
     navigateWorkspace,
     openProjectStartPopup,
