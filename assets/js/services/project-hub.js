@@ -88,8 +88,25 @@
     return { ok: false, unavailable: true, message };
   }
 
-  function openProject() {
-    return unavailableAction();
+  function actionFailure(error, fallbackMessage) {
+    const message = error?.message || fallbackMessage;
+    setText('[data-project-hub-status]', message);
+    return { ok: false, error, message };
+  }
+
+  async function openProject(projectId) {
+    try {
+      setText('[data-project-hub-status]', 'Opening project...');
+      const result = await global.BuildPlanCloud?.applyCloudProject?.(projectId);
+      if (!result || result.ok === false) {
+        throw new Error(result?.message || 'Unable to open project.');
+      }
+      global.BuildPlanAppShell?.navigateTo?.('workspace');
+      setText('[data-project-hub-status]', 'Project opened.');
+      return { ok: true, ...result };
+    } catch (error) {
+      return actionFailure(error, 'Unable to open project.');
+    }
   }
 
   function createProject() {
@@ -101,16 +118,68 @@
     return global.BuildPlanAppShell?.navigateWorkspace?.();
   }
 
-  function renameProject() {
-    return unavailableAction();
+  async function askRenameName() {
+    if (typeof global.Swal?.fire === 'function') {
+      const response = await global.Swal.fire({
+        title: 'Rename project',
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+      });
+      if (!response?.isConfirmed) return null;
+      return response.value;
+    }
+    if (typeof global.prompt === 'function') {
+      return global.prompt('Project name');
+    }
+    return null;
+  }
+
+  async function renameProject(projectId, nextName) {
+    try {
+      const rawName = nextName === undefined ? await askRenameName() : nextName;
+      const name = String(rawName || '').trim();
+      if (!name) return { ok: false, cancelled: true };
+      const result = await global.BuildPlanCloud?.renameProject?.(projectId, name);
+      await load();
+      setText('[data-project-hub-status]', 'Project renamed.');
+      return { ok: true, ...result };
+    } catch (error) {
+      return actionFailure(error, 'Unable to rename project.');
+    }
   }
 
   function duplicateProject() {
     return unavailableAction();
   }
 
-  function archiveProject() {
-    return unavailableAction();
+  async function confirmArchive() {
+    if (typeof global.Swal?.fire === 'function') {
+      const response = await global.Swal.fire({
+        title: 'Archive project?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Archive',
+      });
+      return !!response?.isConfirmed;
+    }
+    if (typeof global.confirm === 'function') {
+      return global.confirm('Archive this project?');
+    }
+    return false;
+  }
+
+  async function archiveProject(projectId, confirmed) {
+    try {
+      const shouldArchive = confirmed === true ? true : await confirmArchive();
+      if (!shouldArchive) return { ok: false, cancelled: true };
+      const result = await global.BuildPlanCloud?.deleteProject?.(projectId);
+      await load();
+      setText('[data-project-hub-status]', 'Project archived.');
+      return { ok: true, ...result };
+    } catch (error) {
+      return actionFailure(error, 'Unable to archive project.');
+    }
   }
 
   function navigateHome() {
@@ -163,10 +232,10 @@
   function handleListClick(event) {
     const target = event?.target?.closest?.('button');
     if (!target) return;
-    if (target.dataset.projectHubOpen) openProject(target.dataset.projectHubOpen);
-    else if (target.dataset.projectHubRename) renameProject(target.dataset.projectHubRename);
+    if (target.dataset.projectHubOpen) void openProject(target.dataset.projectHubOpen);
+    else if (target.dataset.projectHubRename) void renameProject(target.dataset.projectHubRename);
     else if (target.dataset.projectHubDuplicate) duplicateProject(target.dataset.projectHubDuplicate);
-    else if (target.dataset.projectHubArchive) archiveProject(target.dataset.projectHubArchive);
+    else if (target.dataset.projectHubArchive) void archiveProject(target.dataset.projectHubArchive);
   }
 
   function initialize() {
