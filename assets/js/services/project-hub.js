@@ -82,12 +82,6 @@
     }).join('');
   }
 
-  function unavailableAction() {
-    const message = 'ฟังก์ชันนี้จะพร้อมใช้งานในขั้นตอนถัดไป';
-    setText('[data-project-hub-status]', message);
-    return { ok: false, unavailable: true, message };
-  }
-
   function actionFailure(error, fallbackMessage) {
     const message = error?.message || fallbackMessage;
     setText('[data-project-hub-status]', message);
@@ -149,8 +143,19 @@
     }
   }
 
-  function duplicateProject() {
-    return unavailableAction();
+  async function duplicateProject(projectId) {
+    try {
+      setText('[data-project-hub-status]', 'Duplicating project...');
+      const result = await global.BuildPlanCloud?.duplicateProject?.(projectId);
+      if (!result || result.ok === false) {
+        throw new Error(result?.message || 'Unable to duplicate project.');
+      }
+      await load();
+      setText('[data-project-hub-status]', 'Project duplicated.');
+      return { ok: true, ...result };
+    } catch (error) {
+      return actionFailure(error, 'Unable to duplicate project.');
+    }
   }
 
   async function confirmArchive() {
@@ -234,7 +239,7 @@
     if (!target) return;
     if (target.dataset.projectHubOpen) void openProject(target.dataset.projectHubOpen);
     else if (target.dataset.projectHubRename) void renameProject(target.dataset.projectHubRename);
-    else if (target.dataset.projectHubDuplicate) duplicateProject(target.dataset.projectHubDuplicate);
+    else if (target.dataset.projectHubDuplicate) void duplicateProject(target.dataset.projectHubDuplicate);
     else if (target.dataset.projectHubArchive) void archiveProject(target.dataset.projectHubArchive);
   }
 

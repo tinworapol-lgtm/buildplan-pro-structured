@@ -22,6 +22,7 @@ module.exports = async function handler(request, response) {
 
   const url = new URL(request.url, 'http://localhost');
   const projectId = url.searchParams.get('id');
+  const action = url.searchParams.get('action');
 
   if (request.method === 'GET') {
     if (projectId) {
@@ -37,6 +38,45 @@ module.exports = async function handler(request, response) {
   }
 
   if (request.method === 'POST') {
+    if (action === 'duplicate') {
+      if (!projectId) return sendJson(response, 400, { message: 'Project id is required' });
+      const sourceRows = await supabaseRest(
+        'projects?id=eq.' + encodeURIComponent(projectId) +
+        '&user_id=eq.' + encodeURIComponent(session.user.id) +
+        '&archived_at=is.null&select=id,name,payload,updated_at,created_at&limit=1'
+      );
+      const source = Array.isArray(sourceRows) ? sourceRows[0] : null;
+      if (!source) return sendJson(response, 404, { message: 'Project not found' });
+      const payloadBytes = Buffer.byteLength(JSON.stringify(source.payload), 'utf8');
+      if (payloadBytes > BETA_PROJECT_PAYLOAD_BYTES) {
+        return sendJson(response, 413, { message: 'Project payload is too large for beta cloud save', limitBytes: BETA_PROJECT_PAYLOAD_BYTES });
+      }
+
+      const existingRows = await supabaseRest('projects?user_id=eq.' + encodeURIComponent(session.user.id) + '&archived_at=is.null&select=id');
+      if ((existingRows || []).length >= BETA_PROJECT_LIMIT) {
+        return sendJson(response, 403, { message: 'Beta project limit reached', limit: BETA_PROJECT_LIMIT });
+      }
+
+      const updatedAt = new Date().toISOString();
+      const name = ('สำเนา - ' + source.name).slice(0, 160);
+      const rows = await supabaseRest('projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          user_id: session.user.id,
+          name,
+          payload: source.payload,
+          updated_at: updatedAt,
+        }),
+      });
+      const project = Array.isArray(rows) ? rows[0] : rows;
+      await writeAuditLog(session.user.id, 'project.duplicate', { sourceProjectId: source.id, projectId: project?.id, name });
+      return sendJson(response, 200, { project: summarize(project) });
+    }
+
     const body = await readJsonBody(request);
     const payload = body.projectData || body.payload;
     if (!payload || typeof payload !== 'object') return sendJson(response, 400, { message: 'Missing projectData payload' });

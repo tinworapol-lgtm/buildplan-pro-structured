@@ -66,6 +66,19 @@
       }
     },
     {
+      "method": "POST",
+      "path": "/api/projects?action=duplicate&id=:id",
+      "purpose": "Duplicate one active project owned by the logged-in user on the server.",
+      "request": {},
+      "response": {
+        "project": {
+          "id": "uuid",
+          "name": "สำเนา - Project name",
+          "updatedAt": "2026-06-14T00:00:00.000Z"
+        }
+      }
+    },
+    {
       "method": "DELETE",
       "path": "/api/projects/:id",
       "purpose": "Archive one project owned by the logged-in user.",

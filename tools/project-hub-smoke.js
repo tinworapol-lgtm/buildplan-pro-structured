@@ -42,6 +42,7 @@ function createHarness() {
   let listCallCount = 0;
   let applyProjectId = '';
   const renamedProjects = [];
+  const duplicatedProjects = [];
   const archivedProjects = [];
   let currentProjectId = 'p1';
   let session = {
@@ -89,6 +90,10 @@ function createHarness() {
       async renameProject(projectId, name) {
         renamedProjects.push({ projectId, name });
         return { project: { id: projectId, name } };
+      },
+      async duplicateProject(projectId) {
+        duplicatedProjects.push(projectId);
+        return { project: { id: projectId + '-copy', name: 'Copy of ' + projectId } };
       },
       async deleteProject(projectId) {
         archivedProjects.push(projectId);
@@ -142,6 +147,7 @@ function createHarness() {
         currentProjectId,
         applyProjectId,
         renamedProjects: renamedProjects.slice(),
+        duplicatedProjects: duplicatedProjects.slice(),
         archivedProjects: archivedProjects.slice(),
       };
     },
@@ -307,6 +313,16 @@ vm.runInNewContext(source, {
   assert(archiveCalls[0] === 'p1', 'archive project used the wrong project id');
   assert(harness.counts().listCallCount === 1, 'archive project did not reload the project list once');
 
+  harness.resetRequestCounts();
+  harness.navigation.length = 0;
+  const duplicateResult = await hub.duplicateProject('p1');
+  const duplicateCalls = harness.counts().duplicatedProjects;
+  assert(duplicateResult?.ok === true, 'duplicate project did not return ok');
+  assert(duplicateCalls.length === 1, 'duplicate project did not call cloud duplicate once');
+  assert(duplicateCalls[0] === 'p1', 'duplicate project used the wrong project id');
+  assert(harness.counts().listCallCount === 1, 'duplicate project did not reload the project list once');
+  assert(harness.navigation.length === 0, 'duplicate project should stay on Project Hub');
+
   const originalApply = harness.fakeWindow.BuildPlanCloud.applyCloudProject;
   harness.fakeWindow.BuildPlanCloud.applyCloudProject = async () => {
     throw new Error('Open failed');
@@ -383,11 +399,16 @@ vm.runInNewContext(source, {
     'archive action click did not call archiveProject',
   );
 
+  const duplicateCountBeforeClick = harness.counts().duplicatedProjects.length;
+  harness.resetRequestCounts();
+  harness.navigation.length = 0;
   await dispatchAction({ projectHubDuplicate: 'p1' });
   assert(
-    harness.elements['[data-project-hub-status]'].textContent,
-    'duplicate action click did not render unavailable status',
+    harness.counts().duplicatedProjects.length === duplicateCountBeforeClick + 1,
+    'duplicate action click did not call duplicateProject',
   );
+  assert(harness.counts().listCallCount === 1, 'duplicate action click did not reload the project list once');
+  assert(harness.navigation.length === 0, 'duplicate action click should stay on Project Hub');
 
   harness.resetRequestCounts();
   harness.setSession({ authenticated: true, user: { email: 'owner@example.com' } });
