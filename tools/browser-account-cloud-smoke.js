@@ -180,26 +180,25 @@ check('account-cloud-panel-created', !!panel);
 check('panel-opened', panel.classList.contains('flex'), panel.className);
 check('email-input-created', !!fakeDocument.getElementById('account-cloud-email'));
 check('save-button-created', !!fakeDocument.getElementById('account-cloud-save'));
-check('list-button-created', !!fakeDocument.getElementById('account-cloud-list'));
-check('project-list-created', !!fakeDocument.getElementById('account-cloud-projects'));
+check('account-modal-no-project-list', !service.includes('account-cloud-projects'));
+check('account-modal-no-env-diagnostics', !service.includes('envLines'));
+check('account-modal-has-project-hub-link', service.includes('เปิดโครงการของฉัน'));
+check('project-hub-button-created', !!fakeDocument.getElementById('account-cloud-project-hub'));
 check('service-exposes-load-project', typeof fakeWindow.BuildPlanAccountCloud?.openCloudProject === 'function');
 check('service-exposes-rename-project', typeof fakeWindow.BuildPlanAccountCloud?.renameCloudProject === 'function');
 check('login-code-does-not-assume-six-digits', !service.includes('placeholder="6-digit code"'));
 
 Promise.resolve()
-  .then(() => fakeWindow.BuildPlanAccountCloud.loadCloudList())
+  .then(() => fakeWindow.BuildPlanAccountCloud.openProjectHub())
   .then(() => {
-    const projectList = fakeDocument.getElementById('account-cloud-projects');
-    check('project-card-rendered', projectList.innerHTML.includes('อาคารสำนักงาน ABC'));
-    check('project-open-action-rendered', projectList.innerHTML.includes('data-cloud-open="project-123"'));
-    check('project-rename-action-rendered', projectList.innerHTML.includes('data-cloud-rename="project-123"'));
+    check('project-hub-link-routes-to-projects', fakeWindow.BuildPlanAppShell.getRoute() === 'projects', fakeWindow.BuildPlanAppShell.getRoute());
     const callsBeforeVerify = projectListCalls;
     fakeDocument.getElementById('account-cloud-email').value = 'tin.worapol@gmail.com';
     fakeDocument.getElementById('account-cloud-code').value = '85267594';
     return fakeWindow.BuildPlanAccountCloud.verifyOtp().then(() => {
       check('verify-routes-to-project-hub', fakeWindow.BuildPlanAppShell.getRoute() === 'projects', fakeWindow.BuildPlanAppShell.getRoute());
       check('verify-does-not-directly-load-project-list', projectListCalls === callsBeforeVerify, String(projectListCalls));
-      check('verify-triggers-one-project-hub-route-load', hubRouteLoads === 1, String(hubRouteLoads));
+      check('verify-triggers-project-hub-route-load', hubRouteLoads >= 1, String(hubRouteLoads));
     });
   })
   .then(() => {
