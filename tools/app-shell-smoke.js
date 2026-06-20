@@ -37,9 +37,7 @@ const ids = [
   'project-info-header',
   'gantt-page',
   'signature-section',
-  'btn-home-open-workspace',
   'btn-workspace-back-home',
-  'btn-home-login',
   'btn-home-open-setup',
   'btn-home-close-setup',
   'btn-login-back-home',
@@ -100,7 +98,9 @@ function check(id, ok, detail = '') {
 }
 
 check('home-page-markup', html.includes('id="app-home-page"'));
-check('workspace-button-markup', html.includes('id="btn-home-open-workspace"'));
+check('single-entry-button-markup', html.includes('class="ct-login-submit"') && html.includes('data-ct-login-user'));
+check('hero-duplicate-entry-buttons-removed', !html.includes('id="btn-home-open-workspace"') && !html.includes('id="btn-hero-signup"') && !html.includes('id="btn-home-login"'));
+check('support-button-markup', html.includes('id="btn-support-coffee"'));
 check('workspace-back-home-markup', html.includes('id="btn-workspace-back-home"'));
 check('project-hub-markup', html.includes('id="app-project-hub"'));
 check('project-hub-route', shell.includes("'projects'") && shell.includes("setDisplay('app-project-hub'"));
@@ -231,7 +231,6 @@ check('project-hub-hidden-after-workspace',
     && elements.get('app-project-hub')['aria-hidden'] === 'true');
 check('home-hidden-on-workspace', elements.get('app-home-page').style.display === 'none', elements.get('app-home-page').style.display);
 check('workspace-visible-on-workspace', elements.get('top-ribbon').style.display !== 'none', elements.get('top-ribbon').style.display);
-check('home-button-bound', typeof elements.get('btn-home-open-workspace').listeners.click === 'function');
 check('workspace-back-home-bound', typeof elements.get('btn-workspace-back-home').listeners.click === 'function');
 fakeWindow.BuildPlanAppShell.applyReadiness({ configured: false, missing: ['A', 'B', 'C'] });
 check('demo-readiness-label', elements.get('app-shell-saas-status').textContent.length > 0, elements.get('app-shell-saas-status').textContent);

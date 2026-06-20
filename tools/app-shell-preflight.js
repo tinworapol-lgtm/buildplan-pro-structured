@@ -35,8 +35,8 @@ const html = readText('index.html');
 for (const marker of [
   'id="app-home-page"',
   'id="app-login-page"',
-  'id="btn-home-open-workspace"',
-  'id="btn-home-login"',
+  'class="ct-login-submit"',
+  'data-ct-login-user',
   'id="login-email"',
   'assets/js/services/app-shell.js',
 ]) {

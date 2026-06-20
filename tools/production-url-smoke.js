@@ -53,7 +53,7 @@ async function main() {
     { id: 'has-app-home-page', ok: html.includes('id="app-home-page"'), detail: 'app-home-page' },
     { id: 'has-workspace-back-home', ok: html.includes('id="btn-workspace-back-home"') && html.includes('workspace-back-home-btn'), detail: 'workspace back home button' },
     { id: 'has-app-login-page', ok: html.includes('id="app-login-page"'), detail: 'app-login-page' },
-    { id: 'has-ct-saas-landing', ok: html.includes('BuildPlan Pro') && html.includes('btn-hero-signup'), detail: 'BuildPlan Pro landing copy' },
+    { id: 'has-ct-saas-landing', ok: html.includes('BuildPlan Pro') && html.includes('ct-login-submit') && !html.includes('btn-hero-signup') && !html.includes('btn-home-open-workspace'), detail: 'BuildPlan Pro simplified landing CTA' },
         { id: 'has-public-free-support-landing', ok: html.includes('ct-reference-landing') && html.includes('ct-free-access-row') && html.includes('id="ct-support-modal"') && !html.includes('ct-plan-price-row'), detail: 'public free access landing with supporter modal' },
     { id: 'has-project-hub-page', ok: html.includes('id="app-project-hub"') && html.includes('data-project-hub-list'), detail: 'app-project-hub' },
     { id: 'loads-project-hub', ok: html.includes('assets/js/services/project-hub.js?v=phase44'), detail: 'project-hub.js?v=phase44' },
