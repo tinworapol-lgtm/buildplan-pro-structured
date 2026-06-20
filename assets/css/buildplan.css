@@ -1605,3 +1605,88 @@ html, body, button, input, select, textarea, .swal2-popup {
   .plan-toolbar-polished .plan-control-row { grid-template-columns: 1fr !important; }
   .plan-toolbar-polished .plan-toggle-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+
+/* Phase 77: compact plan controls and top today layer */
+.plan-toolbar-polished {
+  padding: 6px !important;
+  gap: 5px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 18px rgba(15, 35, 66, .08) !important;
+}
+.plan-toolbar-polished .plan-summary-row {
+  grid-template-columns: minmax(92px, .86fr) minmax(0, 2.15fr) !important;
+  gap: 5px !important;
+}
+.plan-toolbar-polished .plan-control-row {
+  grid-template-columns: minmax(92px, .86fr) minmax(0, 1.75fr) minmax(86px, .88fr) !important;
+  gap: 5px !important;
+}
+.plan-toolbar-polished .plan-section-label,
+.plan-toolbar-polished .plan-view-label,
+.plan-toolbar-polished .plan-select,
+.plan-toolbar-polished .plan-mode-btn,
+.plan-toolbar-polished .plan-date-pill,
+.plan-toolbar-polished .plan-date-pill span,
+.plan-toolbar-polished .plan-chip span {
+  font-size: 12px !important;
+  line-height: 1.05 !important;
+}
+.plan-toolbar-polished .plan-section-label,
+.plan-toolbar-polished .plan-view-label {
+  min-height: 30px !important;
+  padding: 4px 6px !important;
+  gap: 5px !important;
+  border-radius: 9px !important;
+}
+.plan-toolbar-polished .plan-section-label i,
+.plan-toolbar-polished .plan-view-label i {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+.plan-toolbar-polished .plan-date-pill {
+  min-height: 30px !important;
+  height: 30px !important;
+  border-radius: 9px !important;
+  gap: 8px !important;
+}
+.plan-toolbar-polished .plan-date-pill i { font-size: 10px !important; }
+.plan-toolbar-polished .plan-select,
+.plan-toolbar-polished .plan-mode-btn {
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 9px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.plan-toolbar-polished .plan-toggle-grid {
+  gap: 5px !important;
+}
+.plan-toolbar-polished .plan-chip {
+  height: 36px !important;
+  min-height: 36px !important;
+  gap: 2px !important;
+  border-radius: 9px !important;
+  box-shadow: none !important;
+}
+.plan-toolbar-polished .plan-chip i { font-size: 12px !important; }
+#today-line-layer {
+  z-index: 100000 !important;
+  overflow: visible !important;
+  isolation: isolate;
+}
+#today-line-layer .today-line-display-zone {
+  z-index: 100000 !important;
+  overflow: visible !important;
+  isolation: isolate;
+}
+#today-line-layer .today-progress-popover,
+.today-progress-popover {
+  z-index: 100001 !important;
+  isolation: isolate;
+}
+#scurve-overlay-svg {
+  z-index: 30 !important;
+}

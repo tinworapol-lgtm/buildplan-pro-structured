@@ -27,7 +27,7 @@
         }
     </script>
 
-        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase76">
+        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase77">
 </head>
 <body class="flex flex-col h-screen text-slate-800 bg-slate-50" data-app-route="home">
 
@@ -717,7 +717,7 @@
         
         <div class="no-print plan-toolbar plan-toolbar-polished flex flex-col gap-2 shrink-0 w-full xl:w-fit xl:max-w-[500px] xl:self-start min-w-0">
             <div class="plan-summary-row flex items-center justify-start gap-2 text-sm">
-                <div class="font-black text-[12px] text-slate-600 whitespace-nowrap">แผนงาน</div>
+                <div class="font-black text-[12px] text-slate-600 whitespace-nowrap plan-section-label"><i class="fa-solid fa-calendar-day"></i><span>แผนงาน</span></div>
                 <div class="plan-date-pill">
                     <span id="summary-start"></span>
                     <i class="fa-solid fa-arrow-right text-[9px] text-slate-400"></i>
@@ -725,7 +725,7 @@
                 </div>
             </div>
             <div class="plan-control-row">
-                <span class="font-bold text-[11px] text-slate-500 whitespace-nowrap shrink-0">มุมมอง</span>
+                <span class="font-bold text-[11px] text-slate-500 whitespace-nowrap shrink-0 plan-view-label"><i class="fa-solid fa-table-cells-large"></i><span>มุมมอง</span></span>
                 <select id="scale-selector" onchange="changeScale(this.value)" class="plan-select max-w-full min-w-[128px]">
                     <option value="auto">🌟 อัตโนมัติ</option>
                     <option value="daily">📅 รายวัน</option>
@@ -819,6 +819,7 @@
                             <g id="scurve-overlay-group"></g>
                         </svg>
                         
+                        <div id="today-line-layer" class="absolute top-0 left-0 w-full h-full pointer-events-none no-print"></div>
                         <div id="gantt-bars" class="absolute top-0 left-0 w-full h-full pointer-events-none z-20"></div>
                     </div>
                 </div>
@@ -1208,7 +1209,7 @@
   <script src="assets/js/modules/02-storage.js?v=phase31"></script>
   <script src="assets/js/modules/03-ui-controls-print.js"></script>
   <script src="assets/js/modules/04-duration-installments.js"></script>
-  <script src="assets/js/modules/05-gantt-rendering.js?v=phase70"></script>
+  <script src="assets/js/modules/05-gantt-rendering.js?v=phase77"></script>
   <script src="assets/js/modules/06-actual-dashboard.js?v=phase32"></script>
   <script src="assets/js/modules/07-cost-scurve.js"></script>
   <script src="assets/js/modules/08-task-editing-bootstrap.js?v=phase31"></script>

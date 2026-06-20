@@ -717,6 +717,7 @@
             const container = document.getElementById('gantt-bars');
             const criticalLines = document.getElementById('critical-lines');
             const criticalSvg = document.getElementById('critical-svg');
+            const todayLayer = document.getElementById('today-line-layer');
             
             let dependencyLines = document.getElementById('dependency-lines');
             if (!dependencyLines && criticalSvg) {
@@ -1008,7 +1009,7 @@
                 }
 
 
-                container.appendChild(todayLine);
+                (todayLayer || container).appendChild(todayLine);
             }
 
             renderInstallmentLines(container);
