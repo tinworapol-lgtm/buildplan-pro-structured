@@ -148,8 +148,8 @@ check('supporter-payment-api-markers', readText('api/support.js').includes('coff
 check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('supporter-status-ui-markers', html.includes('data-ct-support-status') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshSupportStatus') && readText('assets/js/services/ct-saas-mock-app.js').includes('handleSupportReturn'));
 check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase70'));
-check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase70') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase72'));
+check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase70') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/css/buildplan.css').includes('Phase 72: 60 percent smaller today status card') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
 check('executive-dashboard-print-report', html.includes('id="dashboard-photo-manager"') && html.includes('id="executive-print-report"') && readText('assets/js/modules/06-actual-dashboard.js').includes('printExecutiveDashboardReport') && readText('assets/js/modules/03-ui-controls-print.js').includes('printExecutiveDashboardReport') && readText('assets/css/buildplan.css').includes('executive-dashboard-print'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
