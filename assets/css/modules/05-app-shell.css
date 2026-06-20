@@ -487,7 +487,7 @@ body[data-app-route="workspace"] #app-login-page {
 
 /* Phase 28 home image background */
 .app-shell-page {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .app-shell-home {
@@ -707,7 +707,7 @@ body[data-app-route="workspace"] #app-login-page {
 .ct-landing-page,
 .ct-login-route-page,
 .ct-app-page {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
   background: #f5f9ff;
   color: #0f2342;
 }
@@ -1564,7 +1564,7 @@ body[data-app-route="workspace"] #app-login-page {
   bottom: 22px;
   z-index: 80;
   display: none;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .ct-chat-launcher {
@@ -1968,7 +1968,7 @@ body[data-ct-subscription-tone="expired"] .ct-module-card[data-enabled="false"] 
   display: grid;
   place-items: center;
   padding: 18px;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .ct-billing-backdrop {
@@ -2783,7 +2783,7 @@ body.ct-billing-open {
   overflow: hidden;
   background: #f3f8ff;
   color: #06153a;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .ct-dashboard-ref-page .ct-ref-sidebar {
@@ -3712,6 +3712,195 @@ body.ct-billing-open {
 
 @media (max-width: 760px) {
   .ct-plan-price-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Project Hub page shell */
+.project-hub-page {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+  color: #0f2342;
+  background: #f3f7fc;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
+}
+
+.project-hub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 72px;
+  padding: 12px clamp(20px, 4vw, 56px);
+  color: #ffffff;
+  background: #06366f;
+  border-bottom: 3px solid #f26522;
+}
+
+.project-hub-brand,
+.project-hub-header-actions,
+.project-hub-toolbar,
+.project-hub-toolbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.project-hub-brand {
+  gap: 12px;
+}
+
+.project-hub-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 20px;
+}
+
+.project-hub-brand > div > strong,
+.project-hub-brand > div > span {
+  display: block;
+}
+
+.project-hub-brand strong {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.project-hub-brand [data-project-hub-email] {
+  min-height: 18px;
+  margin-top: 3px;
+  color: #dbeafe;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.project-hub-header-actions,
+.project-hub-toolbar-actions {
+  gap: 10px;
+}
+
+.project-hub-main {
+  width: min(1280px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 36px 0 48px;
+}
+
+.project-hub-toolbar {
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.project-hub-kicker {
+  margin: 0 0 4px;
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.project-hub-toolbar h1 {
+  margin: 0;
+  color: #082f67;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.2;
+}
+
+.project-hub-toolbar h1 span {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.project-hub-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.project-hub-button-light {
+  color: #082f67;
+  border-color: #cbd8e8;
+  background: #ffffff;
+}
+
+.project-hub-header .project-hub-button-light {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.project-hub-button-primary {
+  color: #ffffff;
+  background: #f26522;
+}
+
+.project-hub-status {
+  min-height: 24px;
+  margin-bottom: 12px;
+  color: #526275;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.project-hub-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.project-hub-list > article {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #d7e2ef;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(8, 47, 103, 0.07);
+}
+
+@media (max-width: 960px) {
+  .project-hub-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .project-hub-header,
+  .project-hub-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-hub-header-actions,
+  .project-hub-toolbar-actions {
+    width: 100%;
+  }
+
+  .project-hub-header-actions .project-hub-button,
+  .project-hub-toolbar-actions .project-hub-button {
+    flex: 1;
+  }
+
+  .project-hub-main {
+    width: min(100% - 28px, 560px);
+    padding-top: 24px;
+  }
+
+  .project-hub-list {
     grid-template-columns: 1fr;
   }
 }

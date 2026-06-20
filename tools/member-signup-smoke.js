@@ -71,11 +71,7 @@ const ids = [
   'cost-page',
   'duration-page',
   'signature-section',
-  'btn-home-open-workspace',
   'btn-workspace-back-home',
-  'btn-home-login',
-  'btn-home-signup',
-  'btn-hero-signup',
   'btn-login-panel-signup',
   'btn-home-open-setup',
   'btn-home-close-setup',
@@ -191,7 +187,8 @@ function check(id, ok, detail = '') {
   if (!ok) throw new Error(id + (detail ? ': ' + detail : ''));
 }
 
-check('member-signup-button-markup', html.includes('id="btn-home-signup"') && html.includes('id="btn-hero-signup"') && html.includes('ct-free-access-row'));
+check('member-signup-entry-cta-simplified', !html.includes('id="btn-home-signup"') && !html.includes('id="btn-hero-signup"') && html.includes('ct-free-access-row'));
+check('landing-single-entry-button', html.includes('class="ct-login-submit"') && html.includes('data-ct-login-user'));
 check('member-signup-modal-markup', html.includes('id="member-signup-modal"') && html.includes('id="signup-full-name"'));
 check('member-signup-otp-markup', html.includes('id="signup-otp-code"') && html.includes('id="btn-signup-verify-code"'));
 check('member-signup-shell-functions', shell.includes('submitSignupProfile') && shell.includes('verifySignupCode'));

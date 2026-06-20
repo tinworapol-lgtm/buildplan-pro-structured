@@ -14,11 +14,13 @@ function createElement(id) {
   const listeners = {};
   return {
     id,
+    hidden: id === 'app-project-hub',
     value: '',
     textContent: '',
     dataset: {},
     style: {},
     listeners,
+    setAttribute(name, value) { this[name] = value; },
     addEventListener: (eventName, handler) => { listeners[eventName] = handler; },
   };
 }
@@ -26,6 +28,7 @@ function createElement(id) {
 const ids = [
   'app-home-page',
   'app-login-page',
+  'app-project-hub',
   'ct-program-selector',
   'ct-user-dashboard',
   'ct-admin-dashboard',
@@ -34,9 +37,7 @@ const ids = [
   'project-info-header',
   'gantt-page',
   'signature-section',
-  'btn-home-open-workspace',
   'btn-workspace-back-home',
-  'btn-home-login',
   'btn-home-open-setup',
   'btn-home-close-setup',
   'btn-login-back-home',
@@ -97,8 +98,14 @@ function check(id, ok, detail = '') {
 }
 
 check('home-page-markup', html.includes('id="app-home-page"'));
-check('workspace-button-markup', html.includes('id="btn-home-open-workspace"'));
+check('single-entry-button-markup', html.includes('class="ct-login-submit"') && html.includes('data-ct-login-user'));
+check('hero-duplicate-entry-buttons-removed', !html.includes('id="btn-home-open-workspace"') && !html.includes('id="btn-hero-signup"') && !html.includes('id="btn-home-login"'));
+check('support-button-markup', html.includes('id="btn-support-coffee"'));
 check('workspace-back-home-markup', html.includes('id="btn-workspace-back-home"'));
+check('project-hub-markup', html.includes('id="app-project-hub"'));
+check('project-hub-route', shell.includes("'projects'") && shell.includes("setDisplay('app-project-hub'"));
+check('project-hub-actions', html.includes('data-project-hub-new') && html.includes('data-project-hub-refresh'));
+check('project-hub-accessible-name', html.includes('aria-labelledby="project-hub-title"') && html.includes('id="project-hub-title"'));
 check('ct-program-selector-markup', html.includes('id="ct-program-selector"'));
 check('ct-user-dashboard-markup', html.includes('id="ct-user-dashboard"'));
 check('ct-user-dashboard-reference', html.includes('ct-dashboard-ref-page') && html.includes('ct-ref-quick-actions') && html.includes('data-ct-plan-storage'));
@@ -141,8 +148,11 @@ check('supporter-payment-api-markers', readText('api/support.js').includes('coff
 check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('supporter-status-ui-markers', html.includes('data-ct-support-status') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshSupportStatus') && readText('assets/js/services/ct-saas-mock-app.js').includes('handleSupportReturn'));
 check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase75'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase76'));
+check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase70') && html.includes('assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/css/buildplan.css').includes('Phase 72: 60 percent smaller today status card') && readText('assets/css/buildplan.css').includes('Phase 73: 50 percent larger compact today status') && readText('assets/css/buildplan.css').includes('Phase 74: wider today status equal typography') && readText('assets/css/buildplan.css').includes('Phase 73: IBM Plex Sans Thai global typography') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
+check('ibm-plex-font-local-assets', fs.existsSync(path.join(projectDir, 'assets/vendor/fonts/ibm-plex-sans-thai.css')) && fs.existsSync(path.join(projectDir, 'assets/vendor/fonts/ibm-plex-sans-thai/ibm-plex-sans-thai-thai-400-normal.woff2')));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
+check('executive-dashboard-print-report', html.includes('id="dashboard-photo-manager"') && html.includes('id="executive-print-report"') && readText('assets/js/modules/06-actual-dashboard.js').includes('printExecutiveDashboardReport') && readText('assets/js/modules/03-ui-controls-print.js').includes('printExecutiveDashboardReport') && readText('assets/css/buildplan.css').includes('executive-dashboard-print'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
 check('actual-curve-wheel-zoom-removed', !readText('assets/js/modules/06-actual-dashboard.js').includes('bindActualCurveZoom') && !readText('assets/js/modules/06-actual-dashboard.js').includes('Scroll mouse เพื่อซูม S-Curve'));
 check('actual-start-date-column', readText('assets/js/modules/06-actual-dashboard.js').includes('getTaskActualStartRecord') && readText('assets/js/modules/06-actual-dashboard.js').includes('actual-start-date'));
@@ -162,7 +172,7 @@ check('ct-saas-css', appShellCss.includes('Phase 37: Construction Tech SaaS mock
 check('ct-saas-js-file', fs.existsSync(path.join(projectDir, 'assets/js/services/ct-saas-mock-app.js')));
 check('ct-saas-css', appShellCss.includes('Phase 37: Construction Tech SaaS mock frontend prototype'));
 check('ct-saas-js-file', fs.existsSync(path.join(projectDir, 'assets/js/services/ct-saas-mock-app.js')));
-check('sarabun-app-shell-css', appShellCss.includes('font-family: "Sarabun", sans-serif'));
+check('ibm-plex-app-shell-css', appShellCss.includes('IBM Plex Sans Thai') && html.includes('assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73'));
 check('saas-guidance-doc', fs.existsSync(path.join(projectDir, 'docs/SAAS_LAUNCH_CHECKLIST_TH.md')));
 check('readiness-next-actions-api', readText('api/system/readiness.js').includes('nextActions'));
 check('api-env-guard-helper', readText('api/_shared.js').includes('envGuardPayload'));
@@ -213,11 +223,17 @@ check('user-dashboard-visible', elements.get('ct-user-dashboard').style.display 
 fakeWindow.BuildPlanAppShell.navigateTo('admin-dashboard');
 check('route-admin-dashboard', body.dataset.appRoute === 'admin-dashboard', body.dataset.appRoute);
 check('admin-dashboard-visible', elements.get('ct-admin-dashboard').style.display === 'flex', elements.get('ct-admin-dashboard').style.display);
+fakeWindow.BuildPlanAppShell.navigateTo('projects');
+check('route-projects', body.dataset.appRoute === 'projects', body.dataset.appRoute);
+check('project-hub-visible', elements.get('app-project-hub').style.display === 'flex' && elements.get('app-project-hub').hidden === false);
 fakeWindow.BuildPlanAppShell.navigateWorkspace();
 check('route-workspace', body.dataset.appRoute === 'workspace', body.dataset.appRoute);
+check('project-hub-hidden-after-workspace',
+  elements.get('app-project-hub').style.display === 'none'
+    && elements.get('app-project-hub').hidden === true
+    && elements.get('app-project-hub')['aria-hidden'] === 'true');
 check('home-hidden-on-workspace', elements.get('app-home-page').style.display === 'none', elements.get('app-home-page').style.display);
 check('workspace-visible-on-workspace', elements.get('top-ribbon').style.display !== 'none', elements.get('top-ribbon').style.display);
-check('home-button-bound', typeof elements.get('btn-home-open-workspace').listeners.click === 'function');
 check('workspace-back-home-bound', typeof elements.get('btn-workspace-back-home').listeners.click === 'function');
 fakeWindow.BuildPlanAppShell.applyReadiness({ configured: false, missing: ['A', 'B', 'C'] });
 check('demo-readiness-label', elements.get('app-shell-saas-status').textContent.length > 0, elements.get('app-shell-saas-status').textContent);
@@ -226,8 +242,9 @@ fakeWindow.BuildPlanAppShell.applyReadiness({ configured: true, missing: [] });
 check('ready-readiness-label', elements.get('app-shell-saas-status').textContent.length > 0, elements.get('app-shell-saas-status').textContent);
 check('ready-readiness-tone', elements.get('app-shell-saas-card').dataset.tone === 'ready', elements.get('app-shell-saas-card').dataset.tone);
 
-check('phase75-plan-toolbar-polish', html.includes('plan-toolbar-polished') && html.includes('plan-toggle-grid') && readText('assets/css/buildplan.css').includes('Phase 75: cost scurve removal and plan toolbar polish'));
-check('phase75-cost-scurve-removed', !html.includes('id="s-curve-chart"'));
+check('phase76-plan-toolbar-polish', html.includes('plan-toolbar-polished') && html.includes('plan-toggle-grid') && readText('assets/css/buildplan.css').includes('Phase 76: restore hub polish and fix plan controls'));
+check('phase76-cost-scurve-removed', !html.includes('id="s-curve-chart"'));
+check('phase76-no-toolbar-escape-text', !readText('assets/css/buildplan.css').includes('\\f073') && !readText('assets/css/buildplan.css').includes('\\f00a'));
 
 const report = {
   ok: checks.every((item) => item.ok),
@@ -237,6 +254,17 @@ const report = {
 fs.mkdirSync(reportDir, { recursive: true });
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
 
-console.log('app shell smoke ok');
-console.log('checks:', checks.length);
-console.log('report:', path.relative(projectDir, reportPath));
+(async () => {
+  fakeWindow.BuildPlanAuth.refreshSession = async () => {
+    throw new Error('session unavailable');
+  };
+  fakeWindow.BuildPlanAppShell.navigateTo('workspace');
+  await fakeWindow.BuildPlanAppShell.navigateAccountHome();
+  check('account-home-fallbacks-home-on-session-error', body.dataset.appRoute === 'home', body.dataset.appRoute);
+
+  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
+
+  console.log('app shell smoke ok');
+  console.log('checks:', checks.length);
+  console.log('report:', path.relative(projectDir, reportPath));
+})();

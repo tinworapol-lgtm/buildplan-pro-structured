@@ -79,7 +79,7 @@ for (const marker of ['totalMembers', 'membersToday', 'membersThisWeek', 'latest
   if (!adminApi.includes(marker)) fail('admin summary missing member marker', marker);
 }
 
-for (const marker of ['btn-home-signup', 'signup-full-name', 'signup-phone', 'signup-organization', 'signup-role', 'signup-otp-code']) {
+for (const marker of ['signup-full-name', 'signup-phone', 'signup-organization', 'signup-role', 'signup-otp-code']) {
   if (!html.includes(marker)) fail('HTML missing signup marker', marker);
 }
 

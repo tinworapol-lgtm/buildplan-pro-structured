@@ -102,6 +102,17 @@
     return result;
   }
 
+  async function duplicateProject(projectId) {
+    const endpoint = getEndpoint();
+    if (!endpoint) return { configured: false, message: 'Cloud project endpoint is not configured' };
+    if (!projectId) throw new Error('projectId is required');
+    return requestJson(endpoint + '?action=duplicate&id=' + encodeURIComponent(projectId), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+  }
+
   async function deleteProject(projectId) {
     const endpoint = getEndpoint();
     if (!endpoint) return { configured: false, archived: false };
@@ -124,6 +135,7 @@
     saveProject,
     loadProject,
     renameProject,
+    duplicateProject,
     deleteProject,
     exportUserData,
     applyCloudProject,

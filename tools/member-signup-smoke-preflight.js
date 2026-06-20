@@ -25,7 +25,6 @@ const quality = read('tools/quality-gate.js');
 
 for (const marker of [
   'member-signup-smoke-phase-66.json',
-  'btn-home-signup',
   'member-signup-modal',
   'submitSignupProfile',
   'verifySignupCode',

@@ -6,7 +6,8 @@
     <title>BuildPlan Pro</title>
     <script src="assets/vendor/tailwind/tailwindcss-cdn.js"></script>
     <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="assets/vendor/fonts/sarabun.css">
+    <link rel="stylesheet" href="assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73">
+
     <script src="assets/vendor/sweetalert2/sweetalert2.all.min.js"></script>
     
     <script>
@@ -18,14 +19,15 @@
                         slate: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 800: '#1e293b' },
                         excel: { header: '#f8fafc', border: '#e2e8f0', select: '#eff6ff' }
                     },
-                    fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                    fontFamily: { sans: ['IBM Plex Sans Thai', 'Arial', 'sans-serif'] },
+
                     boxShadow: { 'modern': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }
                 }
             }
         }
     </script>
 
-        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase75">
+        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase76">
 </head>
 <body class="flex flex-col h-screen text-slate-800 bg-slate-50" data-app-route="home">
 
@@ -42,10 +44,6 @@
                     <span class="ct-brand-mark"><i class="fa-solid fa-chart-gantt"></i></span>
                     <span>BuildPlan Pro</span>
                 </div>
-                <nav class="ct-public-nav" aria-label="เมนูหลัก">
-                    <button type="button" id="btn-home-signup" class="ct-nav-button">เข้าใช้ฟรี</button>
-                    <button type="button" id="btn-home-login" class="ct-nav-button">เข้าใช้แผนงาน</button>
-                </nav>
             </header>
 
             <main class="ct-landing-grid">
@@ -58,14 +56,6 @@
                         <span><i class="fa-solid fa-mug-hot"></i><b>สนับสนุนได้ตามสมัครใจ</b><small>ผู้สนับสนุนจะได้รับป้าย Supporter และสิทธิ์ทดลองฟังก์ชันใหม่ในอนาคต</small></span>
                     </div>
                     <div class="ct-hero-actions">
-                        <button id="btn-home-open-workspace" type="button" class="ct-primary-button" data-ct-login-user>
-                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                            เข้าใช้แผนงาน
-                        </button>
-                        <button type="button" id="btn-hero-signup" class="ct-success-button">
-                            เข้าใช้ BuildPlan Pro ฟรี <span class="sr-only">ใช้ฟรีเต็มฟังก์ชัน</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
                         <button type="button" id="btn-support-coffee" class="ct-coffee-button" data-ct-open-support>
                             <i class="fa-solid fa-mug-hot"></i>
                             สนับสนุนค่ากาแฟ
@@ -112,7 +102,6 @@
                             </div>
                         </div>
                     </div>
-                    <p class="ct-register-line">ต้องการช่วยพัฒนาระบบต่อ? <button type="button" data-ct-open-support>สนับสนุนค่ากาแฟ</button></p>
                 </aside>
             </main>
         </div>
@@ -254,6 +243,48 @@
             <div id="app-shell-setup-actions"></div>
         </div>
     </div>
+
+    <section id="app-project-hub" class="app-shell-page project-hub-page" hidden aria-hidden="true" aria-labelledby="project-hub-title">
+        <header class="project-hub-header">
+            <div class="project-hub-brand">
+                <span class="project-hub-brand-mark"><i class="fa-solid fa-chart-gantt"></i></span>
+                <div>
+                    <strong>BuildPlan Pro</strong>
+                    <span data-project-hub-email></span>
+                </div>
+            </div>
+            <div class="project-hub-header-actions">
+                <button type="button" class="project-hub-button project-hub-button-light" data-project-hub-home>
+                    <i class="fa-solid fa-house"></i>
+                    <span>หน้าหลัก</span>
+                </button>
+                <button type="button" class="project-hub-button project-hub-button-light" data-project-hub-signout>
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>ออกจากระบบ</span>
+                </button>
+            </div>
+        </header>
+        <main class="project-hub-main">
+            <div class="project-hub-toolbar">
+                <div>
+                    <p class="project-hub-kicker">PROJECT WORKSPACE</p>
+                    <h1 id="project-hub-title">โครงการของฉัน <span data-project-hub-count>0</span></h1>
+                </div>
+                <div class="project-hub-toolbar-actions">
+                    <button type="button" class="project-hub-button project-hub-button-light" data-project-hub-refresh>
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>รีเฟรช</span>
+                    </button>
+                    <button type="button" class="project-hub-button project-hub-button-primary" data-project-hub-new>
+                        <i class="fa-solid fa-plus"></i>
+                        <span>สร้างโครงการใหม่</span>
+                    </button>
+                </div>
+            </div>
+            <div class="project-hub-status" data-project-hub-status aria-live="polite"></div>
+            <div class="project-hub-list" data-project-hub-list></div>
+        </main>
+    </section>
 
     <section id="ct-program-selector" class="app-shell-page ct-app-page ct-program-page" aria-label="แพ็กเกจและฟังก์ชั่นแผนงาน">
         <header class="ct-app-topbar">
@@ -837,7 +868,26 @@
                         <div class="kpi-card">
                             <div class="kpi-label mb-3">Critical Path</div>
                             <div id="dashboard-critical-list" class="space-y-2 text-sm"></div>
-                        </div>
+                        </div>
+
+                    <section class="kpi-card no-print mt-5 xl:col-span-2 order-last" id="dashboard-photo-manager">
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+                            <div>
+                                <div class="kpi-label">Site Progress Photos</div>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">Executive report photos</h3>
+                                <p class="text-sm text-slate-500 mt-1">Upload site photos, add captions, and select images for the executive print report.</p>
+                            </div>
+                            <label class="dashboard-photo-upload">
+                                <i class="fa-solid fa-images"></i>
+                                Add report photos
+                                <input id="dashboard-photo-input" type="file" accept="image/*" multiple onchange="handleDashboardPhotoInput(event)">
+                            </label>
+                        </div>
+                        <div id="dashboard-photo-list" class="dashboard-photo-list"></div>
+                    </section>
+
+                    <section id="executive-print-report" class="executive-print-report" aria-hidden="true"></section>
+
                         <div class="kpi-card">
                             <div class="kpi-label mb-3">Upcoming Work</div>
                             <div id="dashboard-upcoming-list" class="space-y-2 text-sm"></div>
@@ -1148,6 +1198,7 @@
   <script src="assets/js/services/project-schema.js"></script>
   <script src="assets/js/services/auth-adapter.js"></script>
   <script src="assets/js/services/cloud-save-adapter.js?v=phase42"></script>
+  <script src="assets/js/services/project-hub.js?v=phase44"></script>
     <script src="assets/js/services/saas-readiness-adapter.js?v=phase27"></script>
   <script src="assets/js/services/error-logger.js"></script>
   <script src="assets/js/services/account-cloud-ui.js?v=phase43"></script>
@@ -1157,7 +1208,7 @@
   <script src="assets/js/modules/02-storage.js?v=phase31"></script>
   <script src="assets/js/modules/03-ui-controls-print.js"></script>
   <script src="assets/js/modules/04-duration-installments.js"></script>
-  <script src="assets/js/modules/05-gantt-rendering.js?v=phase42"></script>
+  <script src="assets/js/modules/05-gantt-rendering.js?v=phase70"></script>
   <script src="assets/js/modules/06-actual-dashboard.js?v=phase32"></script>
   <script src="assets/js/modules/07-cost-scurve.js"></script>
   <script src="assets/js/modules/08-task-editing-bootstrap.js?v=phase31"></script>

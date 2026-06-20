@@ -1,6 +1,6 @@
 // แผนงาน app shell: routes Home and Workspace without changing the planner internals.
 (function bootstrapBuildPlanAppShell(global) {
-  const routes = ['home', 'login', 'programs', 'billing', 'user-dashboard', 'admin-dashboard', 'workspace'];
+  const routes = ['home', 'login', 'projects', 'programs', 'billing', 'user-dashboard', 'admin-dashboard', 'workspace'];
   let currentRoute = 'home';
   let otpCooldownUntil = 0;
 
@@ -160,6 +160,13 @@
   function applyRouteVisibility(route) {
     setDisplay('app-home-page', route === 'home' ? 'flex' : 'none');
     setDisplay('app-login-page', route === 'login' ? 'flex' : 'none');
+    const projectHubVisible = route === 'projects';
+    const projectHub = global.document?.getElementById('app-project-hub');
+    setDisplay('app-project-hub', projectHubVisible ? 'flex' : 'none');
+    if (projectHub) {
+      projectHub.hidden = !projectHubVisible;
+      projectHub.setAttribute?.('aria-hidden', projectHubVisible ? 'false' : 'true');
+    }
     setDisplay('ct-program-selector', ['programs', 'billing'].includes(route) ? 'flex' : 'none');
     setDisplay('ct-user-dashboard', route === 'user-dashboard' ? 'flex' : 'none');
     setDisplay('ct-admin-dashboard', route === 'admin-dashboard' ? 'flex' : 'none');
@@ -200,6 +207,15 @@
 
   function navigateHome() {
     return navigateTo('home');
+  }
+
+  async function navigateAccountHome() {
+    try {
+      const session = await global.BuildPlanAuth?.refreshSession?.();
+      return navigateTo(session?.authenticated ? 'projects' : 'home');
+    } catch (_error) {
+      return navigateTo('home');
+    }
   }
 
   function navigateLogin() {
@@ -482,8 +498,8 @@
     try {
       const session = await global.BuildPlanAuth?.verifyEmailOtp?.(email, code);
       if (session?.authenticated) {
-        setMessage('Signed in. Opening workspace...');
-        navigateWorkspace();
+        setMessage('Signed in. Opening projects...');
+        navigateTo('projects');
       } else {
         setMessage(session?.message || 'Verification completed.');
       }
@@ -501,8 +517,8 @@
 
   function applyAuthCallbackSession(session) {
     if (session.authenticated) {
-      setMessage('Signed in. Opening workspace...');
-      navigateWorkspace({ skipProjectPopup: true });
+      setMessage('Signed in. Opening projects...');
+      navigateTo('projects');
       return;
     }
     setMessage(session.message || 'Login link could not be verified.');
@@ -534,7 +550,7 @@
     bindButton('btn-home-open-setup', () => toggleSetupPanel(true));
     bindButton('btn-home-close-setup', () => toggleSetupPanel(false));
     bindButton('btn-login-back-home', navigateHome);
-    bindButton('btn-workspace-back-home', navigateHome);
+    bindButton('btn-workspace-back-home', navigateAccountHome);
     bindButton('btn-login-open-workspace', navigateWorkspace);
     bindButton('btn-login-send-code', sendLoginCode);
     bindButton('btn-login-verify-code', verifyLoginCode);
@@ -563,6 +579,7 @@
     getRoute,
     navigateTo,
     navigateHome,
+    navigateAccountHome,
     navigateLogin,
     navigateWorkspace,
     openProjectStartPopup,

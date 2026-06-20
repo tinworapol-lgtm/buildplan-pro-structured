@@ -37,6 +37,11 @@ async function main() {
   });
   const ctMockJs = await ctMockResponse.text();
 
+  const projectHubResponse = await fetch(baseUrl + '/assets/js/services/project-hub.js?v=phase44', {
+    headers: { Accept: 'application/javascript' },
+  });
+  const projectHubJs = await projectHubResponse.text();
+
   const checks = [
     { id: 'http-200', ok: response.status === 200, detail: String(response.status) },
     { id: 'has-account-cloud-button', ok: html.includes('btn-account-cloud'), detail: 'btn-account-cloud' },
@@ -48,8 +53,12 @@ async function main() {
     { id: 'has-app-home-page', ok: html.includes('id="app-home-page"'), detail: 'app-home-page' },
     { id: 'has-workspace-back-home', ok: html.includes('id="btn-workspace-back-home"') && html.includes('workspace-back-home-btn'), detail: 'workspace back home button' },
     { id: 'has-app-login-page', ok: html.includes('id="app-login-page"'), detail: 'app-login-page' },
-    { id: 'has-ct-saas-landing', ok: html.includes('BuildPlan Pro') && html.includes('btn-hero-signup'), detail: 'BuildPlan Pro landing copy' },
+    { id: 'has-ct-saas-landing', ok: html.includes('BuildPlan Pro') && html.includes('ct-login-submit') && !html.includes('btn-hero-signup') && !html.includes('btn-home-open-workspace'), detail: 'BuildPlan Pro simplified landing CTA' },
         { id: 'has-public-free-support-landing', ok: html.includes('ct-reference-landing') && html.includes('ct-free-access-row') && html.includes('id="ct-support-modal"') && !html.includes('ct-plan-price-row'), detail: 'public free access landing with supporter modal' },
+    { id: 'has-project-hub-page', ok: html.includes('id="app-project-hub"') && html.includes('data-project-hub-list'), detail: 'app-project-hub' },
+    { id: 'loads-project-hub', ok: html.includes('assets/js/services/project-hub.js?v=phase44'), detail: 'project-hub.js?v=phase44' },
+    { id: 'project-hub-http-200', ok: projectHubResponse.status === 200, detail: String(projectHubResponse.status) },
+    { id: 'project-hub-actions', ok: projectHubJs.includes('openProject') && projectHubJs.includes('duplicateProject') && projectHubJs.includes('archiveProject'), detail: 'project hub actions' },
     { id: 'has-ct-program-selector', ok: html.includes('id="ct-program-selector"'), detail: 'ct-program-selector' },
     { id: 'has-ct-user-dashboard', ok: html.includes('id="ct-user-dashboard"'), detail: 'ct-user-dashboard' },
     { id: 'has-reference-user-dashboard', ok: html.includes('ct-dashboard-ref-page') && html.includes('ct-ref-quick-actions') && html.includes('data-ct-plan-storage'), detail: 'phase 43 user dashboard reference UI' },

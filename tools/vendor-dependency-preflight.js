@@ -28,7 +28,8 @@ const requiredFiles = [
   'assets/vendor/tailwind/tailwindcss-cdn.js',
   'assets/vendor/fontawesome/css/all.min.css',
   'assets/vendor/sweetalert2/sweetalert2.all.min.js',
-  'assets/vendor/fonts/sarabun.css',
+  'assets/vendor/fonts/ibm-plex-sans-thai.css',
+  'assets/vendor/fonts/ibm-plex-sans-thai/ibm-plex-sans-thai-thai-400-normal.woff2',
   'docs/VENDOR_LOCALIZATION_PHASE_22.md',
 ];
 for (const file of requiredFiles) {
@@ -48,7 +49,7 @@ for (const external of [
 for (const localAsset of [
   'assets/vendor/tailwind/tailwindcss-cdn.js',
   'assets/vendor/fontawesome/css/all.min.css',
-  'assets/vendor/fonts/sarabun.css',
+  'assets/vendor/fonts/ibm-plex-sans-thai.css',
   'assets/vendor/sweetalert2/sweetalert2.all.min.js',
 ]) {
   if (!html.includes(localAsset)) fail('index.html missing local vendor asset', localAsset);

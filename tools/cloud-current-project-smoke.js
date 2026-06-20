@@ -83,6 +83,7 @@ function assert(ok, message) {
   const cloud = fakeWindow.BuildPlanCloud;
   assert(typeof cloud.getCurrentProjectId === 'function', 'getCurrentProjectId is missing');
   assert(typeof cloud.renameProject === 'function', 'renameProject is missing');
+  assert(typeof cloud.duplicateProject === 'function', 'duplicateProject is missing');
 
   await cloud.applyCloudProject('project-123');
   assert(cloud.getCurrentProjectId() === 'project-123', 'loaded project id was not remembered');
@@ -95,6 +96,18 @@ function assert(ok, message) {
   await cloud.renameProject('project-123', 'อาคารสำนักงานปรับปรุง');
   const renameRequest = requests.find((request) => request.options.method === 'PATCH');
   assert(renameRequest?.url.includes('id=project-123'), 'rename did not target the selected project');
+
+  await cloud.duplicateProject('project-123');
+  const duplicateRequest = requests.find((request) => (
+    request.options.method === 'POST' &&
+    String(request.url).includes('action=duplicate')
+  ));
+  assert(
+    duplicateRequest?.url === '/api/projects?action=duplicate&id=project-123',
+    'duplicate did not call the secure duplicate endpoint'
+  );
+  assert(duplicateRequest?.options.body === '{}', 'duplicate did not send an empty JSON body');
+  assert(cloud.getCurrentProjectId() === 'project-123', 'duplicate should not change the current project id automatically');
 
   console.log('cloud current project smoke ok');
 })();

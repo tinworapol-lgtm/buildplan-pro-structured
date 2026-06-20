@@ -99,6 +99,7 @@
                 durationPlanSettings: { ...durationPlanSettings },
                 actualSettings: { ...actualSettings },
                 actualEntries: JSON.parse(JSON.stringify(actualEntries || {})),
+                dashboardPhotos: JSON.parse(JSON.stringify(dashboardPhotos || [])),
                 costSettings: { ...costSettings },
                 tasks
             };
@@ -123,6 +124,7 @@
             durationPlanSettings = normalizeDurationPlanSettings(projectData.durationPlanSettings || {});
             actualSettings = normalizeActualSettings(projectData.actualSettings || actualSettings);
             actualEntries = normalizeActualEntries(projectData.actualEntries || {});
+            dashboardPhotos = normalizeDashboardPhotos(projectData.dashboardPhotos || []);
             if (projectData.prefs) {
                 userScalePreference = projectData.prefs.userScalePreference || userScalePreference;
                 ganttBarStyleMode = projectData.prefs.ganttBarStyleMode || ganttBarStyleMode;

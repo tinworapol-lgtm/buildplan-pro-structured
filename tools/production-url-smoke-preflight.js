@@ -43,6 +43,11 @@ for (const marker of [
   'ct-mock-app-public-unlock',
   'has-ct-subscription-panel',
   'has-ct-billing-modal',
+  'has-project-hub-page',
+  'loads-project-hub',
+  'project-hub-http-200',
+  'project-hub-actions',
+  'project-hub.js?v=phase44',
 ]) {
   if (!smoke.includes(marker)) fail('Production smoke tool missing marker', marker);
 }
