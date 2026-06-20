@@ -1065,3 +1065,160 @@ body.ct-support-open {
   body.executive-dashboard-print #dashboard-page > .max-w-7xl > .bg-white > *:not(#executive-print-report) { display: none !important; }
   body.executive-dashboard-print #executive-print-report { display: block !important; }
 }
+
+
+/* Phase 70: executive style today status card */
+.today-progress-popover {
+  width: 360px !important;
+  min-width: 360px !important;
+  max-width: 360px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  color: #172033 !important;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, .22) !important;
+  overflow: visible !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+}
+.today-progress-popover::before {
+  top: 42px !important;
+  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, .16));
+}
+.today-progress-popover.today-popover-right::before {
+  left: -10px !important;
+  border-top: 10px solid transparent !important;
+  border-bottom: 10px solid transparent !important;
+  border-right: 10px solid #ffffff !important;
+}
+.today-progress-popover.today-popover-left::before {
+  right: -10px !important;
+  border-top: 10px solid transparent !important;
+  border-bottom: 10px solid transparent !important;
+  border-left: 10px solid #ffffff !important;
+}
+.today-popover-card-head {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0b57e3 0%, #2563eb 58%, #3b82f6 100%);
+  border-radius: 18px 18px 0 0;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0;
+  overflow: hidden;
+}
+.today-popover-card-head::after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: 0;
+  width: 130px;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 30%, rgba(255, 255, 255, .12) 31%, rgba(255, 255, 255, .16) 68%, transparent 69%);
+  pointer-events: none;
+}
+.today-popover-card-head small {
+  color: inherit !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+}
+.today-popover-head-icon,
+.today-popover-metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.today-popover-head-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2563eb;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .12);
+}
+.today-popover-card-body {
+  display: grid;
+  padding: 14px 22px 18px;
+  background: #ffffff;
+  border-radius: 0 0 18px 18px;
+}
+.today-progress-popover div:not(.today-popover-title) {
+  display: block;
+}
+.today-popover-metric {
+  display: grid !important;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.today-popover-metric:last-child {
+  border-bottom: 0;
+}
+.today-popover-metric-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 18px;
+}
+.today-icon-variance { color: #16a34a; }
+.today-icon-status { color: #2563eb; }
+.today-popover-label {
+  color: #172033 !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+}
+.today-popover-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 94px;
+  justify-content: flex-end;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+}
+.today-value-blue { color: #2563eb !important; }
+.today-value-green { color: #16a34a !important; }
+.today-value-red { color: #dc2626 !important; }
+.today-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 138px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+}
+.today-status-good {
+  color: #16a34a !important;
+  background: #dcfce7;
+}
+.today-status-risk {
+  color: #dc2626 !important;
+  background: #fee2e2;
+}
+@media (max-width: 760px) {
+  .today-progress-popover {
+    width: 312px !important;
+    min-width: 312px !important;
+    max-width: 312px !important;
+  }
+  .today-popover-card-head,
+  .today-popover-card-head small { font-size: 17px !important; }
+  .today-popover-label { font-size: 15px !important; }
+  .today-popover-value { font-size: 19px !important; min-width: 82px; }
+  .today-status-pill { min-width: 116px; font-size: 13px !important; }
+}

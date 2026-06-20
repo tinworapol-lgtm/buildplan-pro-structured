@@ -640,12 +640,34 @@
         function createTodayProgressPopover(todayLine, dateKey, planProgress, actualProgress, variance) {
             const popover = document.createElement('div');
             popover.className = 'today-progress-popover';
+            const scheduleStatus = getTodayScheduleDayStatus(dateKey, actualProgress, variance);
             popover.innerHTML = `
-                <div class="today-popover-title">Today Status <small>${formatDateDisplay(new Date(dateKey + 'T00:00:00'))}</small></div>
-                <div><span>Plan Pregress :</span><b>${planProgress.toFixed(2)}%</b></div>
-                <div><span>Actual Progress :</span><b>${actualProgress.toFixed(2)}%</b></div>
-                <div><span>Variance :</span><b class="${variance >= 0 ? 'text-emerald-300' : 'text-red-300'}">${variance >= 0 ? '+' : ''}${variance.toFixed(2)}%</b></div>
-                <div><span>Status :</span><b>${getTodayScheduleDayStatus(dateKey, actualProgress, variance)}</b></div>
+                <div class="today-popover-card-head">
+                    <span class="today-popover-head-icon"><i class="fa-solid fa-calendar-days"></i></span>
+                    <span>Today Status <small>${formatDateDisplay(new Date(dateKey + 'T00:00:00'))}</small></span>
+                </div>
+                <div class="today-popover-card-body">
+                    <div class="today-popover-metric">
+                        <span class="today-popover-metric-icon today-icon-plan"><i class="fa-solid fa-bullseye"></i></span>
+                        <span class="today-popover-label">Plan Progress</span>
+                        <b class="today-popover-value today-value-blue">${planProgress.toFixed(2)}%</b>
+                    </div>
+                    <div class="today-popover-metric">
+                        <span class="today-popover-metric-icon today-icon-actual"><i class="fa-solid fa-chart-column"></i></span>
+                        <span class="today-popover-label">Actual Progress</span>
+                        <b class="today-popover-value today-value-blue">${actualProgress.toFixed(2)}%</b>
+                    </div>
+                    <div class="today-popover-metric">
+                        <span class="today-popover-metric-icon today-icon-variance"><i class="fa-solid fa-arrow-trend-up"></i></span>
+                        <span class="today-popover-label">Variance</span>
+                        <b class="today-popover-value ${variance >= 0 ? 'today-value-green' : 'today-value-red'}">${variance >= 0 ? '<i class="fa-solid fa-caret-up"></i> +' : '<i class="fa-solid fa-caret-down"></i> '}${variance.toFixed(2)}%</b>
+                    </div>
+                    <div class="today-popover-metric">
+                        <span class="today-popover-metric-icon today-icon-status"><i class="fa-solid fa-shield-check"></i></span>
+                        <span class="today-popover-label">Status</span>
+                        <b class="today-status-pill ${variance >= -0.01 ? 'today-status-good' : 'today-status-risk'}"><i class="fa-solid fa-circle-check"></i> ${scheduleStatus}</b>
+                    </div>
+                </div>
             `;
             popover.style.top = '72px';
             let dragging = false;
