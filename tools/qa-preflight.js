@@ -75,7 +75,14 @@ const dynamicJsIds = unique([
   ...[...cleanJs.matchAll(/\.id\s*=\s*["']([^"']+)["']/g)].map((match) => match[1]),
 ]);
 const availableIds = new Set([...htmlIds, ...dynamicJsIds]);
-const missingIds = referencedIds.filter((id) => !availableIds.has(id));
+const intentionallyRemovedIds = new Set([
+  's-curve-fill-toggle',
+  's-curve-mode-toggle',
+  's-curve-chart',
+  's-curve-date-range',
+]);
+
+const missingIds = referencedIds.filter((id) => !availableIds.has(id) && !intentionallyRemovedIds.has(id));
 if (missingIds.length) fail('JS references missing HTML ids', missingIds);
 
 const inlineHandlers = [

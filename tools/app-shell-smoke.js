@@ -141,7 +141,7 @@ check('supporter-payment-api-markers', readText('api/support.js').includes('coff
 check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('supporter-status-ui-markers', html.includes('data-ct-support-status') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshSupportStatus') && readText('assets/js/services/ct-saas-mock-app.js').includes('handleSupportReturn'));
 check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase33'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase75'));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
 check('actual-curve-wheel-zoom-removed', !readText('assets/js/modules/06-actual-dashboard.js').includes('bindActualCurveZoom') && !readText('assets/js/modules/06-actual-dashboard.js').includes('Scroll mouse เพื่อซูม S-Curve'));
@@ -225,6 +225,9 @@ check('demo-readiness-tone', elements.get('app-shell-saas-card').dataset.tone ==
 fakeWindow.BuildPlanAppShell.applyReadiness({ configured: true, missing: [] });
 check('ready-readiness-label', elements.get('app-shell-saas-status').textContent.length > 0, elements.get('app-shell-saas-status').textContent);
 check('ready-readiness-tone', elements.get('app-shell-saas-card').dataset.tone === 'ready', elements.get('app-shell-saas-card').dataset.tone);
+
+check('phase75-plan-toolbar-polish', html.includes('plan-toolbar-polished') && html.includes('plan-toggle-grid') && readText('assets/css/buildplan.css').includes('Phase 75: cost scurve removal and plan toolbar polish'));
+check('phase75-cost-scurve-removed', !html.includes('id="s-curve-chart"'));
 
 const report = {
   ok: checks.every((item) => item.ok),

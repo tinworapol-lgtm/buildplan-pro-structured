@@ -25,7 +25,7 @@
         }
     </script>
 
-        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase33">
+        <link rel="stylesheet" href="assets/css/buildplan.css?v=phase75">
 </head>
 <body class="flex flex-col h-screen text-slate-800 bg-slate-50" data-app-route="home">
 
@@ -684,8 +684,8 @@
             </div>
         </div>
         
-        <div class="no-print plan-toolbar flex flex-col gap-2 shrink-0 w-full xl:w-fit xl:max-w-[500px] xl:self-start min-w-0">
-            <div class="flex items-center justify-start gap-2 text-sm">
+        <div class="no-print plan-toolbar plan-toolbar-polished flex flex-col gap-2 shrink-0 w-full xl:w-fit xl:max-w-[500px] xl:self-start min-w-0">
+            <div class="plan-summary-row flex items-center justify-start gap-2 text-sm">
                 <div class="font-black text-[12px] text-slate-600 whitespace-nowrap">แผนงาน</div>
                 <div class="plan-date-pill">
                     <span id="summary-start"></span>
@@ -704,7 +704,7 @@
                 </select>
                 <button id="btn-toggle-gantt-style" onclick="toggleGanttBarStyle()" class="plan-mode-btn" title="สลับรูปแบบกราฟแท่ง Gantt">Classic</button>
             </div>
-            <div class="plan-toggle-row custom-scrollbar">
+            <div class="plan-toggle-row plan-toggle-grid custom-scrollbar">
                 <label class="plan-chip" title="ซ่อน/แสดง คอลัมน์ Pred.">
                     <input type="checkbox" id="show-pred" checked onchange="togglePredColumn()">
                     <i class="fa-solid fa-link"></i>
@@ -984,30 +984,6 @@
                             <div class="header-cell w-64 shrink-0 h-full text-black font-bold flex items-center justify-center">มูลค่างาน (บาท)</div>
                         </div>
                         <div id="cost-table-body"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="px-6 py-5 border-t border-slate-200 bg-slate-50">
-                <div class="bg-white rounded-xl border-2 border-black overflow-hidden shadow-modern">
-                    <div class="px-4 py-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-800">กราฟ S-Curve แผนสะสมมูลค่างาน</h3>
-                            <p class="text-sm text-slate-500">กราฟเส้นสีน้ำเงินแสดงมูลค่างานสะสมตามแผน Master Plan และใช้เทียบกับเส้น Actual สีแดง</p>
-                        </div>
-                        <div class="flex flex-col items-start xl:items-end gap-2">
-                            <div class="text-sm text-slate-600">
-                                <span class="font-bold text-slate-700">ช่วงเวลา:</span>
-                                <span id="s-curve-date-range">-</span>
-                            </div>
-                            <div class="flex flex-wrap gap-2 justify-start xl:justify-end">
-                                <button type="button" id="s-curve-mode-toggle" onclick="toggleSCurveSmoothMode()" class="px-3 py-2 rounded-lg text-sm font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-all">เส้นตรง</button>
-                                <button type="button" id="s-curve-fill-toggle" onclick="toggleSCurveFill()" class="px-3 py-2 rounded-lg text-sm font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-all">ปิดสีใต้เส้นกราฟ</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 lg:p-5">
-                        <div id="s-curve-chart" class="w-full min-h-[420px] bg-white rounded-lg"></div>
                     </div>
                 </div>
             </div>
