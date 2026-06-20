@@ -356,7 +356,7 @@ select,
 textarea,
 .app-shell-page,
 .ct-app-page {
-  font-family: "TH Sarabun New", "Sarabun", sans-serif !important;
+  font-family: var(--buildplan-font-family, "IBM Plex Sans Thai", Arial, sans-serif) !important;
 }
 
 .ct-reference-landing .ct-brand {
@@ -1014,7 +1014,7 @@ body.ct-support-open {
 .dashboard-photo-include { display: inline-flex !important; grid-template-columns: none !important; align-items: center; gap: 7px !important; }
 .dashboard-photo-actions button { border: 1px solid #fecaca; border-radius: 9px; padding: 7px 10px; color: #b91c1c; background: #fff; font-weight: 900; }
 .executive-print-report { display: none; }
-.exec-report-page { width: 100%; min-height: 100%; color: #0f172a; background: #fff; font-family: 'Sarabun', Arial, sans-serif; }
+.exec-report-page { width: 100%; min-height: 100%; color: #0f172a; background: #fff; font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif); }
 .exec-report-header, .exec-project-strip, .exec-kpi-grid, .exec-report-grid, .exec-photo-section { break-inside: avoid; }
 .exec-report-header { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; padding-bottom: 12px; border-bottom: 4px solid #f97316; }
 .exec-report-brand { color: #07348d; font-size: 13px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
@@ -1385,4 +1385,56 @@ body.ct-support-open {
     min-width: 126px !important;
     max-width: 126px !important;
   }
+}
+
+
+/* Phase 73: IBM Plex Sans Thai global typography */
+html, body, button, input, select, textarea, .swal2-popup {
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif) !important;
+}
+
+
+/* Phase 73: 50 percent larger compact today status */
+.today-progress-popover {
+  width: 198px !important;
+  min-width: 198px !important;
+  max-width: 198px !important;
+  border-radius: 10px !important;
+}
+.today-progress-popover::before { top: 18px !important; }
+.today-popover-card-head {
+  gap: 6px !important;
+  padding: 7px 9px !important;
+  border-radius: 10px 10px 0 0 !important;
+  font-size: 12px !important;
+  line-height: 1.05 !important;
+}
+.today-popover-card-head small { font-size: 12px !important; }
+.today-popover-head-icon {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 10px !important;
+}
+.today-popover-card-body { padding: 7px 9px 8px !important; }
+.today-popover-metric {
+  grid-template-columns: 20px 1fr auto !important;
+  gap: 7px !important;
+  min-height: 24px !important;
+  padding: 2px 0 !important;
+}
+.today-popover-metric-icon {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 9px !important;
+}
+.today-popover-label { font-size: 11px !important; }
+.today-popover-value {
+  min-width: 50px !important;
+  font-size: 13px !important;
+}
+.today-status-pill {
+  min-width: 72px !important;
+  max-width: 82px !important;
+  padding: 4px 7px !important;
+  font-size: 10px !important;
 }

@@ -43,8 +43,9 @@
     "saas:activate:dry": "powershell -ExecutionPolicy Bypass -File tools/saas-activate.ps1",
     "saas:activate": "powershell -ExecutionPolicy Bypass -File tools/saas-activate.ps1 -ApplyEnv -Deploy"
   },
-  "dependencies": {},
-  "devDependencies": {},
+  "dependencies": {
+    "@fontsource/ibm-plex-sans-thai": "^5.2.8"
+  },
   "buildPlan": {
     "phase": "structured-phase-24",
     "entrypoint": "index.html",

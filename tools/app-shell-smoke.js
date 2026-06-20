@@ -148,8 +148,9 @@ check('supporter-payment-api-markers', readText('api/support.js').includes('coff
 check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('supporter-status-ui-markers', html.includes('data-ct-support-status') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshSupportStatus') && readText('assets/js/services/ct-saas-mock-app.js').includes('handleSupportReturn'));
 check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase72'));
-check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase70') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/css/buildplan.css').includes('Phase 72: 60 percent smaller today status card') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase73'));
+check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase70') && html.includes('assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/css/buildplan.css').includes('Phase 72: 60 percent smaller today status card') && readText('assets/css/buildplan.css').includes('Phase 73: 50 percent larger compact today status') && readText('assets/css/buildplan.css').includes('Phase 73: IBM Plex Sans Thai global typography') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
+check('ibm-plex-font-local-assets', fs.existsSync(path.join(projectDir, 'assets/vendor/fonts/ibm-plex-sans-thai.css')) && fs.existsSync(path.join(projectDir, 'assets/vendor/fonts/ibm-plex-sans-thai/ibm-plex-sans-thai-thai-400-normal.woff2')));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
 check('executive-dashboard-print-report', html.includes('id="dashboard-photo-manager"') && html.includes('id="executive-print-report"') && readText('assets/js/modules/06-actual-dashboard.js').includes('printExecutiveDashboardReport') && readText('assets/js/modules/03-ui-controls-print.js').includes('printExecutiveDashboardReport') && readText('assets/css/buildplan.css').includes('executive-dashboard-print'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
@@ -171,7 +172,7 @@ check('ct-saas-css', appShellCss.includes('Phase 37: Construction Tech SaaS mock
 check('ct-saas-js-file', fs.existsSync(path.join(projectDir, 'assets/js/services/ct-saas-mock-app.js')));
 check('ct-saas-css', appShellCss.includes('Phase 37: Construction Tech SaaS mock frontend prototype'));
 check('ct-saas-js-file', fs.existsSync(path.join(projectDir, 'assets/js/services/ct-saas-mock-app.js')));
-check('sarabun-app-shell-css', appShellCss.includes('font-family: "Sarabun", sans-serif'));
+check('ibm-plex-app-shell-css', appShellCss.includes('IBM Plex Sans Thai') && html.includes('assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73'));
 check('saas-guidance-doc', fs.existsSync(path.join(projectDir, 'docs/SAAS_LAUNCH_CHECKLIST_TH.md')));
 check('readiness-next-actions-api', readText('api/system/readiness.js').includes('nextActions'));
 check('api-env-guard-helper', readText('api/_shared.js').includes('envGuardPayload'));

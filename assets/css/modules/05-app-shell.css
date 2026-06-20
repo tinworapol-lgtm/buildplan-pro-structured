@@ -487,7 +487,7 @@ body[data-app-route="workspace"] #app-login-page {
 
 /* Phase 28 home image background */
 .app-shell-page {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .app-shell-home {
@@ -707,7 +707,7 @@ body[data-app-route="workspace"] #app-login-page {
 .ct-landing-page,
 .ct-login-route-page,
 .ct-app-page {
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
   background: #f5f9ff;
   color: #0f2342;
 }
@@ -1564,7 +1564,7 @@ body[data-app-route="workspace"] #app-login-page {
   bottom: 22px;
   z-index: 80;
   display: none;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .ct-chat-launcher {
@@ -1968,7 +1968,7 @@ body[data-ct-subscription-tone="expired"] .ct-module-card[data-enabled="false"] 
   display: grid;
   place-items: center;
   padding: 18px;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .ct-billing-backdrop {
@@ -2783,7 +2783,7 @@ body.ct-billing-open {
   overflow: hidden;
   background: #f3f8ff;
   color: #06153a;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .ct-dashboard-ref-page .ct-ref-sidebar {
@@ -3724,7 +3724,7 @@ body.ct-billing-open {
   flex-direction: column;
   color: #0f2342;
   background: #f3f7fc;
-  font-family: "Sarabun", sans-serif;
+  font-family: var(--buildplan-font-family, 'IBM Plex Sans Thai', Arial, sans-serif);
 }
 
 .project-hub-header {
