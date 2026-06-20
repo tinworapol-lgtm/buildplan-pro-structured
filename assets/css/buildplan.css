@@ -1438,3 +1438,49 @@ html, body, button, input, select, textarea, .swal2-popup {
   padding: 4px 7px !important;
   font-size: 10px !important;
 }
+
+
+/* Phase 74: wider today status equal typography */
+.today-progress-popover {
+  width: 297px !important;
+  min-width: 297px !important;
+  max-width: 297px !important;
+  border-radius: 11px !important;
+}
+.today-popover-card-head {
+  padding: 7px 10px !important;
+  font-size: 11px !important;
+  line-height: 1.1 !important;
+}
+.today-popover-card-head small {
+  font-size: 11px !important;
+}
+.today-popover-card-body {
+  padding: 7px 10px 8px !important;
+}
+.today-popover-metric {
+  grid-template-columns: 20px 1fr auto !important;
+  gap: 8px !important;
+  min-height: 24px !important;
+}
+.today-popover-label,
+.today-popover-value,
+.today-status-pill {
+  font-size: 11px !important;
+  line-height: 1.1 !important;
+}
+.today-popover-value {
+  min-width: 62px !important;
+}
+.today-status-pill {
+  min-width: 96px !important;
+  max-width: 120px !important;
+  padding: 4px 8px !important;
+}
+@media (max-width: 760px) {
+  .today-progress-popover {
+    width: 252px !important;
+    min-width: 252px !important;
+    max-width: 252px !important;
+  }
+}
