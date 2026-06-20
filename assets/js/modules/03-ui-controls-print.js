@@ -73,6 +73,10 @@
 
         // --- ระบบพิมพ์เอกสาร (บังคับพอดีหน้ากระดาษอัจฉริยะแบบแม่นยำ) ---
         function printReport() {
+            if (currentPage === 'dashboard' && typeof printExecutiveDashboardReport === 'function') {
+                printExecutiveDashboardReport();
+                return;
+            }
             const paperSize = document.getElementById('print-paper-size').value;
             let styleId = 'dynamic-print-style';
             let styleEl = document.getElementById(styleId);

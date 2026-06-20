@@ -866,7 +866,26 @@
                         <div class="kpi-card">
                             <div class="kpi-label mb-3">Critical Path</div>
                             <div id="dashboard-critical-list" class="space-y-2 text-sm"></div>
-                        </div>
+                        </div>
+
+                    <section class="kpi-card no-print mt-5 xl:col-span-2 order-last" id="dashboard-photo-manager">
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+                            <div>
+                                <div class="kpi-label">Site Progress Photos</div>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">Executive report photos</h3>
+                                <p class="text-sm text-slate-500 mt-1">Upload site photos, add captions, and select images for the executive print report.</p>
+                            </div>
+                            <label class="dashboard-photo-upload">
+                                <i class="fa-solid fa-images"></i>
+                                Add report photos
+                                <input id="dashboard-photo-input" type="file" accept="image/*" multiple onchange="handleDashboardPhotoInput(event)">
+                            </label>
+                        </div>
+                        <div id="dashboard-photo-list" class="dashboard-photo-list"></div>
+                    </section>
+
+                    <section id="executive-print-report" class="executive-print-report" aria-hidden="true"></section>
+
                         <div class="kpi-card">
                             <div class="kpi-label mb-3">Upcoming Work</div>
                             <div id="dashboard-upcoming-list" class="space-y-2 text-sm"></div>

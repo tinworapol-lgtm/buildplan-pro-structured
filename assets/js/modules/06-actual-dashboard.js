@@ -396,6 +396,115 @@ ${actualControl}
             return current ? Math.min(100, Math.max(0, (current.cumulative / totalValue) * 100)) : 0;
         }
 
+
+        function normalizeDashboardPhotos(items = []) {
+            return (Array.isArray(items) ? items : []).filter(Boolean).map((item, index) => ({
+                id: item.id || ('dashboard-photo-' + Date.now() + '-' + index),
+                name: item.name || 'site-photo',
+                dataUrl: item.dataUrl || '',
+                date: item.date || safeFormatDate(new Date()),
+                zone: item.zone || '',
+                caption: item.caption || '',
+                status: item.status || 'In progress',
+                include: item.include !== false
+            })).filter(item => item.dataUrl);
+        }
+
+        function dashboardPhotoDateValue(photo) {
+            return photo?.date || getDashboardSelectedDateKey();
+        }
+
+        function getDashboardFieldValue(ids, fallback = '-') {
+            for (const id of ids) {
+                const value = document.getElementById(id)?.value;
+                if (value !== undefined && String(value).trim() !== '') return value;
+            }
+            return fallback;
+        }
+
+        function escapeDashboardReportHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch]));
+        }
+
+        function handleDashboardPhotoInput(event) {
+            const files = Array.from(event?.target?.files || []).filter(file => file.type?.startsWith('image/')).slice(0, 12);
+            if (!files.length) return;
+            let pending = files.length;
+            const finish = () => {
+                pending -= 1;
+                if (pending > 0) return;
+                dashboardPhotos = normalizeDashboardPhotos(dashboardPhotos);
+                renderDashboardPhotos();
+                renderExecutivePrintReport();
+                scheduleAutoSave();
+            };
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    dashboardPhotos.push({
+                        id: 'dashboard-photo-' + Date.now() + '-' + Math.random().toString(16).slice(2),
+                        name: file.name || 'site-photo',
+                        dataUrl: String(reader.result || ''),
+                        date: getDashboardSelectedDateKey(),
+                        zone: '',
+                        caption: '',
+                        status: 'In progress',
+                        include: true
+                    });
+                    finish();
+                };
+                reader.onerror = finish;
+                reader.readAsDataURL(file);
+            });
+            if (event?.target) event.target.value = '';
+        }
+
+        function updateDashboardPhoto(photoId, field, value) {
+            const photo = (dashboardPhotos || []).find(item => item.id === photoId);
+            if (!photo) return;
+            if (field === 'include') photo.include = !!value;
+            else photo[field] = value;
+            renderDashboardPhotos();
+            renderExecutivePrintReport();
+            scheduleAutoSave();
+        }
+
+        function removeDashboardPhoto(photoId) {
+            dashboardPhotos = (dashboardPhotos || []).filter(item => item.id !== photoId);
+            renderDashboardPhotos();
+            renderExecutivePrintReport();
+            scheduleAutoSave();
+        }
+
+        function renderDashboardPhotos() {
+            const list = document.getElementById('dashboard-photo-list');
+            if (!list) return;
+            dashboardPhotos = normalizeDashboardPhotos(dashboardPhotos);
+            if (!dashboardPhotos.length) {
+                list.innerHTML = '<div class="dashboard-photo-empty">No report photos yet. Add site photos to include them in the executive print report.</div>';
+                return;
+            }
+            list.innerHTML = dashboardPhotos.map(photo => {
+                const id = escapeDashboardReportHtml(photo.id);
+                const checked = photo.include !== false ? 'checked' : '';
+                return '<article class="dashboard-photo-card">' +
+                    '<img src="' + photo.dataUrl + '" alt="' + escapeDashboardReportHtml(photo.name) + '">' +
+                    '<div class="dashboard-photo-fields">' +
+                        '<div class="dashboard-photo-row">' +
+                            '<label><span>Date</span><input type="date" value="' + escapeDashboardReportHtml(dashboardPhotoDateValue(photo)) + '" onchange="updateDashboardPhoto(\'' + id + '\', \'date\', this.value)"></label>' +
+                            '<label><span>Status</span><input type="text" value="' + escapeDashboardReportHtml(photo.status) + '" onchange="updateDashboardPhoto(\'' + id + '\', \'status\', this.value)" placeholder="Structure work level 2"></label>' +
+                        '</div>' +
+                        '<label><span>Zone / Area</span><input type="text" value="' + escapeDashboardReportHtml(photo.zone) + '" onchange="updateDashboardPhoto(\'' + id + '\', \'zone\', this.value)" placeholder="Building A, Level 3"></label>' +
+                        '<label><span>Caption</span><textarea rows="2" onchange="updateDashboardPhoto(\'' + id + '\', \'caption\', this.value)" placeholder="Progress, issues, or key notes">' + escapeDashboardReportHtml(photo.caption) + '</textarea></label>' +
+                        '<div class="dashboard-photo-actions">' +
+                            '<label class="dashboard-photo-include"><input type="checkbox" ' + checked + ' onchange="updateDashboardPhoto(\'' + id + '\', \'include\', this.checked)"> Include in report</label>' +
+                            '<button type="button" onclick="removeDashboardPhoto(\'' + id + '\')"><i class="fa-solid fa-trash-can"></i> Remove</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</article>';
+            }).join('');
+        }
+
         function getDashboardSelectedDateKey() {
             const input = document.getElementById('dashboard-date-input');
             if (input?.value) return input.value;
@@ -471,6 +580,89 @@ ${actualControl}
                 </div>
             `;
             }).join('');
+        }
+
+
+        function renderExecutiveReportTasks(taskList, emptyText) {
+            const items = (taskList || []).slice(0, 5);
+            if (!items.length) return '<div class="exec-empty">' + escapeDashboardReportHtml(emptyText) + '</div>';
+            return items.map(task => {
+                const startRecord = getTaskActualStartRecord(task.id);
+                const completeRecord = getTaskCompletionRecord(task.id);
+                const progress = getTaskProgressForDisplay(task, tasks.indexOf(task));
+                const dateLine = completeRecord
+                    ? 'Actual start ' + formatDateDisplay(startRecord?.date || task.startDateObj) + ' | Complete ' + formatDateDisplay(completeRecord.date)
+                    : (startRecord ? 'Actual start ' + formatDateDisplay(startRecord.date) : 'Plan start ' + formatDateDisplay(task.startDateObj)) + ' | Plan finish ' + formatDateDisplay(task.endDateObj);
+                return '<div class="exec-task ' + (progress >= 100 ? 'is-complete' : '') + '">' +
+                    '<div><strong>' + escapeDashboardReportHtml(task.wbs || '-') + ' ' + escapeDashboardReportHtml(task.name || '-') + '</strong><span>' + escapeDashboardReportHtml(dateLine) + '</span></div>' +
+                    '<b>' + progress + '%</b>' +
+                '</div>';
+            }).join('');
+        }
+
+        function renderExecutivePrintReport(metrics = computeProjectMetrics()) {
+            const report = document.getElementById('executive-print-report');
+            if (!report) return;
+            const reportDate = new Date(metrics.dateKey + 'T00:00:00');
+            const projectName = getDashboardFieldValue(['proj-name', 'project-name'], 'Construction Project');
+            const includedPhotos = normalizeDashboardPhotos(dashboardPhotos).filter(photo => photo.include !== false).slice(0, 6);
+            const photoMarkup = includedPhotos.length ? includedPhotos.map((photo, index) => {
+                const date = new Date(dashboardPhotoDateValue(photo) + 'T00:00:00');
+                return '<figure class="exec-photo-card">' +
+                    '<img src="' + photo.dataUrl + '" alt="' + escapeDashboardReportHtml(photo.name) + '">' +
+                    '<figcaption><strong>' + (index + 1) + '. ' + escapeDashboardReportHtml(photo.status || 'Site progress') + '</strong>' +
+                    '<span>' + formatDateDisplay(date) + (photo.zone ? ' | ' + escapeDashboardReportHtml(photo.zone) : '') + '</span>' +
+                    '<p>' + escapeDashboardReportHtml(photo.caption || 'No caption') + '</p></figcaption>' +
+                '</figure>';
+            }).join('') : '<div class="exec-photo-empty">No site photos selected for this report.</div>';
+            report.innerHTML = '<div class="exec-report-page">' +
+                '<header class="exec-report-header"><div><div class="exec-report-brand">BuildPlan Pro</div><h1>Executive Progress Report</h1><p>' + escapeDashboardReportHtml(projectName) + '</p></div>' +
+                '<div class="exec-report-meta"><span>Report Date</span><b>' + formatDateDisplay(reportDate) + '</b><small>Contract: ' + escapeDashboardReportHtml(getDashboardFieldValue(['proj-contract-no', 'contract-no'])) + '</small></div></header>' +
+                '<section class="exec-project-strip">' +
+                    '<div><span>Owner</span><b>' + escapeDashboardReportHtml(getDashboardFieldValue(['proj-owner', 'project-owner'])) + '</b></div>' +
+                    '<div><span>Contractor</span><b>' + escapeDashboardReportHtml(getDashboardFieldValue(['proj-contractor', 'contractor'])) + '</b></div>' +
+                    '<div><span>Supervisor</span><b>' + escapeDashboardReportHtml(getDashboardFieldValue(['proj-supervisor', 'supervisor'])) + '</b></div>' +
+                    '<div><span>Project Value</span><b>' + formatMoneyDisplay(metrics.projectTotal) + '</b></div>' +
+                '</section>' +
+                '<section class="exec-kpi-grid">' +
+                    '<div><span>Plan Progress</span><b class="blue">' + metrics.plannedProgress.toFixed(2) + '%</b></div>' +
+                    '<div><span>Actual Progress</span><b class="green">' + metrics.actualProgress.toFixed(2) + '%</b></div>' +
+                    '<div><span>Variance</span><b class="' + (metrics.variance >= 0 ? 'green' : 'red') + '">' + (metrics.variance >= 0 ? '+' : '') + metrics.variance.toFixed(2) + '%</b></div>' +
+                    '<div><span>Status</span><b class="' + (metrics.dayDelta < 0 || metrics.overdue.length ? 'red' : 'green') + '">' + escapeDashboardReportHtml(metrics.status) + '</b></div>' +
+                    '<div><span>Earned Value</span><b>' + formatMoneyDisplay(metrics.actualValue) + '</b></div>' +
+                    '<div><span>Paid Value</span><b>' + formatMoneyDisplay(metrics.paidValue) + '</b></div>' +
+                    '<div><span>Value Delta</span><b class="' + (metrics.valueDelta >= 0 ? 'blue' : 'red') + '">' + formatMoneyDisplay(metrics.valueDelta) + '</b></div>' +
+                '</section>' +
+                '<section class="exec-report-grid">' +
+                    '<div class="exec-panel exec-span-2"><h2>Planned vs Actual</h2>' + renderDashboardBar('Planned cumulative', metrics.plannedProgress, 'bg-red-500') + renderDashboardBar('Actual progress', metrics.actualProgress, 'bg-emerald-500') + '</div>' +
+                    '<div class="exec-panel"><h2>Risk Watchlist</h2>' + renderExecutiveReportTasks(metrics.overdue, 'No overdue work') + '</div>' +
+                    '<div class="exec-panel"><h2>Critical Path</h2>' + renderExecutiveReportTasks(metrics.critical, 'No critical path') + '</div>' +
+                    '<div class="exec-panel"><h2>Upcoming Work</h2>' + renderExecutiveReportTasks(metrics.upcoming, 'No upcoming work') + '</div>' +
+                '</section>' +
+                '<section class="exec-photo-section"><div class="exec-section-title"><h2>Site Progress Photos</h2><span>' + includedPhotos.length + ' selected</span></div><div class="exec-photo-grid">' + photoMarkup + '</div></section>' +
+            '</div>';
+        }
+
+        function printExecutiveDashboardReport() {
+            const paperSize = document.getElementById('print-paper-size')?.value || 'A3';
+            let styleEl = document.getElementById('executive-dashboard-print-style');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'executive-dashboard-print-style';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.textContent = '@media print { @page { size: ' + paperSize + ' landscape; margin: 8mm; } }';
+            renderExecutivePrintReport();
+            const report = document.getElementById('executive-print-report');
+            document.body.classList.add('executive-dashboard-print');
+            if (report) report.setAttribute('aria-hidden', 'false');
+            const cleanup = () => {
+                document.body.classList.remove('executive-dashboard-print');
+                if (report) report.setAttribute('aria-hidden', 'true');
+                window.removeEventListener('afterprint', cleanup);
+            };
+            window.addEventListener('afterprint', cleanup);
+            setTimeout(() => window.print(), 120);
         }
 
         function renderDashboard() {

@@ -150,6 +150,7 @@ check('supporter-status-ui-markers', html.includes('data-ct-support-status') && 
 check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
 check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase33'));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
+check('executive-dashboard-print-report', html.includes('id="dashboard-photo-manager"') && html.includes('id="executive-print-report"') && readText('assets/js/modules/06-actual-dashboard.js').includes('printExecutiveDashboardReport') && readText('assets/js/modules/03-ui-controls-print.js').includes('printExecutiveDashboardReport') && readText('assets/css/buildplan.css').includes('executive-dashboard-print'));
 check('view-mode-controls-removed', !html.includes('data-view-mode-choice=') && !readText('assets/css/buildplan.css').includes('body[data-view-mode="dark"]'));
 check('actual-curve-wheel-zoom-removed', !readText('assets/js/modules/06-actual-dashboard.js').includes('bindActualCurveZoom') && !readText('assets/js/modules/06-actual-dashboard.js').includes('Scroll mouse เพื่อซูม S-Curve'));
 check('actual-start-date-column', readText('assets/js/modules/06-actual-dashboard.js').includes('getTaskActualStartRecord') && readText('assets/js/modules/06-actual-dashboard.js').includes('actual-start-date'));
