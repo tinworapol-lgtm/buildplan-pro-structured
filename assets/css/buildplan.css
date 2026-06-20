@@ -1139,7 +1139,7 @@ body.ct-support-open {
   height: 32px;
   border-radius: 8px;
   background: #ffffff;
-  color: #2563eb;
+  color: #2563eb !important;
   box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .12);
 }
 .today-popover-card-body {
@@ -1167,7 +1167,7 @@ body.ct-support-open {
   height: 34px;
   border-radius: 10px;
   background: #eff6ff;
-  color: #2563eb;
+  color: #2563eb !important;
   font-size: 18px;
 }
 .today-icon-variance { color: #16a34a; }
