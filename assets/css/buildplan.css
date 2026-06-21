@@ -1690,3 +1690,44 @@ html, body, button, input, select, textarea, .swal2-popup {
 #scurve-overlay-svg {
   z-index: 30 !important;
 }
+
+
+/* Phase 78: clear today layer and explicit toggle states */
+.plan-toolbar-polished .plan-chip {
+  border-color: #d7e2f2 !important;
+  background: #ffffff !important;
+  color: #0f2342 !important;
+}
+.plan-toolbar-polished .plan-chip i,
+.plan-toolbar-polished .plan-chip span {
+  color: #0b4fb3 !important;
+}
+.plan-toolbar-polished .plan-chip:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+}
+.plan-toolbar-polished .plan-chip:has(input:checked) {
+  border-color: #0b63d9 !important;
+  background: linear-gradient(135deg, #0b63d9, #07348d) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 14px rgba(11, 99, 217, .22) !important;
+}
+.plan-toolbar-polished .plan-chip:has(input:checked) i,
+.plan-toolbar-polished .plan-chip:has(input:checked) span {
+  color: #ffffff !important;
+}
+.plan-toolbar-polished .plan-chip:has(input:checked)::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #bbf7d0;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.35);
+}
+#today-line-layer .today-line-display-zone,
+#today-line-layer .today-progress-popover {
+  pointer-events: auto;
+}

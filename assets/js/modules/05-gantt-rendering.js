@@ -734,6 +734,8 @@
             }
 
             container.innerHTML = '';
+            document.querySelectorAll('.today-line-display-zone').forEach((node) => node.remove());
+            if (todayLayer) todayLayer.innerHTML = '';
             criticalLines.innerHTML = '';
             if (dependencyLines) dependencyLines.innerHTML = '';
             
