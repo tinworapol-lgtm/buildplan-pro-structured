@@ -1,12 +1,15 @@
 // BuildPlan Pro - Gantt table, timeline, dependency, and overlay rendering
 // Split from assets/js/app.js without behavior changes.
 
+        let selectedTaskRowIndex = null;
+
         function applyPlanPageDefaultToggles() {
             const defaults = {
                 'show-pred': true,
                 'show-today-line': false,
                 'show-installment-lines': false,
                 'show-critical': false,
+                'show-actual-bars': true,
                 'show-scurve-overlay': false,
                 'show-bar-labels': false
             };
@@ -43,14 +46,26 @@
 
         function getDataPaneFixedWidth() {
             const showPred = document.getElementById('show-pred')?.checked !== false;
-            const predWidth = showPred ? 80 : 0;
+            const predWidth = showPred ? 144 : 0;
             return 64 + 48 + 56 + predWidth + 112 + 112 + 80 + 40 + 10 + 4;
         }
 
         function getPrintableDataPaneWidth() {
             const showPred = document.getElementById('show-pred')?.checked !== false;
-            const predWidth = showPred ? 80 : 0;
+            const predWidth = showPred ? 144 : 0;
             return 48 + taskNameColumnWidth + 56 + predWidth + 112 + 112 + 80 + 2;
+        }
+
+        function splitPrimaryPredecessor(rawValue) {
+            const firstValue = String(rawValue || '').split(',')[0]?.trim() || '';
+            const match = firstValue.match(/^([0-9.]+)\s*(FS|SS|FF|SF)?\s*([+-]\s*\d+)?$/i);
+            const fallbackWbs = firstValue.replace(/\s*(FS|SS|FF|SF)\s*([+-]\s*\d+)?$/i, '').replace(/\s*[+-]\s*\d+$/i, '');
+            const lagDays = parseInt(String(match?.[3] || '0').replace(/\s+/g, ''), 10) || 0;
+            return {
+                wbs: match ? match[1] : fallbackWbs,
+                type: (match?.[2] || 'FS').toUpperCase(),
+                lagDays
+            };
         }
 
         function syncTaskNameColumnWidth() {
@@ -91,6 +106,34 @@
             });
         }
 
+        function applySelectedTaskRowClass() {
+            document.querySelectorAll('#data-body [data-task-index]').forEach(row => {
+                row.classList.toggle('selected-task-row', String(row.dataset.taskIndex) === String(selectedTaskRowIndex));
+            });
+        }
+
+        function setSelectedGanttRow(index) {
+            if (index === null || index === undefined || index === '') {
+                selectedTaskRowIndex = null;
+            } else {
+                const nextIndex = Number(index);
+                selectedTaskRowIndex = Number.isFinite(nextIndex) ? nextIndex : null;
+            }
+            applySelectedTaskRowClass();
+            renderGanttBars();
+        }
+
+        function setupGanttSelectionClearListener() {
+            if (document.body.dataset.ganttSelectionClearBound === '1') return;
+            document.body.dataset.ganttSelectionClearBound = '1';
+            document.addEventListener('click', (event) => {
+                if (currentPage !== 'gantt') return;
+                const target = event.target;
+                if (target?.closest?.('#data-body [data-task-index], .gantt-bar, .actual-gantt-bar, .milestone-marker, .dependency-line, .plan-toolbar, #top-ribbon, #workflow-guideline, input, select, textarea, button')) return;
+                if (selectedTaskRowIndex !== null) setSelectedGanttRow(null);
+            });
+        }
+
         function renderTable() {
             const tbody = document.getElementById('data-body');
             tbody.innerHTML = '';
@@ -103,6 +146,10 @@
                 else if(task.isGroup) rowClasses += "bg-slate-100/70 hover:bg-slate-200/50";
                 else rowClasses += "bg-white hover:bg-blue-50/40";
                 row.className = rowClasses;
+                row.dataset.taskIndex = String(index);
+                if (selectedTaskRowIndex === index) row.classList.add('selected-task-row');
+                row.addEventListener('click', () => setSelectedGanttRow(index));
+                row.addEventListener('focusin', () => setSelectedGanttRow(index));
                 
                 const isGroup = task.isGroup;
                 const isMilestone = task.isMilestone;
@@ -116,6 +163,10 @@
                 const leftPadding = isGroup || isMilestone ? "pl-3" : "pl-8";
                 const safeTaskName = escapeTooltipHtml(task.name);
                 const safePreds = escapeTooltipHtml(task.predecessorsStr || '');
+                const predParts = splitPrimaryPredecessor(task.predecessorsStr || '');
+                const safePredWbs = escapeTooltipHtml(predParts.wbs);
+                const predType = ['FS', 'FF', 'SS', 'SF'].includes(predParts.type) ? predParts.type : 'FS';
+                const predLag = predParts.lagDays > 0 ? `+${predParts.lagDays}` : (predParts.lagDays < 0 ? `${predParts.lagDays}` : '');
                 const safeStart = escapeTooltipHtml(task.start);
 
                 row.innerHTML = `
@@ -149,8 +200,15 @@
                         <input type="number" value="${task.duration}" onchange="updateData(${index}, 'duration', this.value)" class="w-full h-full text-center px-2 font-medium ${isGroup||isMilestone ? 'text-slate-400 cursor-not-allowed bg-transparent font-bold' : 'text-slate-700'}" ${(isGroup||isMilestone) ? 'readonly' : ''}>
                     </div>
 
-                    <div class="cell w-20 shrink-0 justify-center pred-col transition-all">
-                        <input type="text" value="${safePreds}" onchange="updateData(${index}, 'predecessors', this.value)" class="w-full h-full text-center px-2 font-bold text-[11px] ${isGroup ? 'text-slate-400 bg-slate-50/50 cursor-not-allowed' : 'text-indigo-600 uppercase'}" ${isGroup ? 'readonly title="หัวข้อใหญ่ไม่สามารถระบุความสัมพันธ์ได้"' : 'placeholder="e.g. 1.1FS"'}>
+                    <div class="cell w-36 shrink-0 justify-center pred-col transition-all p-0">
+                        <div class="grid grid-cols-[50px_44px_50px] w-full h-full divide-x divide-slate-200">
+                            <input data-pred-wbs type="text" value="${safePredWbs}" onchange="updatePredecessorParts(${index}, this.value, this.parentElement.querySelector('[data-pred-link]')?.value, this.parentElement.querySelector('[data-pred-lag]')?.value)" class="w-full h-full text-center px-1 font-bold text-[11px] ${isGroup ? 'text-slate-400 bg-slate-50/50 cursor-not-allowed' : 'text-indigo-600'}" ${isGroup ? 'readonly title="หัวข้อใหญ่ไม่สามารถระบุความสัมพันธ์ได้"' : 'placeholder="1.1"'}>
+                            <select data-pred-link onchange="updatePredecessorParts(${index}, this.parentElement.querySelector('[data-pred-wbs]')?.value, this.value, this.parentElement.querySelector('[data-pred-lag]')?.value)" class="w-full h-full text-center text-[10px] font-black ${isGroup ? 'text-slate-400 bg-slate-50/50 cursor-not-allowed' : 'text-amber-700 bg-white'}" ${isGroup ? 'disabled title="หัวข้อใหญ่ไม่สามารถระบุความสัมพันธ์ได้"' : 'title="FS=Finish to Start, FF=Finish to Finish, SS=Start to Start, SF=Start to Finish"'}>
+                                ${['FS', 'FF', 'SS', 'SF'].map(type => `<option value="${type}" ${predType === type ? 'selected' : ''}>${type}</option>`).join('')}
+                            </select>
+                            <input data-pred-lag type="text" value="${predLag}" onchange="updatePredecessorParts(${index}, this.parentElement.querySelector('[data-pred-wbs]')?.value, this.parentElement.querySelector('[data-pred-link]')?.value, this.value)" class="w-full h-full text-center px-1 font-bold text-[11px] ${isGroup ? 'text-slate-400 bg-slate-50/50 cursor-not-allowed' : 'text-slate-700'}" ${isGroup ? 'readonly title="หัวข้อใหญ่ไม่สามารถระบุความสัมพันธ์ได้"' : 'placeholder="+0" title="Lag/Lead เช่น +5 หรือ -3 วัน"'}>
+                        </div>
+                        <input type="hidden" value="${safePreds}">
                     </div>
                     
                     <div class="cell w-28 shrink-0 relative overflow-hidden group/date ${disableStart ? 'bg-slate-50' : ''}">
@@ -181,6 +239,7 @@
             document.getElementById('data-body').style.height = `${totalHeight}px`;
             syncTaskNameColumnWidth();
             setupTaskNameColumnResizer();
+            applySelectedTaskRowClass();
         }
 
         function renderTimeline() {
@@ -738,9 +797,17 @@
             if (todayLayer) todayLayer.innerHTML = '';
             criticalLines.innerHTML = '';
             if (dependencyLines) dependencyLines.innerHTML = '';
+
+            if (selectedTaskRowIndex !== null && tasks[selectedTaskRowIndex]) {
+                const selectedBand = document.createElement('div');
+                selectedBand.className = 'gantt-selected-row-highlight';
+                selectedBand.style.top = `${selectedTaskRowIndex * 36}px`;
+                container.appendChild(selectedBand);
+            }
             
             const showCritical = document.getElementById('show-critical').checked;
             const showBarLabels = document.getElementById('show-bar-labels')?.checked !== false;
+            const showActualBars = document.getElementById('show-actual-bars')?.checked !== false;
 
             tasks.forEach((task, index) => {
                 let leftPx = getDateOffsetPx(task.startDateObj);
@@ -821,15 +888,18 @@
 
                 container.appendChild(bar);
 
-                if (!task.isGroup) {
+                if (showActualBars && !task.isGroup) {
                     const actualRecord = typeof getTaskActualDateRangeRecord === 'function'
                         ? getTaskActualDateRangeRecord(task.id)
                         : (typeof getLatestActualRecordForTask === 'function' ? getLatestActualRecordForTask(task.id) : null);
-                    if (actualRecord && actualRecord.percent > 0) {
+                    const actualPercent = clampNumber(barProgress, 0, 100);
+                    const hasActualRange = !!(actualRecord?.startDate && actualRecord?.endDate);
+                    if (hasActualRange && actualPercent > 0 && barProgress > 0) {
                         const actualBar = document.createElement('div');
                         const actualStartDate = new Date(actualRecord.startDate || actualRecord.date || task.startDateObj);
                         let actualEndDate = new Date(actualRecord.endDate || actualRecord.date || actualStartDate);
                         actualEndDate.setDate(actualEndDate.getDate() + 1);
+                        if (isNaN(actualStartDate.getTime()) || isNaN(actualEndDate.getTime()) || actualEndDate < actualStartDate) return;
                         const actualLeftPx = Math.max(0, getDateOffsetPx(actualStartDate));
                         const actualRightPx = Math.max(actualLeftPx + 4, getDateOffsetPx(actualEndDate));
                         actualBar.className = 'actual-gantt-bar';
@@ -837,8 +907,8 @@
                         actualBar.style.left = `${actualLeftPx}px`;
                         actualBar.style.top = `${(index * 36) + 17}px`;
                         actualBar.style.width = `${Math.max(actualRightPx - actualLeftPx, 4)}px`;
-                        actualBar.title = `${actualRecord.percent.toFixed(2)}%\n${formatDateDisplay(actualStartDate)} - ${formatDateDisplay(actualEndDate)}`;
-                        if (showBarLabels && actualRightPx - actualLeftPx > 34) actualBar.textContent = `${actualRecord.percent.toFixed(0)}%`;
+                        actualBar.title = `${actualPercent.toFixed(2)}%\n${formatDateDisplay(actualStartDate)} - ${formatDateDisplay(actualEndDate)}`;
+                        if (showBarLabels && actualRightPx - actualLeftPx > 34) actualBar.textContent = `${actualPercent.toFixed(0)}%`;
                         container.appendChild(actualBar);
                     }
                 }
@@ -1118,3 +1188,5 @@
                 container.appendChild(marker);
             });
         }
+
+setupGanttSelectionClearListener();

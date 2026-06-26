@@ -7,6 +7,23 @@
             calculateDates();
         }
 
+        function normalizePredecessorLag(lagValue) {
+            const clean = String(lagValue || '').trim().replace(/\s+/g, '');
+            if (!clean || clean === '+' || clean === '-') return '';
+            const lag = parseInt(clean, 10);
+            if (!Number.isFinite(lag) || lag === 0) return '';
+            return lag > 0 ? `+${lag}` : `${lag}`;
+        }
+
+        function updatePredecessorParts(index, wbsValue, linkType, lagValue = '') {
+            const wbs = String(wbsValue || '').trim();
+            const type = ['FS', 'FF', 'SS', 'SF'].includes(String(linkType || '').toUpperCase())
+                ? String(linkType || '').toUpperCase()
+                : 'FS';
+            const lag = normalizePredecessorLag(lagValue);
+            updateData(index, 'predecessors', wbs ? `${wbs}${type}${lag}` : '');
+        }
+
         function addMainTask() {
             let lastStart = safeFormatDate(new Date());
             if(tasks.length > 0) {

@@ -24,10 +24,11 @@
         // ระบบปุ่ม ย่อ/ขยาย พื้นที่ลงนาม
         let isSignatureVisible = true;
         function toggleSignatureVisibility() {
-            isSignatureVisible = !isSignatureVisible;
             const sigSection = document.getElementById('signature-section');
             const icon = document.getElementById('sig-toggle-icon');
             const text = document.getElementById('sig-toggle-text');
+            const isCurrentlyVisible = sigSection ? getComputedStyle(sigSection).display !== 'none' : isSignatureVisible;
+            isSignatureVisible = !isCurrentlyVisible;
             
             if(isSignatureVisible) {
                 if (currentPage !== 'cost') sigSection.style.display = 'flex';
@@ -72,12 +73,40 @@
         }
 
         // --- ระบบพิมพ์เอกสาร (บังคับพอดีหน้ากระดาษอัจฉริยะแบบแม่นยำ) ---
+        function printAppPageReport(pageName, paperSize) {
+            const pageIdMap = { actual: 'actual-page', cost: 'cost-page', duration: 'duration-page' };
+            const pageId = pageIdMap[pageName];
+            const targetPage = pageId ? document.getElementById(pageId) : null;
+            if (!targetPage) return false;
+            let styleEl = document.getElementById('app-page-print-style');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'app-page-print-style';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.textContent = '@media print { @page { size: ' + paperSize + ' landscape; margin: 8mm; } }';
+            const wasHidden = targetPage.classList.contains('page-hidden');
+            targetPage.classList.remove('page-hidden');
+            document.body.classList.add('app-page-report-print', 'print-' + pageName + '-report');
+            const cleanup = () => {
+                document.body.classList.remove('app-page-report-print', 'print-' + pageName + '-report');
+                if (wasHidden) targetPage.classList.add('page-hidden');
+                window.removeEventListener('afterprint', cleanup);
+            };
+            window.addEventListener('afterprint', cleanup);
+            setTimeout(() => window.print(), 120);
+            return true;
+        }
+
         function printReport() {
             if (currentPage === 'dashboard' && typeof printExecutiveDashboardReport === 'function') {
                 printExecutiveDashboardReport();
                 return;
             }
             const paperSize = document.getElementById('print-paper-size').value;
+            if (['actual', 'cost', 'duration'].includes(currentPage) && printAppPageReport(currentPage, paperSize)) {
+                return;
+            }
             let styleId = 'dynamic-print-style';
             let styleEl = document.getElementById(styleId);
             
@@ -160,6 +189,12 @@
             `;
             
             // หน่วงเวลาเล็กน้อยเพื่อให้ CSS อัปเดตโครงสร้างตารางก่อนสั่งปริ้นท์
+            document.body.classList.add('gantt-report-print');
+            const cleanupPrintClass = () => {
+                document.body.classList.remove('gantt-report-print');
+                window.removeEventListener('afterprint', cleanupPrintClass);
+            };
+            window.addEventListener('afterprint', cleanupPrintClass);
             setTimeout(() => {
                 window.print();
             }, 150);

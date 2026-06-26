@@ -215,16 +215,21 @@ ${actualControl}
             const actualEl = document.getElementById('actual-current-kpi');
             const varianceEl = document.getElementById('actual-variance-kpi');
             const daysEl = document.getElementById('actual-days-kpi');
+            const statusCard = document.getElementById('actual-status-kpi-card');
             if (plannedEl) plannedEl.textContent = metrics.planned.toFixed(2) + '%';
             if (actualEl) actualEl.textContent = metrics.actual.toFixed(2) + '%';
             if (varianceEl) {
                 varianceEl.textContent = (metrics.variance >= 0 ? '+' : '') + metrics.variance.toFixed(2) + '%';
-                varianceEl.className = `kpi-value ${metrics.variance >= 0 ? 'text-emerald-700' : 'text-red-700'}`;
+                varianceEl.className = 'kpi-value';
             }
             if (daysEl) {
                 const absDays = Math.abs(metrics.dayDelta);
                 daysEl.textContent = metrics.dayDelta > 0 ? `เร็วกว่า ${absDays} วัน` : metrics.dayDelta < 0 ? `ช้ากว่า ${absDays} วัน` : 'ตรงตามแผน';
-                daysEl.className = `kpi-value ${metrics.dayDelta >= 0 ? 'text-emerald-700' : 'text-red-700'}`;
+                daysEl.className = 'kpi-value';
+            }
+            if (statusCard) {
+                statusCard.classList.toggle('dashboard-kpi-status', metrics.dayDelta >= 0);
+                statusCard.classList.toggle('dashboard-kpi-danger', metrics.dayDelta < 0);
             }
         }
 
@@ -301,6 +306,209 @@ ${actualControl}
             if (signatureSection) signatureSection.style.display = isDocumentPage && isSignatureVisible ? 'flex' : 'none';
         }
 
+        const workflowGuidelinePositionKey = 'buildplan.workflowGuideline.position';
+
+        function getWorkflowGuidelineRoute() {
+            return document.body?.dataset?.appRoute || (location.hash || '#home').replace('#', '') || 'home';
+        }
+
+        function getWorkflowGuidelineWidth(panel) {
+            if (!panel) return 58;
+            if (panel.classList.contains('workflow-guideline-collapsed')) return 58;
+            return Math.min(318, Math.max(58, window.innerWidth - 16));
+        }
+
+        function applyWorkflowGuidelinePosition(left, top, persist = true) {
+            const panel = document.getElementById('workflow-guideline');
+            if (!panel) return;
+            const margin = 8;
+            const width = getWorkflowGuidelineWidth(panel);
+            const height = Math.min(panel.offsetHeight || 58, window.innerHeight - (margin * 2));
+            const maxLeft = Math.max(margin, window.innerWidth - width - margin);
+            const maxTop = Math.max(margin, window.innerHeight - height - margin);
+            const nextLeft = Math.min(Math.max(margin, left), maxLeft);
+            const nextTop = Math.min(Math.max(margin, top), maxTop);
+
+            panel.style.left = nextLeft + 'px';
+            panel.style.top = nextTop + 'px';
+            panel.style.right = 'auto';
+            panel.style.bottom = 'auto';
+            panel.classList.toggle('workflow-guideline-side-right', nextLeft + (width / 2) > window.innerWidth / 2);
+
+            if (persist) {
+                try {
+                    localStorage.setItem(workflowGuidelinePositionKey, JSON.stringify({ left: nextLeft, top: nextTop }));
+                } catch (_error) {}
+            }
+        }
+
+        function restoreWorkflowGuidelinePosition() {
+            const panel = document.getElementById('workflow-guideline');
+            if (!panel) return;
+            let position = null;
+            try {
+                position = JSON.parse(localStorage.getItem(workflowGuidelinePositionKey) || 'null');
+            } catch (_error) {}
+            const fallbackLeft = parseFloat(panel.style.left) || 10;
+            const fallbackTop = parseFloat(panel.style.top) || 146;
+            applyWorkflowGuidelinePosition(
+                Number.isFinite(position?.left) ? position.left : fallbackLeft,
+                Number.isFinite(position?.top) ? position.top : fallbackTop,
+                false
+            );
+        }
+
+        function setupWorkflowGuidelineDrag() {
+            const panel = document.getElementById('workflow-guideline');
+            const handle = document.getElementById('workflow-guideline-toggle');
+            if (!panel || !handle || panel.dataset.dragBound === '1') return;
+            panel.dataset.dragBound = '1';
+
+            handle.addEventListener('click', (event) => {
+                if (panel.dataset.suppressToggle === '1') {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    delete panel.dataset.suppressToggle;
+                }
+            }, true);
+
+            handle.addEventListener('pointerdown', (event) => {
+                if (event.button !== undefined && event.button !== 0) return;
+                panel.dataset.pointerDragActive = '1';
+                const rect = panel.getBoundingClientRect();
+                const startX = event.clientX;
+                const startY = event.clientY;
+                let moved = false;
+
+                const onPointerMove = (moveEvent) => {
+                    const dx = moveEvent.clientX - startX;
+                    const dy = moveEvent.clientY - startY;
+                    if (!moved && Math.hypot(dx, dy) < 4) return;
+                    moved = true;
+                    panel.classList.add('is-dragging');
+                    applyWorkflowGuidelinePosition(rect.left + dx, rect.top + dy, false);
+                };
+
+                const onPointerUp = () => {
+                    handle.releasePointerCapture?.(event.pointerId);
+                    handle.removeEventListener('pointermove', onPointerMove);
+                    handle.removeEventListener('pointerup', onPointerUp);
+                    handle.removeEventListener('pointercancel', onPointerUp);
+                    window.removeEventListener('pointerup', onPointerUp);
+                    window.removeEventListener('pointercancel', onPointerUp);
+                    delete panel.dataset.pointerDragActive;
+                    panel.classList.remove('is-dragging');
+                    if (moved) {
+                        panel.dataset.suppressToggle = '1';
+                        const nextRect = panel.getBoundingClientRect();
+                        applyWorkflowGuidelinePosition(nextRect.left, nextRect.top, true);
+                    }
+                };
+
+                handle.setPointerCapture?.(event.pointerId);
+                handle.addEventListener('pointermove', onPointerMove);
+                handle.addEventListener('pointerup', onPointerUp);
+                handle.addEventListener('pointercancel', onPointerUp);
+                window.addEventListener('pointerup', onPointerUp);
+                window.addEventListener('pointercancel', onPointerUp);
+            });
+
+            handle.addEventListener('mousedown', (event) => {
+                if (event.button !== 0 || panel.dataset.pointerDragActive === '1') return;
+                const rect = panel.getBoundingClientRect();
+                const startX = event.clientX;
+                const startY = event.clientY;
+                let moved = false;
+
+                const onMouseMove = (moveEvent) => {
+                    const dx = moveEvent.clientX - startX;
+                    const dy = moveEvent.clientY - startY;
+                    if (!moved && Math.hypot(dx, dy) < 4) return;
+                    moved = true;
+                    panel.classList.add('is-dragging');
+                    applyWorkflowGuidelinePosition(rect.left + dx, rect.top + dy, false);
+                };
+
+                const onMouseUp = () => {
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                    panel.classList.remove('is-dragging');
+                    if (moved) {
+                        panel.dataset.suppressToggle = '1';
+                        const nextRect = panel.getBoundingClientRect();
+                        applyWorkflowGuidelinePosition(nextRect.left, nextRect.top, true);
+                    }
+                };
+
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+        }
+
+        function syncWorkflowGuidelineForRoute(route = getWorkflowGuidelineRoute()) {
+            setupWorkflowGuidelineDrag();
+            if (route === 'workspace') {
+                restoreWorkflowGuidelinePosition();
+                updateWorkflowGuidelineState();
+            }
+        }
+
+        function hasWorkflowStepData(step) {
+            if (step === 1) {
+                return (tasks || []).some(task => !task.isMilestone && (task.name || task.start || task.duration));
+            }
+            if (step === 2) {
+                const projectValue = parseFloat(String(document.getElementById('project-value')?.value || '').replace(/,/g, '')) || 0;
+                return projectValue > 0 || (tasks || []).some(task => (parseFloat(task.cost) || 0) > 0);
+            }
+            if (step === 3) {
+                const hasInstallments = (parseInt(installmentSettings?.count, 10) || 0) > 0;
+                const hasDurationAllocations = Object.values(durationPlanSettings || {}).some(entry => {
+                    return Object.values(entry?.allocations || {}).some(value => (parseFloat(value) || 0) > 0);
+                });
+                return hasInstallments || hasDurationAllocations;
+            }
+            if (step === 4) {
+                return Object.values(actualEntries || {}).some(snapshot => {
+                    return Object.values(snapshot || {}).some(value => (parseFloat(value) || 0) > 0);
+                });
+            }
+            if (step === 5) {
+                return hasWorkflowStepData(4) || (dashboardPhotos || []).length > 0;
+            }
+            return false;
+        }
+
+        function updateWorkflowGuidelineState() {
+            document.querySelectorAll('.workflow-step').forEach(stepEl => {
+                const step = parseInt(stepEl.dataset.guideStep, 10);
+                const pageMap = { 1: 'gantt', 2: 'cost', 3: 'duration', 4: 'actual', 5: 'dashboard' };
+                stepEl.classList.toggle('is-complete', hasWorkflowStepData(step));
+                stepEl.classList.toggle('is-active', pageMap[step] === currentPage);
+            });
+        }
+
+        function toggleWorkflowGuideline(forceOpen = null) {
+            const panel = document.getElementById('workflow-guideline');
+            const toggle = document.getElementById('workflow-guideline-toggle');
+            if (!panel) return;
+            setupWorkflowGuidelineDrag();
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : panel.classList.contains('workflow-guideline-collapsed');
+            panel.classList.toggle('workflow-guideline-collapsed', !shouldOpen);
+            if (toggle) toggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+            requestAnimationFrame(() => {
+                const rect = panel.getBoundingClientRect();
+                applyWorkflowGuidelinePosition(rect.left, rect.top, true);
+                if (shouldOpen) updateWorkflowGuidelineState();
+            });
+        }
+
+        function openGuidelineStep(page) {
+            if (typeof switchPage === 'function') switchPage(page);
+            toggleWorkflowGuideline(true);
+            updateWorkflowGuidelineState();
+        }
+
         function switchPage(page) {
             updateSidebarOffset();
             const pages = {
@@ -365,7 +573,15 @@ ${actualControl}
             } else {
                 showTargetPage();
             }
+            updateWorkflowGuidelineState();
+            syncWorkflowGuidelineForRoute('workspace');
         }
+
+        window.addEventListener('buildplan:app-route', (event) => {
+            syncWorkflowGuidelineForRoute(event.detail?.route);
+        });
+        window.addEventListener('resize', () => restoreWorkflowGuidelinePosition());
+        document.addEventListener('DOMContentLoaded', () => syncWorkflowGuidelineForRoute());
 
         function getTaskFinalValueMap() {
             const map = new Map();
@@ -520,6 +736,32 @@ ${actualControl}
             return 'ตามแผน';
         }
 
+        function getDashboardInstallmentSummary(dateKey = getDashboardSelectedDateKey()) {
+            const empty = {
+                current: 0,
+                total: 0,
+                paid: 0,
+                label: '- / -',
+                status: '&#3618;&#3633;&#3591;&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3626;&#3619;&#3657;&#3634;&#3591;&#3591;&#3623;&#3604;&#3591;&#3634;&#3609;',
+                isLate: false
+            };
+            const schedule = typeof getInstallmentSchedule === 'function' ? getInstallmentSchedule() : [];
+            if (!schedule.length) return empty;
+            const targetKey = /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey)) ? String(dateKey) : safeFormatDate(new Date());
+            const currentItem = schedule.find(item => safeFormatDate(item.dateObj) >= targetKey) || schedule[schedule.length - 1];
+            const paidItems = schedule.filter(item => item.paymentDateKey && item.paymentDateKey <= targetKey);
+            const currentNo = currentItem?.no || schedule.length;
+            const isLate = paidItems.length < currentNo;
+            return {
+                current: currentNo,
+                total: schedule.length,
+                paid: paidItems.length,
+                isLate,
+                label: paidItems.length + ' / ' + schedule.length,
+                status: isLate ? '&#3621;&#3656;&#3634;&#3594;&#3657;&#3634;: &#3588;&#3623;&#3619;&#3648;&#3610;&#3636;&#3585;&#3606;&#3638;&#3591;&#3591;&#3623;&#3604;&#3607;&#3637;&#3656; ' + currentNo : '&#3611;&#3633;&#3592;&#3592;&#3640;&#3610;&#3633;&#3609;&#3605;&#3657;&#3629;&#3591;&#3648;&#3610;&#3636;&#3585;&#3606;&#3638;&#3591;&#3591;&#3623;&#3604;&#3607;&#3637;&#3656; ' + currentNo
+            };
+        }
+
         function computeProjectMetrics(dateKey = getDashboardSelectedDateKey()) {
             const workTasks = tasks.filter(task => !task.isGroup && !task.isMilestone);
             const milestones = tasks.filter(task => task.isMilestone);
@@ -541,8 +783,9 @@ ${actualControl}
             const dayDelta = actualVariance.dayDelta || 0;
             const paidValue = typeof getCumulativePaidValueAtDate === 'function' ? getCumulativePaidValueAtDate(dateKey) : (typeof getLatestCumulativePaidValue === 'function' ? getLatestCumulativePaidValue() : 0);
             const valueDelta = actualValue - paidValue;
+            const installmentSummary = getDashboardInstallmentSummary(dateKey);
             const status = metricsStatusText(dayDelta, overdue.length);
-            return { dateKey, workTasks, milestones, projectTotal, actualValue, paidValue, valueDelta, actualProgress, plannedProgress, variance, dayDelta, status, overdue, inProgress, complete, upcoming, critical };
+            return { dateKey, workTasks, milestones, projectTotal, actualValue, paidValue, valueDelta, installmentSummary, actualProgress, plannedProgress, variance, dayDelta, status, overdue, inProgress, complete, upcoming, critical };
         }
 
         function renderDashboardBar(label, value, colorClass) {
@@ -584,7 +827,7 @@ ${actualControl}
 
 
         function renderExecutiveReportTasks(taskList, emptyText) {
-            const items = (taskList || []).slice(0, 5);
+            const items = (taskList || []).slice(0, 3);
             if (!items.length) return '<div class="exec-empty">' + escapeDashboardReportHtml(emptyText) + '</div>';
             return items.map(task => {
                 const startRecord = getTaskActualStartRecord(task.id);
@@ -605,7 +848,7 @@ ${actualControl}
             if (!report) return;
             const reportDate = new Date(metrics.dateKey + 'T00:00:00');
             const projectName = getDashboardFieldValue(['proj-name', 'project-name'], 'Construction Project');
-            const includedPhotos = normalizeDashboardPhotos(dashboardPhotos).filter(photo => photo.include !== false).slice(0, 6);
+            const includedPhotos = normalizeDashboardPhotos(dashboardPhotos).filter(photo => photo.include !== false).slice(0, 3);
             const photoMarkup = includedPhotos.length ? includedPhotos.map((photo, index) => {
                 const date = new Date(dashboardPhotoDateValue(photo) + 'T00:00:00');
                 return '<figure class="exec-photo-card">' +
@@ -639,7 +882,7 @@ ${actualControl}
                     '<div class="exec-panel"><h2>Critical Path</h2>' + renderExecutiveReportTasks(metrics.critical, 'No critical path') + '</div>' +
                     '<div class="exec-panel"><h2>Upcoming Work</h2>' + renderExecutiveReportTasks(metrics.upcoming, 'No upcoming work') + '</div>' +
                 '</section>' +
-                '<section class="exec-photo-section"><div class="exec-section-title"><h2>Site Progress Photos</h2><span>' + includedPhotos.length + ' selected</span></div><div class="exec-photo-grid">' + photoMarkup + '</div></section>' +
+                (includedPhotos.length ? '<section class="exec-photo-section"><div class="exec-section-title"><h2>Site Progress Photos</h2><span>' + includedPhotos.length + ' selected</span></div><div class="exec-photo-grid">' + photoMarkup + '</div></section>' : '') +
             '</div>';
         }
 
@@ -651,14 +894,29 @@ ${actualControl}
                 styleEl.id = 'executive-dashboard-print-style';
                 document.head.appendChild(styleEl);
             }
-            styleEl.textContent = '@media print { @page { size: ' + paperSize + ' landscape; margin: 8mm; } }';
+            styleEl.textContent = '@media print { @page { size: ' + paperSize + ' landscape; margin: 5mm; } }';
             renderExecutivePrintReport();
             const report = document.getElementById('executive-print-report');
+            let standaloneReport = document.getElementById('executive-print-standalone');
+            if (!standaloneReport) {
+                standaloneReport = document.createElement('section');
+                standaloneReport.id = 'executive-print-standalone';
+                standaloneReport.setAttribute('aria-hidden', 'true');
+                document.body.appendChild(standaloneReport);
+            }
+            standaloneReport.innerHTML = report?.innerHTML || '<div class="exec-report-page"><div class="exec-empty">No dashboard report data</div></div>';
+            const dashboardPage = document.getElementById('dashboard-page');
+            const dashboardWasHidden = dashboardPage?.classList.contains('page-hidden');
+            if (dashboardPage) dashboardPage.classList.remove('page-hidden');
             document.body.classList.add('executive-dashboard-print');
             if (report) report.setAttribute('aria-hidden', 'false');
+            standaloneReport.setAttribute('aria-hidden', 'false');
             const cleanup = () => {
                 document.body.classList.remove('executive-dashboard-print');
+                if (dashboardPage && dashboardWasHidden) dashboardPage.classList.add('page-hidden');
                 if (report) report.setAttribute('aria-hidden', 'true');
+                standaloneReport.setAttribute('aria-hidden', 'true');
+                standaloneReport.innerHTML = '';
                 window.removeEventListener('afterprint', cleanup);
             };
             window.addEventListener('afterprint', cleanup);
@@ -682,14 +940,19 @@ ${actualControl}
                 healthChip.className = 'health-chip ' + healthClass;
                 healthChip.innerHTML = `<i class="fa-solid fa-circle-check"></i>${healthText}`;
             }
+            const isLate = metrics.overdue.length > 0 || metrics.dayDelta < 0;
+            const statusCardClass = isLate ? 'dashboard-kpi-danger' : 'dashboard-kpi-status';
+            const statusIcon = isLate ? 'fa-triangle-exclamation' : 'fa-flag';
+            kpis.className = 'dashboard-kpi-grid';
             kpis.innerHTML = `
-                <div class="kpi-card"><div class="kpi-label">Plan Progress</div><div class="kpi-value text-blue-700">${metrics.plannedProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ความคืบหน้าตามแผนสะสม</div></div>
-                <div class="kpi-card"><div class="kpi-label">Actual Progress</div><div class="kpi-value text-emerald-700">${metrics.actualProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ผลงานจริงจาก Actual Tracking</div></div>
-                <div class="kpi-card"><div class="kpi-label">Variance</div><div class="kpi-value ${metrics.variance >= 0 ? 'text-emerald-700' : 'text-red-700'}">${metrics.variance >= 0 ? '+' : ''}${metrics.variance.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">Actual - Plan</div></div>
-                <div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value ${metrics.dayDelta < 0 || metrics.overdue.length ? 'text-red-700' : metrics.dayDelta > 0 ? 'text-emerald-700' : 'text-narit-blue'}">${metrics.status}</div><div class="text-xs text-slate-500 mt-2">สถานะ ณ ${formatDateDisplay(new Date(metrics.dateKey + 'T00:00:00'))}</div></div>
-                <div class="kpi-card"><div class="kpi-label">มูลค่างานที่ทำได้</div><div class="kpi-value text-narit-blue">${formatMoneyDisplay(metrics.actualValue)}</div><div class="text-xs text-slate-500 mt-2">มูลค่าโครงการ x %Actual</div></div>
-                <div class="kpi-card"><div class="kpi-label">มูลค่างานที่เบิก</div><div class="kpi-value text-emerald-700">${formatMoneyDisplay(metrics.paidValue)}</div><div class="text-xs text-slate-500 mt-2">จากเบิกจ่ายสะสมตามวันที่รายงาน</div></div>
-                <div class="kpi-card"><div class="kpi-label">มูลค่าส่วนต่าง</div><div class="kpi-value ${metrics.valueDelta >= 0 ? 'text-blue-700' : 'text-red-700'}">${formatMoneyDisplay(metrics.valueDelta)}</div><div class="text-xs text-slate-500 mt-2">มูลค่างานที่ทำได้ - มูลค่างานที่เบิก</div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-blue"><div class="dashboard-kpi-icon"><i class="fa-solid fa-bullseye"></i></div><div><div class="kpi-label">Plan Progress</div><div class="kpi-value">${metrics.plannedProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ความคืบหน้าตามแผนสะสม</div></div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-green"><div class="dashboard-kpi-icon"><i class="fa-solid fa-chart-simple"></i></div><div><div class="kpi-label">Actual Progress</div><div class="kpi-value">${metrics.actualProgress.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">ผลงานจริงจาก Actual Tracking</div></div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-teal"><div class="dashboard-kpi-icon"><i class="fa-solid fa-scale-balanced"></i></div><div><div class="kpi-label">Variance</div><div class="kpi-value">${metrics.variance >= 0 ? '+' : ''}${metrics.variance.toFixed(2)}%</div><div class="text-xs text-slate-500 mt-2">Actual - Plan</div></div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-status-summary ${statusCardClass}"><div class="dashboard-kpi-icon"><i class="fa-solid ${statusIcon}"></i></div><div><div class="kpi-label">สรุปสถานะโครงการ</div><div class="kpi-value">${metrics.status}</div><div class="text-xs text-slate-500 mt-2">สถานะ ณ ${formatDateDisplay(new Date(metrics.dateKey + 'T00:00:00'))}</div></div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-blue"><div class="dashboard-kpi-icon"><i class="fa-solid fa-sack-dollar"></i></div><div><div class="kpi-label">มูลค่างานที่ทำได้</div><div class="kpi-value">${formatMoneyDisplay(metrics.actualValue)}</div><div class="text-xs text-slate-500 mt-2">มูลค่าโครงการ x %Actual</div></div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-green"><div class="dashboard-kpi-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div><div><div class="kpi-label">มูลค่างานที่เบิก</div><div class="kpi-value">${formatMoneyDisplay(metrics.paidValue)}</div><div class="text-xs text-slate-500 mt-2">จากเบิกจ่ายสะสมตามวันที่รายงาน</div></div></div>
+                <div class="kpi-card dashboard-kpi-card dashboard-kpi-blue"><div class="dashboard-kpi-icon"><i class="fa-solid fa-calculator"></i></div><div><div class="kpi-label">มูลค่าส่วนต่าง</div><div class="kpi-value">${formatMoneyDisplay(metrics.valueDelta)}</div><div class="text-xs text-slate-500 mt-2">มูลค่างานที่ทำได้ - มูลค่างานที่เบิก</div></div></div>
+                <div class="kpi-card dashboard-kpi-card ${metrics.installmentSummary.isLate ? 'dashboard-kpi-danger' : 'dashboard-kpi-teal'}"><div class="dashboard-kpi-icon"><i class="fa-solid ${metrics.installmentSummary.isLate ? 'fa-triangle-exclamation' : 'fa-calendar-check'}"></i></div><div><div class="kpi-label">&#3612;&#3621;&#3585;&#3634;&#3619;&#3648;&#3610;&#3636;&#3585;&#3591;&#3623;&#3604;&#3591;&#3634;&#3609;</div><div class="kpi-value">${metrics.installmentSummary.label}</div><div class="text-xs text-slate-500 mt-2">${metrics.installmentSummary.status}</div></div></div>
             `;
             const varianceEl = document.getElementById('dashboard-variance');
             if (varianceEl) varianceEl.textContent = 'Variance ' + varianceText;
@@ -703,4 +966,5 @@ ${actualControl}
             if (criticalList) criticalList.innerHTML = renderDashboardList(metrics.critical.slice(0, 8), 'ยังไม่มี critical path');
             const upcomingList = document.getElementById('dashboard-upcoming-list');
             if (upcomingList) upcomingList.innerHTML = renderDashboardList(metrics.upcoming, 'ยังไม่มีงานถัดไป');
+            updateWorkflowGuidelineState();
         }

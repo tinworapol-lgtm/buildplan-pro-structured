@@ -125,6 +125,9 @@
             actualSettings = normalizeActualSettings(projectData.actualSettings || actualSettings);
             actualEntries = normalizeActualEntries(projectData.actualEntries || {});
             dashboardPhotos = normalizeDashboardPhotos(projectData.dashboardPhotos || []);
+            if (typeof syncTaskProgressFromActual === 'function') {
+                syncTaskProgressFromActual(getLatestActualEntryDateKey?.() || getActualSelectedDateKey?.());
+            }
             if (projectData.prefs) {
                 userScalePreference = projectData.prefs.userScalePreference || userScalePreference;
                 ganttBarStyleMode = projectData.prefs.ganttBarStyleMode || ganttBarStyleMode;
@@ -144,6 +147,12 @@
             historyStack = [];
             currentHistoryIndex = -1;
             calculateDates(true);
+            requestAnimationFrame(() => {
+                renderTimeline();
+                renderGanttBars();
+                renderGanttSCurveOverlay();
+                renderDashboard();
+            });
             normalizeCostSettingsInputs();
             updateAutoSaveStatus();
         }

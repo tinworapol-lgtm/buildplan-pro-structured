@@ -141,7 +141,7 @@
                         <div class="flex flex-col sm:flex-row gap-2">${dayWarning}${percentWarning}</div>
                     </div>
                     <div class="overflow-auto custom-scrollbar border border-slate-200 rounded-xl bg-white">
-                        <table class="w-full min-w-[1280px] text-[12px]">
+                        <table class="w-full min-w-[1360px] text-[12px] installment-schedule-table">
                             <thead class="bg-slate-50 text-slate-800">
                                 <tr>
                                     <th class="border border-slate-200 px-2 py-2 text-center">งวดงานที่</th>
@@ -153,6 +153,7 @@
                                     <th class="border border-slate-200 px-2 py-2 text-right">มูลค่างวดงาน (บาท)</th>
                                     <th class="border border-slate-200 px-2 py-2 text-right">มูลค่างวดงานสะสม (บาท)</th>
                                     <th class="border border-slate-200 px-2 py-2 text-center">เบิกจ่ายแล้ว</th>
+                                    <th class="border border-slate-200 px-2 py-2 text-center">ผลการเบิกจ่าย</th>
                                     <th class="border border-slate-200 px-2 py-2 text-right">เบิกจ่ายสะสม</th>
                                 </tr>
                             </thead>
@@ -171,11 +172,11 @@
                                         <td class="border border-slate-200 px-2 py-2 text-center font-black ${Math.abs(item.cumulativePercent - 100) <= 0.01 ? 'text-emerald-700' : item.cumulativePercent > 100 ? 'text-red-700' : 'text-slate-700'}">${item.cumulativePercent.toFixed(2)}%</td>
                                         <td class="border border-slate-200 px-2 py-2 text-right font-bold text-slate-800">${formatMoneyDisplay(item.installmentValue)}</td>
                                         <td class="border border-slate-200 px-2 py-2 text-right font-black text-narit-blue">${formatMoneyDisplay(item.cumulativeValue)}</td>
-                                        <td class="border border-slate-200 px-2 py-2">
-                                            <div class="flex flex-col gap-1">
-                                                <input type="date" value="${item.paymentDateKey}" onchange="updateInstallmentPaymentDate(${item.no}, this.value)" class="rounded-lg border border-slate-300 px-2 py-1 text-center font-bold">
-                                                ${item.paymentDateKey ? `<div class="rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-center text-[11px] font-black text-emerald-700">เบิกจ่ายแล้ว ${formatMoneyDisplay(item.paidValue)} บาท</div>` : '<div class="text-center text-[11px] font-bold text-slate-400">ยังไม่เบิกจ่าย</div>'}
-                                            </div>
+                                        <td class="border border-slate-200 px-2 py-2 text-center">
+                                            <input type="date" value="${item.paymentDateKey}" onchange="updateInstallmentPaymentDate(${item.no}, this.value)" class="installment-payment-date rounded-lg border border-slate-300 px-2 py-1 text-center font-bold">
+                                        </td>
+                                        <td class="border border-slate-200 px-2 py-2 text-center">
+                                            ${item.paymentDateKey ? `<span class="installment-payment-status paid">เบิกจ่ายแล้ว</span><div class="installment-payment-value">${formatMoneyDisplay(item.paidValue)} บาท</div>` : '<span class="installment-payment-status unpaid">ยังไม่เบิกจ่าย</span>'}
                                         </td>
                                         <td class="border border-slate-200 px-2 py-2 text-right font-black text-emerald-700">${formatMoneyDisplay(item.cumulativePaidValue)}</td>
                                     </tr>
@@ -547,6 +548,21 @@
             return true;
         }
 
+
+        function applyDurationPlanSingle(taskId) {
+            const task = tasks.find(item => String(item.id) === String(taskId));
+            if (!task || !isTaskDurationPlanEditable(task)) return;
+            if (Math.abs(getDurationPlanTotal(task.id) - 100) > 0.01) {
+                showAppAlert({ icon: 'warning', title: '&#3612;&#3621;&#3619;&#3623;&#3617; % &#3618;&#3633;&#3591;&#3652;&#3617;&#3656;&#3588;&#3619;&#3610;', text: '&#3585;&#3619;&#3640;&#3603;&#3634;&#3651;&#3626;&#3656; % &#3651;&#3627;&#3657;&#3619;&#3623;&#3617;&#3648;&#3607;&#3656;&#3634;&#3585;&#3633;&#3610; 100% &#3585;&#3656;&#3629;&#3609;&#3611;&#3619;&#3633;&#3610; Gantt Chart' });
+                return;
+            }
+            if (applyDurationPlanToTask(task.id, true)) {
+                renderUI();
+                scheduleAutoSave();
+                finishProcessingAlert({ icon: 'success', title: '&#3611;&#3619;&#3633;&#3610; Gantt Chart &#3649;&#3621;&#3657;&#3623;', text: '&#3611;&#3619;&#3633;&#3610;&#3648;&#3593;&#3614;&#3634;&#3632;&#3619;&#3634;&#3618;&#3585;&#3634;&#3619;&#3607;&#3637;&#3656;&#3648;&#3621;&#3639;&#3629;&#3585;' });
+            }
+        }
+
         function applyDurationPlanToAll() {
             showProcessingAlert('กำลังปรับแผนงาน', 'ระบบกำลังนำระยะเวลางานไปใช้กับ Gantt');
             setTimeout(() => {
@@ -613,6 +629,7 @@
                         <div class="text-lg font-black text-slate-700">ยังไม่มีข้อมูลงวดงาน</div>
                         <div class="text-sm mt-2">ไปที่หน้ามูลค่าโครงการ แล้วสร้างกำหนดส่งงวดงานก่อน</div>
                     </div>`;
+                setupDurationPlanTopScroll(0);
                 return;
             }
 
@@ -627,8 +644,9 @@
                 </div>`).join('');
 
             const rows = tasks.filter(task => !task.isMilestone).map(task => renderDurationPlanRow(task, periods, compact)).join('');
-            const minTableWidth = compact.no + compact.name + compact.days + compact.total + compact.start + compact.range + (compact.period * periods.length);
+            const minTableWidth = compact.no + compact.name + compact.days + compact.total + compact.start + compact.action + (compact.period * periods.length);
             table.innerHTML = `
+                <div class="duration-plan-title duration-plan-title-with-actions"><span>&#3605;&#3634;&#3619;&#3634;&#3591;&#3649;&#3610;&#3656;&#3591; % &#3591;&#3623;&#3604;&#3591;&#3634;&#3609;</span><div class="duration-plan-title-actions"><button type="button" onclick="autoDistributeDurationPlan()" class="duration-plan-action-btn duration-plan-action-secondary"><i class="fa-solid fa-scale-balanced"></i> &#3648;&#3593;&#3621;&#3637;&#3656;&#3618; % &#3605;&#3634;&#3617;&#3594;&#3656;&#3623;&#3591;&#3648;&#3623;&#3621;&#3634;&#3648;&#3604;&#3636;&#3617;</button></div></div>
                 <div class="duration-plan-inner" style="min-width:${minTableWidth}px">
                 <div class="flex w-full bg-slate-50 border-b border-slate-300 sticky top-0 z-10 items-center" style="height:50px;">
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center" style="width:${compact.no}px">ที่</div>
@@ -640,11 +658,58 @@
                     ${installmentHeaders}
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center" style="width:${compact.total}px">ผลรวม</div>
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.start}px">แนะนำวันเริ่ม</div>
-                    <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.range}px">ช่วงวันที่คำนวณ</div>
+                    <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.action}px">&#3611;&#3619;&#3633;&#3610; Gantt Chart</div>
                 </div>
                 <div>${rows || '<div class="px-6 py-8 text-center text-slate-400 text-sm">ยังไม่มีรายการปฏิบัติงาน</div>'}</div>
                 </div>`;
             setupDurationNameColumnResizer();
+            setupDurationPlanTopScroll(minTableWidth);
+        }
+
+        function selectDurationPlanRow(taskId) {
+            const table = document.getElementById('duration-plan-table');
+            if (!table) return;
+            table.querySelectorAll('.duration-plan-row.is-selected').forEach(row => row.classList.remove('is-selected'));
+            const row = table.querySelector(`[data-duration-task-id="${taskId}"]`);
+            if (row) row.classList.add('is-selected');
+        }
+
+        function setupDurationPlanSelectionClearListener() {
+            if (document.body.dataset.durationSelectionClearBound === '1') return;
+            document.body.dataset.durationSelectionClearBound = '1';
+            document.addEventListener('click', (event) => {
+                if (currentPage !== 'duration') return;
+                const target = event.target;
+                if (target?.closest?.('.duration-plan-row, #duration-plan-top-scroll, #duration-page .no-print, #top-ribbon, #workflow-guideline, input, select, textarea, button')) return;
+                document.querySelectorAll('#duration-plan-table .duration-plan-row.is-selected').forEach(row => row.classList.remove('is-selected'));
+            });
+        }
+
+        function setupDurationPlanTopScroll(width = 0) {
+            const topScroll = document.getElementById('duration-plan-top-scroll');
+            const spacer = document.getElementById('duration-plan-top-spacer');
+            const bottomScroll = document.getElementById('duration-plan-scroll-wrap');
+            if (!topScroll || !spacer || !bottomScroll) return;
+
+            const scrollWidth = Math.max(width, bottomScroll.scrollWidth || 0);
+            topScroll.style.display = scrollWidth > bottomScroll.clientWidth ? 'block' : 'none';
+            spacer.style.width = scrollWidth + 'px';
+
+            if (topScroll.dataset.bound === '1') return;
+            topScroll.dataset.bound = '1';
+            let syncing = false;
+            topScroll.addEventListener('scroll', () => {
+                if (syncing) return;
+                syncing = true;
+                bottomScroll.scrollLeft = topScroll.scrollLeft;
+                syncing = false;
+            });
+            bottomScroll.addEventListener('scroll', () => {
+                if (syncing) return;
+                syncing = true;
+                topScroll.scrollLeft = bottomScroll.scrollLeft;
+                syncing = false;
+            });
         }
 
         function clampDurationTaskNameColumnWidth(value) {
@@ -654,27 +719,17 @@
         function getDurationTableLayout(tableWidth, periodCount) {
             const no = 50;
             const days = 70;
-            const total = 84;
+            const total = 92;
             const start = 150;
-            const range = 142;
+            const action = 118;
             const count = Math.max(1, periodCount);
-            const minPeriod = 58;
-            const maxPeriod = 92;
-            const fixedWidth = no + days + total + start + range;
-            const available = Math.max(260, tableWidth - fixedWidth);
-            const maxName = Math.max(130, available - (minPeriod * count));
-            let name = Math.min(maxName, clampDurationTaskNameColumnWidth(durationTaskNameColumnWidth));
-            let period = Math.floor((available - name) / count);
-            if (period > maxPeriod) {
-                period = maxPeriod;
-                name = available - (period * count);
-            }
-            if (period < minPeriod) {
-                period = minPeriod;
-                name = Math.max(80, available - (period * count));
-            }
-            durationTaskNameColumnWidth = clampDurationTaskNameColumnWidth(name);
-            return { no, name, days, period, total, start, range };
+            const minPeriod = 72;
+            const maxPeriod = 96;
+            const fixedWidth = no + days + total + start + action;
+            const name = clampDurationTaskNameColumnWidth(durationTaskNameColumnWidth);
+            const available = Math.max(0, tableWidth - fixedWidth - name);
+            const period = Math.min(maxPeriod, Math.max(minPeriod, Math.floor(available / count) || minPeriod));
+            return { no, name, days, period, total, start, action };
         }
 
         function setupDurationNameColumnResizer() {
@@ -715,9 +770,10 @@
             const nameClass = task.isGroup ? 'font-bold text-slate-800' : 'text-slate-700';
             const pctCells = periods.map(period => {
                 const value = entry.allocations?.[period.no] || '';
+                const hasValue = parseFloat(value) > 0;
                 return `
-                    <div class="cell shrink-0 justify-center px-1" style="width:${compact.period}px">
-                        ${editable ? `<div class="flex items-center justify-center gap-1 min-w-0"><input type="number" min="0" max="100" step="0.01" value="${value}" onchange="updateDurationPlanPercent(${task.id}, ${period.no}, this.value)" class="work-duration-percent"><span class="text-[11px] font-bold text-slate-400">%</span></div>` : '<span class="text-xs text-slate-400">-</span>'}
+                    <div class="cell shrink-0 justify-center px-1 work-duration-percent-cell ${hasValue ? 'has-value' : ''}" style="width:${compact.period}px">
+                        ${editable ? `<div class="flex items-center justify-center gap-1 min-w-0"><input type="number" min="0" max="100" step="0.01" value="${value}" onchange="updateDurationPlanPercent(${task.id}, ${period.no}, this.value)" class="work-duration-percent"><span class="work-duration-percent-sign">%</span></div>` : '<span class="text-xs text-slate-400">-</span>'}
                     </div>`;
             }).join('');
             const options = suggestion.options?.length ? suggestion.options.map(option => `
@@ -727,11 +783,11 @@
                 <select class="work-duration-select" onchange="updateDurationPlanStartMode(${task.id}, this.value)">
                     ${options}
                 </select>` : `<span class="text-xs font-bold text-slate-400">${suggestion.message || '-'}</span>`;
-            const rangeHtml = suggestion.valid && suggestion.startDate
-                ? `${formatDateDisplay(suggestion.startDate)} - ${formatDateDisplay(suggestion.endDate)}${suggestion.warning ? '<br><span class="text-[10px] text-amber-700">' + suggestion.warning + '</span>' : ''}`
-                : '-';
+            const actionHtml = editable
+                ? `<button type="button" onclick="applyDurationPlanSingle(${task.id})" class="duration-plan-row-action" ${totalOk ? '' : 'title="ต้องใส่ % รวม 100% ก่อน"'}><i class="fa-solid fa-arrow-right-to-bracket"></i> Gantt</button>`
+                : '<span class="text-xs font-bold text-slate-400">-</span>';
             return `
-                <div class="flex w-full row-height border-b border-slate-100 ${rowClass}">
+                <div class="flex w-full row-height border-b border-slate-100 duration-plan-row ${rowClass}" onclick="selectDurationPlanRow(${task.id})" onfocusin="selectDurationPlanRow(${task.id})" data-duration-task-id="${task.id}">
                     <div class="cell shrink-0 justify-center text-[11px] font-bold" style="width:${compact.no}px">${task.wbs || ''}</div>
                     <div class="cell shrink-0 px-2 text-[12px] leading-tight overflow-hidden ${nameClass}" style="width:${compact.name}px" title="${escapeTooltipHtml(task.name)}">${escapeTooltipHtml(task.name)}</div>
                     <div class="cell shrink-0 justify-center px-1" style="width:${compact.days}px">
@@ -742,7 +798,7 @@
                         <span class="text-[12px] font-black whitespace-nowrap ${totalOk ? 'text-emerald-700' : 'text-red-600'}">${editable ? total.toFixed(2) + '%' : '-'}</span>
                     </div>
                     <div class="cell shrink-0 justify-center px-1" style="width:${compact.start}px">${selectHtml}</div>
-                    <div class="cell shrink-0 justify-center px-1 text-center text-[11px] font-bold text-slate-600 leading-tight" style="width:${compact.range}px">${rangeHtml}</div>
+                    <div class="cell shrink-0 justify-center px-1" style="width:${compact.action}px">${actionHtml}</div>
                 </div>`;
         }
 
@@ -875,15 +931,37 @@
         function parsePredecessors(predString) {
             if (!predString) return [];
             return predString.split(',').map(s => {
-                let match = s.trim().match(/^([0-9.]+)\s*(FS|SS|FF|SF)?$/i);
+                let match = s.trim().match(/^([0-9.]+)\s*(FS|SS|FF|SF)?\s*([+-]\s*\d+)?$/i);
                 if (match) {
-                    return { wbs: match[1], type: (match[2] || 'FS').toUpperCase() };
+                    const lagDays = parseInt(String(match[3] || '0').replace(/\s+/g, ''), 10) || 0;
+                    return { wbs: match[1], type: (match[2] || 'FS').toUpperCase(), lagDays };
                 }
                 return null;
             }).filter(x => x);
         }
 
+        function offsetDateByDays(date, days) {
+            const next = new Date(date);
+            next.setDate(next.getDate() + (parseInt(days, 10) || 0));
+            return next;
+        }
+
+        function ensureUniqueTaskIds() {
+            const seen = new Set();
+            let changed = false;
+            (tasks || []).forEach((task, index) => {
+                const key = String(task.id || '');
+                if (!key || seen.has(key)) {
+                    task.id = Date.now() + index + Math.floor(Math.random() * 1000);
+                    changed = true;
+                }
+                seen.add(String(task.id));
+            });
+            return changed;
+        }
+
         function calculateDates(saveHistory = true) {
+            ensureUniqueTaskIds();
             let minDate = new Date("2100-01-01");
             let maxDate = new Date("1900-01-01");
 
@@ -940,6 +1018,14 @@
                 if(!t.isMilestone) t.endDateObj.setDate(t.startDateObj.getDate() + t.duration - 1);
             });
 
+            const calculationFloor = tasks.reduce((min, task) => {
+                const candidate = task.manualStartObj instanceof Date ? task.manualStartObj : new Date(task.start || '');
+                return !isNaN(candidate.getTime()) && candidate < min ? new Date(candidate) : min;
+            }, new Date("2100-01-01"));
+            if (isNaN(calculationFloor.getTime()) || calculationFloor.getFullYear() >= 2100) {
+                calculationFloor.setTime(new Date("1900-01-01").getTime());
+            }
+
             let changed = true;
             let loopCount = 0;
             const MAX_LOOPS = tasks.length * 2;
@@ -974,7 +1060,7 @@
                         }
                     } else {
                         if (t.preds.length > 0) {
-                            let candidateStart = new Date(projectStartDate);
+                            let candidateStart = new Date(calculationFloor);
                             let foundValid = false;
 
                             t.preds.forEach(pReq => {
@@ -995,6 +1081,7 @@
                                         cStart = new Date(pTask.startDateObj);
                                         cStart.setDate(cStart.getDate() - t.duration);
                                     }
+                                    cStart = offsetDateByDays(cStart, pReq.lagDays);
 
                                     if (cStart > candidateStart) {
                                         candidateStart = cStart;
@@ -1054,10 +1141,11 @@
                         let pTask = tasks.find(pt => pt.wbs === pReq.wbs);
                         if (pTask && !pTask.isCritical && !pTask.isGroup) {
                             let isTight = false;
-                            if (pReq.type === 'FS' && pTask.endDateObj.getTime() === curr.startDateObj.getTime() - 86400000) isTight = true;
-                            if (pReq.type === 'SS' && pTask.startDateObj.getTime() === curr.startDateObj.getTime()) isTight = true;
-                            if (pReq.type === 'FF' && pTask.endDateObj.getTime() === curr.endDateObj.getTime()) isTight = true;
-                            if (pReq.type === 'SF' && pTask.startDateObj.getTime() === curr.endDateObj.getTime() + 86400000) isTight = true;
+                            const lagMs = (parseInt(pReq.lagDays, 10) || 0) * 86400000;
+                            if (pReq.type === 'FS' && pTask.endDateObj.getTime() + 86400000 + lagMs === curr.startDateObj.getTime()) isTight = true;
+                            if (pReq.type === 'SS' && pTask.startDateObj.getTime() + lagMs === curr.startDateObj.getTime()) isTight = true;
+                            if (pReq.type === 'FF' && pTask.endDateObj.getTime() + lagMs === curr.endDateObj.getTime()) isTight = true;
+                            if (pReq.type === 'SF' && pTask.startDateObj.getTime() + 86400000 + lagMs === curr.endDateObj.getTime()) isTight = true;
 
                             if (isTight) {
                                 pTask.isCritical = true;
@@ -1131,3 +1219,5 @@
                 saveState();
             }
         }
+
+setupDurationPlanSelectionClearListener();
