@@ -25,6 +25,7 @@
         }
 
         function renderUI() {
+            ganttBarStyleMode = 'classic';
             renderTable();
             renderTimeline();
             renderGanttBars();

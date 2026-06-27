@@ -118,6 +118,7 @@
     renderDurationPlanTable,
     applyDurationPlanToTask,
     applyDurationPlanSingle,
+    updateDurationPlanCustomStart,
     selectDurationPlanRow,
     applyDurationPlanToAll,
     autoDistributeDurationPlan

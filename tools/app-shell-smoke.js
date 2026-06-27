@@ -148,8 +148,8 @@ check('supporter-payment-api-markers', readText('api/support.js').includes('coff
 check('supporter-payment-config', readText('assets/js/config/app-config.js').includes("checkout: '/api/support'"));
 check('supporter-status-ui-markers', html.includes('data-ct-support-status') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshSupportStatus') && readText('assets/js/services/ct-saas-mock-app.js').includes('handleSupportReturn'));
 check('supporter-public-summary-markers', html.includes('data-ct-support-public-summary') && readText('assets/js/services/ct-saas-mock-app.js').includes('refreshPublicSupportSummary'));
-check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase90'));
-check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase88') && html.includes('assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/css/buildplan.css').includes('Phase 72: 60 percent smaller today status card') && readText('assets/css/buildplan.css').includes('Phase 73: 50 percent larger compact today status') && readText('assets/css/buildplan.css').includes('Phase 74: wider today status equal typography') && readText('assets/css/buildplan.css').includes('Phase 73: IBM Plex Sans Thai global typography') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
+check('cache-busted-css', html.includes('assets/css/buildplan.css?v=phase91'));
+check('today-status-card-cache-bust', html.includes('assets/js/modules/05-gantt-rendering.js?v=phase91') && html.includes('assets/vendor/fonts/ibm-plex-sans-thai.css?v=phase73') && readText('assets/css/buildplan.css').includes('Phase 70: executive style today status card') && readText('assets/css/buildplan.css').includes('Phase 72: 60 percent smaller today status card') && readText('assets/css/buildplan.css').includes('Phase 73: 50 percent larger compact today status') && readText('assets/css/buildplan.css').includes('Phase 74: wider today status equal typography') && readText('assets/css/buildplan.css').includes('Phase 73: IBM Plex Sans Thai global typography') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-popover-card-head'));
 check('ibm-plex-font-local-assets', fs.existsSync(path.join(projectDir, 'assets/vendor/fonts/ibm-plex-sans-thai.css')) && fs.existsSync(path.join(projectDir, 'assets/vendor/fonts/ibm-plex-sans-thai/ibm-plex-sans-thai-thai-400-normal.woff2')));
 check('cache-busted-core-js', html.includes('assets/js/modules/01-core-state.js?v=phase32'));
 check('executive-dashboard-print-report', html.includes('id="dashboard-photo-manager"') && html.includes('id="executive-print-report"') && readText('assets/js/modules/06-actual-dashboard.js').includes('printExecutiveDashboardReport') && readText('assets/js/modules/03-ui-controls-print.js').includes('printExecutiveDashboardReport') && readText('assets/css/buildplan.css').includes('executive-dashboard-print'));
@@ -248,18 +248,52 @@ check('phase76-no-toolbar-escape-text', !readText('assets/css/buildplan.css').in
 
 check('phase77-compact-controls-today-layer', html.includes('id="today-line-layer"') && html.includes('plan-section-label') && readText('assets/css/buildplan.css').includes('Phase 77: compact plan controls and top today layer') && readText('assets/js/modules/05-gantt-rendering.js').includes('today-line-layer'));
 
-check('phase78-clear-today-layer-toggle-states', html.includes('assets/css/buildplan.css?v=phase90') && html.includes('assets/js/modules/05-gantt-rendering.js?v=phase88') && readText('assets/js/modules/05-gantt-rendering.js').includes("querySelectorAll('.today-line-display-zone')") && readText('assets/css/buildplan.css').includes('Phase 78: clear today layer and explicit toggle states'));
+check('phase78-clear-today-layer-toggle-states', html.includes('assets/css/buildplan.css?v=phase91') && html.includes('assets/js/modules/05-gantt-rendering.js?v=phase91') && readText('assets/js/modules/05-gantt-rendering.js').includes("querySelectorAll('.today-line-display-zone')") && readText('assets/css/buildplan.css').includes('Phase 78: clear today layer and explicit toggle states'));
 check('phase81-actual-toggle-dashboard-label', html.includes('id="show-actual-bars"') && html.includes('Dash Board') && readText('assets/js/modules/05-gantt-rendering.js').includes('showActualBars'));
-check('phase82-load-duration-guideline-installments', html.includes('assets/js/modules/04-duration-installments.js?v=phase87') && readText('assets/js/modules/04-duration-installments.js').includes('calculationFloor') && readText('assets/js/modules/04-duration-installments.js').includes('duration-plan-title-with-actions') && readText('assets/css/buildplan.css').includes('work-duration-percent-cell.has-value') && readText('assets/css/buildplan.css').includes('installment-payment-status'));
+check('phase82-load-duration-guideline-installments', html.includes('assets/js/modules/04-duration-installments.js?v=phase91') && readText('assets/js/modules/04-duration-installments.js').includes('calculationFloor') && readText('assets/js/modules/04-duration-installments.js').includes('duration-plan-title-with-actions') && readText('assets/css/buildplan.css').includes('work-duration-percent-cell.has-value') && readText('assets/css/buildplan.css').includes('installment-payment-status'));
 check('phase83-dashboard-merged-status', html.includes('assets/js/modules/06-actual-dashboard.js?v=phase87') && readText('assets/js/modules/06-actual-dashboard.js').includes('dashboard-kpi-status-summary') && readText('assets/js/modules/06-actual-dashboard.js').includes('dashboard-kpi-danger') && readText('assets/css/buildplan.css').includes('dashboard-kpi-status-summary') && readText('assets/css/buildplan.css').includes('dashboard-kpi-danger'));
 check('phase84-duration-actions-and-actual-kpis', html.includes('id="duration-plan-top-scroll"') && html.includes('id="duration-plan-scroll-wrap"') && html.includes('actual-kpi-grid') && readText('assets/js/modules/04-duration-installments.js').includes('setupDurationPlanTopScroll') && readText('assets/js/modules/06-actual-dashboard.js').includes('actual-status-kpi-card') && readText('assets/css/buildplan.css').includes('actual-kpi-grid'));
-check('phase85-duration-header-actions-compact-nav', html.includes('assets/js/modules/04-duration-installments.js?v=phase87') && html.includes('duration-installment-panel') && html.includes('duration-installment-controls') && !html.includes('class="duration-plan-actions"') && readText('assets/js/modules/04-duration-installments.js').includes('duration-plan-title-with-actions') && readText('assets/css/buildplan.css').includes('duration-plan-title-actions') && readText('assets/css/buildplan.css').includes('duration-installment-controls') && readText('assets/css/buildplan.css').includes('#top-ribbon .top-page-btn'));
+check('phase85-duration-header-actions-compact-nav', html.includes('assets/js/modules/04-duration-installments.js?v=phase91') && html.includes('duration-installment-panel') && html.includes('duration-installment-controls') && !html.includes('class="duration-plan-actions"') && readText('assets/js/modules/04-duration-installments.js').includes('duration-plan-title-with-actions') && readText('assets/css/buildplan.css').includes('duration-plan-title-actions') && readText('assets/css/buildplan.css').includes('duration-installment-controls') && readText('assets/css/buildplan.css').includes('#top-ribbon .top-page-btn'));
 
-check('phase86-dashboard-installment-row-gantt', html.includes('assets/css/buildplan.css?v=phase90') && html.includes('assets/js/modules/04-duration-installments.js?v=phase87') && html.includes('assets/js/modules/06-actual-dashboard.js?v=phase87') && readText('assets/js/modules/04-duration-installments.js').includes('applyDurationPlanSingle') && readText('assets/js/modules/04-duration-installments.js').includes('duration-plan-row-action') && !readText('assets/js/modules/04-duration-installments.js').includes('compact.range') && readText('assets/js/modules/06-actual-dashboard.js').includes('getDashboardInstallmentSummary') && readText('assets/css/buildplan.css').includes('Phase 86: dashboard installment KPI'));
+check('phase86-dashboard-installment-row-gantt', html.includes('assets/css/buildplan.css?v=phase91') && html.includes('assets/js/modules/04-duration-installments.js?v=phase91') && html.includes('assets/js/modules/06-actual-dashboard.js?v=phase87') && readText('assets/js/modules/04-duration-installments.js').includes('applyDurationPlanSingle') && readText('assets/js/modules/04-duration-installments.js').includes('duration-plan-row-action') && !readText('assets/js/modules/04-duration-installments.js').includes('compact.range') && readText('assets/js/modules/06-actual-dashboard.js').includes('getDashboardInstallmentSummary') && readText('assets/css/buildplan.css').includes('Phase 86: dashboard installment KPI'));
 
-check('phase87-print-highlight-fixes', html.includes('assets/css/buildplan.css?v=phase90') && html.includes('assets/js/modules/04-duration-installments.js?v=phase87') && html.includes('assets/js/modules/05-gantt-rendering.js?v=phase88') && html.includes('assets/js/modules/06-actual-dashboard.js?v=phase87') && readText('assets/js/modules/03-ui-controls-print.js').includes('printAppPageReport') && readText('assets/js/modules/05-gantt-rendering.js').includes('setupGanttSelectionClearListener') && readText('assets/js/modules/04-duration-installments.js').includes('setupDurationPlanSelectionClearListener') && readText('assets/css/buildplan.css').includes('Phase 87: compact executive print and app page print fallback') && readText('assets/js/modules/06-actual-dashboard.js').includes('slice(0, 3)'));
+check('phase87-print-highlight-fixes', html.includes('assets/css/buildplan.css?v=phase91') && html.includes('assets/js/modules/04-duration-installments.js?v=phase91') && html.includes('assets/js/modules/05-gantt-rendering.js?v=phase91') && html.includes('assets/js/modules/06-actual-dashboard.js?v=phase87') && readText('assets/js/modules/03-ui-controls-print.js').includes('printAppPageReport') && readText('assets/js/modules/05-gantt-rendering.js').includes('setupGanttSelectionClearListener') && readText('assets/js/modules/04-duration-installments.js').includes('setupDurationPlanSelectionClearListener') && readText('assets/css/buildplan.css').includes('Phase 87: compact executive print and app page print fallback') && readText('assets/js/modules/06-actual-dashboard.js').includes('slice(0, 3)'));
 
-check('phase88-selection-clear-guideline-fa-icons', html.includes('assets/css/buildplan.css?v=phase90') && html.includes('assets/js/modules/05-gantt-rendering.js?v=phase88') && html.includes('fa-regular fa-pen-to-square') && html.includes('fa-solid fa-calculator') && html.includes('fa-regular fa-calendar-plus') && html.includes('fa-solid fa-chart-line') && readText('assets/js/modules/05-gantt-rendering.js').includes("index === null || index === undefined || index === ''"));
+check('phase88-selection-clear-guideline-fa-icons', html.includes('assets/css/buildplan.css?v=phase91') && html.includes('assets/js/modules/05-gantt-rendering.js?v=phase91') && html.includes('fa-regular fa-pen-to-square') && html.includes('fa-solid fa-calculator') && html.includes('fa-regular fa-calendar-plus') && html.includes('fa-solid fa-chart-line') && readText('assets/js/modules/05-gantt-rendering.js').includes("index === null || index === undefined || index === ''"));
+check('phase91-toolbar-duration-print',
+  html.includes('title="Gantt / S-Curve"') &&
+  html.includes('title="Project Value"') &&
+  html.includes('title="Payment Milestone"') &&
+  html.includes('title="Actual Progress"') &&
+  !html.includes('top-page-labeled') &&
+  !html.includes('btn-toggle-gantt-style') &&
+  html.includes('btn-plan-add-task') &&
+  html.includes('04-duration-installments.js?v=phase91') &&
+  html.includes('05-gantt-rendering.js?v=phase91') &&
+  readText('assets/js/modules/04-duration-installments.js').includes('updateDurationPlanCustomStart') &&
+  readText('assets/js/modules/04-duration-installments.js').includes('work-duration-date') &&
+  readText('assets/css/buildplan.css').includes('Phase 91: compact labeled app navigation') &&
+  readText('assets/css/buildplan.css').includes('body.gantt-report-print #today-line-layer *') &&
+  !html.includes('bg-amber-50 border-b border-amber-100 text-sm text-amber-800')
+);
+
+
+check('phase92-icon-only-exact-gantt-bounds',
+  html.includes('title="Gantt / S-Curve"') &&
+  !html.includes('top-page-labeled') &&
+  readText('assets/js/modules/04-duration-installments.js').includes('monthPosition(targetDate) - monthPosition(projectStartDate)') &&
+  readText('assets/js/modules/04-duration-installments.js').includes('projectStartDate = new Date(minDate)') &&
+  readText('assets/css/buildplan.css').includes('Phase 92: keep top page navigation icon-only')
+);
+
+
+check('phase93-gantt-buffer-value-delta',
+  readText('assets/js/modules/04-duration-installments.js').includes('projectStartDate.setDate(projectStartDate.getDate() - 7)') &&
+  readText('assets/js/modules/04-duration-installments.js').includes('projectEndDate.setDate(projectEndDate.getDate() + 7)') &&
+  readText('assets/js/modules/06-actual-dashboard.js').includes('valueDeltaCardClass') &&
+  readText('assets/js/modules/06-actual-dashboard.js').includes("metrics.valueDelta < 0 ? 'dashboard-kpi-danger' : 'dashboard-kpi-green'")
+);
+
 const report = {
   ok: checks.every((item) => item.ok),
   checkedAt: new Date().toISOString(),

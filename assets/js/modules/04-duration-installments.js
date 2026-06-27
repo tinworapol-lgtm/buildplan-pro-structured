@@ -401,6 +401,7 @@
             }
             if (!durationPlanSettings[key].allocations) durationPlanSettings[key].allocations = {};
             if (!durationPlanSettings[key].startMode) durationPlanSettings[key].startMode = 'recommended';
+            if (typeof durationPlanSettings[key].customStart !== 'string') durationPlanSettings[key].customStart = '';
             return durationPlanSettings[key];
         }
 
@@ -497,17 +498,32 @@
                 seenDates.add(key);
                 return true;
             });
-            const mode = entry.startMode || 'recommended';
-            const selected = options.find(option => option.mode === mode) || options[0];
+            const customStart = parseDurationPlanDate(entry.customStart);
+            const mode = customStart ? 'custom' : (entry.startMode || 'recommended');
+            const selected = customStart ? { mode: 'custom', label: 'Custom: ' + formatDateDisplay(customStart), date: clampDate(customStart, early, late) } : (options.find(option => option.mode === mode) || options[0]);
             const endDate = new Date(selected.date);
             endDate.setDate(endDate.getDate() + duration - 1);
-            return { valid: true, options, startDate: selected.date, endDate, windowStart, windowEnd };
+            return { valid: true, options, startDate: selected.date, endDate, windowStart, windowEnd, latestStart: late };
         }
 
         function clampDate(date, min, max) {
             if (date < min) return new Date(min);
             if (date > max) return new Date(max);
             return new Date(date);
+        }
+
+        function parseDurationPlanDate(value) {
+            if (!value) return null;
+            const date = new Date(String(value) + 'T00:00:00');
+            if (!(date instanceof Date) || isNaN(date.getTime())) return null;
+            date.setHours(0, 0, 0, 0);
+            return date;
+        }
+
+        function formatDurationPlanRange(suggestion) {
+            if (!suggestion?.valid || !suggestion.windowStart || !suggestion.windowEnd) return suggestion?.message || '-';
+            const rangeEnd = suggestion.latestStart || suggestion.windowEnd;
+            return formatDateToThai(safeFormatDate(suggestion.windowStart)) + ' - ' + formatDateToThai(safeFormatDate(rangeEnd));
         }
 
         function updateDurationPlanDays(taskId, value) {
@@ -530,8 +546,19 @@
         function updateDurationPlanStartMode(taskId, mode) {
             const entry = getDurationPlanEntry(taskId);
             entry.startMode = mode || 'recommended';
+            if (entry.startMode !== 'custom') entry.customStart = '';
             applyDurationPlanToTask(taskId, false);
             renderDurationPlanTable();
+            scheduleAutoSave();
+        }
+
+        function updateDurationPlanCustomStart(taskId, value) {
+            const entry = getDurationPlanEntry(taskId);
+            entry.customStart = value || '';
+            entry.startMode = entry.customStart ? 'custom' : 'recommended';
+            applyDurationPlanToTask(taskId, false);
+            renderDurationPlanTable();
+            renderUI();
             scheduleAutoSave();
         }
 
@@ -644,7 +671,7 @@
                 </div>`).join('');
 
             const rows = tasks.filter(task => !task.isMilestone).map(task => renderDurationPlanRow(task, periods, compact)).join('');
-            const minTableWidth = compact.no + compact.name + compact.days + compact.total + compact.start + compact.action + (compact.period * periods.length);
+            const minTableWidth = compact.no + compact.name + compact.days + compact.total + compact.start + compact.customStart + compact.action + (compact.period * periods.length);
             table.innerHTML = `
                 <div class="duration-plan-title duration-plan-title-with-actions"><span>&#3605;&#3634;&#3619;&#3634;&#3591;&#3649;&#3610;&#3656;&#3591; % &#3591;&#3623;&#3604;&#3591;&#3634;&#3609;</span><div class="duration-plan-title-actions"><button type="button" onclick="autoDistributeDurationPlan()" class="duration-plan-action-btn duration-plan-action-secondary"><i class="fa-solid fa-scale-balanced"></i> &#3648;&#3593;&#3621;&#3637;&#3656;&#3618; % &#3605;&#3634;&#3617;&#3594;&#3656;&#3623;&#3591;&#3648;&#3623;&#3621;&#3634;&#3648;&#3604;&#3636;&#3617;</button></div></div>
                 <div class="duration-plan-inner" style="min-width:${minTableWidth}px">
@@ -657,7 +684,8 @@
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center" style="width:${compact.days}px">วัน</div>
                     ${installmentHeaders}
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center" style="width:${compact.total}px">ผลรวม</div>
-                    <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.start}px">แนะนำวันเริ่ม</div>
+                    <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.start}px">&#3649;&#3609;&#3632;&#3609;&#3635;&#3594;&#3656;&#3623;&#3591;&#3648;&#3619;&#3636;&#3656;&#3617;</div>
+                    <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.customStart}px">&#3648;&#3621;&#3639;&#3629;&#3585;&#3623;&#3633;&#3609;&#3648;&#3619;&#3636;&#3656;&#3617;</div>
                     <div class="header-cell shrink-0 h-full text-black font-bold flex items-center justify-center text-[11px]" style="width:${compact.action}px">&#3611;&#3619;&#3633;&#3610; Gantt Chart</div>
                 </div>
                 <div>${rows || '<div class="px-6 py-8 text-center text-slate-400 text-sm">ยังไม่มีรายการปฏิบัติงาน</div>'}</div>
@@ -720,16 +748,17 @@
             const no = 50;
             const days = 70;
             const total = 92;
-            const start = 150;
+            const start = 168;
+            const customStart = 132;
             const action = 118;
             const count = Math.max(1, periodCount);
             const minPeriod = 72;
             const maxPeriod = 96;
-            const fixedWidth = no + days + total + start + action;
+            const fixedWidth = no + days + total + start + customStart + action;
             const name = clampDurationTaskNameColumnWidth(durationTaskNameColumnWidth);
             const available = Math.max(0, tableWidth - fixedWidth - name);
             const period = Math.min(maxPeriod, Math.max(minPeriod, Math.floor(available / count) || minPeriod));
-            return { no, name, days, period, total, start, action };
+            return { no, name, days, period, total, start, customStart, action };
         }
 
         function setupDurationNameColumnResizer() {
@@ -776,13 +805,13 @@
                         ${editable ? `<div class="flex items-center justify-center gap-1 min-w-0"><input type="number" min="0" max="100" step="0.01" value="${value}" onchange="updateDurationPlanPercent(${task.id}, ${period.no}, this.value)" class="work-duration-percent"><span class="work-duration-percent-sign">%</span></div>` : '<span class="text-xs text-slate-400">-</span>'}
                     </div>`;
             }).join('');
-            const options = suggestion.options?.length ? suggestion.options.map(option => `
-                <option value="${option.mode}" ${(entry.startMode || 'recommended') === option.mode ? 'selected' : ''}>${option.label}</option>
-            `).join('') : '';
-            const selectHtml = editable && suggestion.valid ? `
-                <select class="work-duration-select" onchange="updateDurationPlanStartMode(${task.id}, this.value)">
-                    ${options}
-                </select>` : `<span class="text-xs font-bold text-slate-400">${suggestion.message || '-'}</span>`;
+            const rangeHtml = editable && suggestion.valid
+                ? `<span class="work-duration-range" title="${formatDurationPlanRange(suggestion)}">${formatDurationPlanRange(suggestion)}</span>`
+                : `<span class="text-xs font-bold text-slate-400">${suggestion.message || '-'}</span>`;
+            const customStartValue = entry.customStart || (suggestion.valid && suggestion.startDate ? safeFormatDate(suggestion.startDate) : '');
+            const customStartHtml = editable && suggestion.valid
+                ? `<input type="date" value="${customStartValue}" min="${suggestion.windowStart ? safeFormatDate(suggestion.windowStart) : ''}" max="${suggestion.latestStart ? safeFormatDate(suggestion.latestStart) : (suggestion.windowEnd ? safeFormatDate(suggestion.windowEnd) : '')}" onchange="updateDurationPlanCustomStart(${task.id}, this.value)" class="work-duration-date">`
+                : '<span class="text-xs font-bold text-slate-400">-</span>';
             const actionHtml = editable
                 ? `<button type="button" onclick="applyDurationPlanSingle(${task.id})" class="duration-plan-row-action" ${totalOk ? '' : 'title="ต้องใส่ % รวม 100% ก่อน"'}><i class="fa-solid fa-arrow-right-to-bracket"></i> Gantt</button>`
                 : '<span class="text-xs font-bold text-slate-400">-</span>';
@@ -797,7 +826,8 @@
                     <div class="cell shrink-0 justify-center px-2" style="width:${compact.total}px">
                         <span class="text-[12px] font-black whitespace-nowrap ${totalOk ? 'text-emerald-700' : 'text-red-600'}">${editable ? total.toFixed(2) + '%' : '-'}</span>
                     </div>
-                    <div class="cell shrink-0 justify-center px-1" style="width:${compact.start}px">${selectHtml}</div>
+                    <div class="cell shrink-0 justify-center px-1" style="width:${compact.start}px">${rangeHtml}</div>
+                    <div class="cell shrink-0 justify-center px-1" style="width:${compact.customStart}px">${customStartHtml}</div>
                     <div class="cell shrink-0 justify-center px-1" style="width:${compact.action}px">${actionHtml}</div>
                 </div>`;
         }
@@ -885,19 +915,22 @@
             if (currentScale === 'daily') return days * colWidth;
             if (currentScale === 'weekly') return (days / 7) * colWidth;
             if (currentScale === 'monthly') {
-                let months = (targetDate.getFullYear() - projectStartDate.getFullYear()) * 12 + (targetDate.getMonth() - projectStartDate.getMonth());
-                let daysInMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0).getDate();
-                let exactMonthOffset = months + (targetDate.getDate() - 1 + (targetDate.getHours() / 24) + (targetDate.getMinutes() / 1440)) / daysInMonth;
-                return exactMonthOffset * colWidth;
+                const monthPosition = (date) => {
+                    const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+                    const dayFraction = (date.getDate() - 1 + (date.getHours() / 24) + (date.getMinutes() / 1440)) / daysInMonth;
+                    return (date.getFullYear() * 12) + date.getMonth() + dayFraction;
+                };
+                return (monthPosition(targetDate) - monthPosition(projectStartDate)) * colWidth;
             }
             if (currentScale === 'yearly') {
-                let years = targetDate.getFullYear() - projectStartDate.getFullYear();
-                let isLeap = new Date(targetDate.getFullYear(), 1, 29).getMonth() === 1;
-                let daysInYear = isLeap ? 366 : 365;
-                let startOfYear = new Date(targetDate.getFullYear(), 0, 1);
-                let dayOfYear = (targetDate - startOfYear) / (1000 * 60 * 60 * 24); 
-                let exactYearOffset = years + (dayOfYear / daysInYear);
-                return exactYearOffset * colWidth;
+                const yearPosition = (date) => {
+                    const isLeap = new Date(date.getFullYear(), 1, 29).getMonth() === 1;
+                    const daysInYear = isLeap ? 366 : 365;
+                    const startOfYear = new Date(date.getFullYear(), 0, 1);
+                    const dayOfYear = (date - startOfYear) / (1000 * 60 * 60 * 24);
+                    return date.getFullYear() + (dayOfYear / daysInYear);
+                };
+                return (yearPosition(targetDate) - yearPosition(projectStartDate)) * colWidth;
             }
             return 0;
         }
@@ -1187,30 +1220,20 @@
                 else if (safeTotalDays > 45) preferredScale = 'weekly';
                 else preferredScale = 'daily';
             }
-
-            // --- เพิ่มระยะขอบว่าง (Buffer) ด้านขวาเล็กน้อย เพื่อป้องกันข้อความ/ลูกศรของงานสุดท้ายตกขอบเวลาพิมพ์ ---
             if (preferredScale === 'yearly') {
                 currentScale = 'yearly'; colWidth = 160;
-                projectStartDate = new Date(minDate.getFullYear() - 1, 0, 1);
-                projectEndDate = new Date(maxDate.getFullYear() + 1, 11, 31); // เผื่อ 1 ปี
             } else if (preferredScale === 'monthly') {
-                currentScale = 'monthly'; colWidth = 120; 
-                projectStartDate = new Date(minDate.getFullYear(), minDate.getMonth() - 1, 1);
-                projectEndDate = new Date(maxDate.getFullYear(), maxDate.getMonth() + 2, 0); // เผื่อ 1 เดือน
+                currentScale = 'monthly'; colWidth = 120;
             } else if (preferredScale === 'weekly') {
                 currentScale = 'weekly'; colWidth = 60;
-                projectStartDate = new Date(minDate);
-                projectStartDate.setDate(projectStartDate.getDate() - 3);
-                projectEndDate = new Date(maxDate);
-                projectEndDate.setDate(projectEndDate.getDate() + 3);
             } else {
                 currentScale = 'daily'; colWidth = 25;
-                projectStartDate = new Date(minDate);
-                projectStartDate.setDate(projectStartDate.getDate() - 3);
-                projectEndDate = new Date(maxDate);
-                projectEndDate.setDate(projectEndDate.getDate() + 3);
             }
-            projectStartDate.setHours(0, 0, 0, 0); 
+            projectStartDate = new Date(minDate);
+            projectStartDate.setDate(projectStartDate.getDate() - 7);
+            projectEndDate = new Date(maxDate);
+            projectEndDate.setDate(projectEndDate.getDate() + 7);
+            projectStartDate.setHours(0, 0, 0, 0);
             projectEndDate.setHours(23, 59, 59, 999); 
             
             renderUI();

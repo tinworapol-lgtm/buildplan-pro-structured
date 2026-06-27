@@ -185,6 +185,26 @@
                         border-right: 1px solid #000 !important;
                         box-sizing: border-box !important;
                     }
+                    #today-line-layer, #today-line-layer *, .today-progress-popover, .today-progress-popover * {
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    #today-line-layer {
+                        display: block !important;
+                        position: absolute !important;
+                        z-index: 2147483000 !important;
+                        overflow: visible !important;
+                    }
+                    #today-line-layer .today-line-display-zone {
+                        display: block !important;
+                        overflow: visible !important;
+                    }
+                    #today-line-layer .today-progress-popover, .today-progress-popover {
+                        display: block !important;
+                        z-index: 2147483002 !important;
+                    }
                 }
             `;
             
@@ -201,22 +221,11 @@
         }
 
         function updateGanttStyleToggleButton() {
-            const btn = document.getElementById('btn-toggle-gantt-style');
-            if (!btn) return;
-            if (ganttBarStyleMode === 'classic') {
-                btn.textContent = 'Modern';
-                btn.className = 'plan-mode-btn plan-mode-btn-active';
-                btn.title = 'สลับเป็นรูปแบบ Modern';
-            } else {
-                btn.textContent = 'Classic';
-                btn.className = 'plan-mode-btn';
-                btn.title = 'สลับเป็นรูปแบบ Classic';
-            }
+            ganttBarStyleMode = 'classic';
         }
 
         function toggleGanttBarStyle() {
-            ganttBarStyleMode = ganttBarStyleMode === 'classic' ? 'modern' : 'classic';
-            updateGanttStyleToggleButton();
+            ganttBarStyleMode = 'classic';
             renderUI();
         }
 
